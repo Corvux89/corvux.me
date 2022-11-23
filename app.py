@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
 
 from constants import WEB_DEBUG
@@ -32,6 +32,14 @@ def setup_cards(file: str, link: str) -> str:
     return str
 
 
+@app.before_request
+def before_request():
+    if not request.is_secure and not WEB_DEBUG:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+
+
 @app.route('/')
 @app.route('/home')
 def homepage():
@@ -61,6 +69,7 @@ def atw_era_2():
 
     return render_template("game_main.html", players=players, header="Abeir-Toril Walkabout: Era 2")
 
+
 @app.route('/Abeir-Toril_Walkabout/Era2/<player>')
 def atw_era_2_player(player):
     f = open('data/era2players.json', encoding="utf8")
@@ -70,11 +79,13 @@ def atw_era_2_player(player):
     return render_template("player.html", player=players[player],
                            button_caption="Back to Era 2", button_link="/Abeir-Toril_Walkabout/Era2")
 
+
 @app.route('/Abeir-Toril_Walkabout/Saga3')
 def atw_saga_3():
     players = setup_cards('data/saga3players.json', '/Abeir-Toril_Walkabout/Saga3/')
 
     return render_template("game_main.html", players=players, header="Abeir-Toril Walkabout: Saga 3")
+
 
 @app.route('/Abeir-Toril_Walkabout/Saga3/<player>')
 def atw_saga_3_player(player):

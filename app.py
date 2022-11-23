@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 
 from constants import WEB_DEBUG
@@ -24,20 +24,15 @@ def setup_cards(file: str, link: str) -> str:
     for p in players.keys():
         player = players[p]
         str += "<div class=\"card rounded-4\">"
-        str += "<img class=\"card-img-top\" src=\"/static/" + player['image'] + "\">"
+        if player['image'] == "":
+            str += "<img class=\"card-img-top\" src=\"/static/images/Placeholder.png\">"
+        else:
+            str += "<img class=\"card-img-top\" src=\"/static/" + player['image'] + "\">"
         str += "<div class=\"card-body\">"
         str += "<h5 class=\"card-title\">" + player['name'] + "</h5>"
         str += "<a href=\"" + link + p + "\" class=\"stretched-link\"></a></div></div>"
 
     return str
-
-
-@app.before_request
-def before_request():
-    if not request.is_secure and not WEB_DEBUG:
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
 
 
 @app.route('/')

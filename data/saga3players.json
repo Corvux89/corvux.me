@@ -1,8 +1,57 @@
 {
+
+  "archimedes": {
+    "name": "Archimedes Charp Darnamin",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vS8Hy8WgzySlCDKjanxf9XraqaGAH0imBvoQPEIf_WxpLEaapz_YoAAKFRin4bteLAPCFB5XiQa9PCk/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "cilleck": {
+    "name": "Cilleck",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vRch9ZwOKB7FrMJQ9qssFQ7cRwR6qrbpJE-ZqmdqhwT2droQ98e9PkezT2JfAQSNDonXsEvOZaCgkck/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "claudite": {
+    "name": "Claudite Yoshin",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQFbr7Cd653dFtrRz6y4iD1WClznO7Mxo1J3UsdLImjOLa328_GEZUFzh3pJWB0rAf_Cl4wpLt4iS0K/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "goda": {
+    "name": "Goda",
+    "subtitle": "Zabrak | Guardian",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQog3LHOvdM__rlFAtpZExWIwiZoDb6Pw4S5KUQ_yjiJflJ3dsIYOyAhlst6bBKLtWIWjml_LfZ04gE/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Saga 3/goda.png",
+    "figcaption": ""
+  },
+
+  "rino": {
+    "name": "Rino",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vRAE2kJqWJZleB4OLIqe2eou1LHT69wFvpnMrATXRciEMGPvj8P8HpZG3mzzjzIAEb2iFXZfLpikhH1/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "stan": {
+    "name": "Stan Q",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQog3LHOvdM__rlFAtpZExWIwiZoDb6Pw4S5KUQ_yjiJflJ3dsIYOyAhlst6bBKLtWIWjml_LfZ04gE/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
   "other": {
     "name": "Other Characters",
     "subtitle": "",
-    "url":"https://docs.google.com/document/d/e/2PACX-1vQg_fDPjKRkivDiXKgzW16W3oHYem9xtRWxVfEBisMHrqtPY6lb7MlIAcIEaOUilLO811Dam0yy-awt/pub?embedded=true",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQN1FnZrPa1vihYIq95MI8HwGfm_6YBWWcooZanrpez6LJQJB9Ysh3q2SMwTsEHU0GFwEvnpHsIR-XZ/pub?embedded=true",
     "image": "images/dice.jpg",
     "figcaption": ""
   },
@@ -10,7 +59,7 @@
   "synopsis": {
     "name": "Synopsis",
     "subtitle": "",
-    "url":"https://docs.google.com/document/d/e/2PACX-1vT54r4zTcvqjn2UO4mE9w6E76ZsRBnUkeZA0e7n6G9xUro2Gct7QUwadVFqu7s_LNiHEEUsnB31T_5s/pub?embedded=true",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vTEF_F_7NCyHCcRe3dRQDTS0aB4GKukaxZcTFby39DbTyiDduyCDUSZFKC8rOe5yaoxr8d6oTcywMYs/pub?embedded=true",
     "image": "images/dice.jpg",
     "figcaption": ""
   }

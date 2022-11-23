@@ -70,6 +70,21 @@ def atw_era_2_player(player):
     return render_template("player.html", player=players[player],
                            button_caption="Back to Era 2", button_link="/Abeir-Toril_Walkabout/Era2")
 
+@app.route('/Abeir-Toril_Walkabout/Saga3')
+def atw_saga_3():
+    players = setup_cards('data/saga3players.json', '/Abeir-Toril_Walkabout/Saga3/')
+
+    return render_template("game_main.html", players=players, header="Abeir-Toril Walkabout: Saga 3")
+
+@app.route('/Abeir-Toril_Walkabout/Saga3/<player>')
+def atw_saga_3_player(player):
+    f = open('data/saga3players.json', encoding="utf8")
+    data = f.read()
+    players = json.loads(data)
+    p = players[player]
+    return render_template("player.html", player=players[player],
+                           button_caption="Back to Saga 3", button_link="/Abeir-Toril_Walkabout/Saga3")
+
 
 if __name__ == "__main__":
     app.run()

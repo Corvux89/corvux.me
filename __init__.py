@@ -1,15 +1,16 @@
 import json
-import os.path
 
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
+
+from constants import WEB_DEBUG
 
 app = Flask(__name__)
 
 Bootstrap(app)
 
 app.config.update(
-    DEBUG=True,
+    DEBUG=WEB_DEBUG,
 )
 
 

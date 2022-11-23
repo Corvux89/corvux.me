@@ -18,8 +18,8 @@
   "golgrim": {
     "name": "Golgrim",
     "subtitle": "",
-    "url":"",
-    "image": "",
+    "url":"/static/images/Placeholder.png",
+    "image": "/images/Placeholder.png",
     "figcaption": ""
   },
 
@@ -50,7 +50,7 @@
   "nox": {
     "name": "Nox",
     "subtitle": "Dragonborn | Paladin",
-    "url":"",
+    "url":"/static/images/Placeholder.png",
     "image": "/images/Abeir-Toril Walkabout/Era 2/nox.jpg",
     "figcaption": "Smith, Oliver. \"Fantasy Painting.\" <em>Artstation</em>, 2017, <a href=\"https://cdna.artstation.com/p/assets/images/images/007/909/728/large/oliver-smith-bronzedragonbron4.jpg?1509301827\">cdna.artstation.com/p/assets/images/images/007/909/728/large/oliver-smith-bronzedragonbron4.jpg?1509301827</a>"
   },

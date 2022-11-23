@@ -1,46 +1,13 @@
 import json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from flask_bootstrap import Bootstrap
-from flask_talisman import Talisman
 
 from constants import WEB_DEBUG
 
 app = Flask(__name__)
 
 Bootstrap(app)
-
-
-csp = {
-    'default-src': [
-        '\'self\'',
-        'https://docs.google.com',
-        'https://code.jquery.com/'
-        'https://cdn.jsdelivr.net/npm/',
-        'https://www.googletagmanager.com/',
-        'https://analytics.google.com/',
-        'https://www.google-analytics.com/'
-    ],
-    'script-src': [
-        '\'self\'',
-        'https://code.jquery.com/',
-        'https://cdn.jsdelivr.net/',
-        'https://www.googletagmanager.com/'
-        ],
-    'img-src': '*',
-
-    'style-src': [
-        '\'self\'',
-        'https://cdn.jsdelivr.net/'
-    ]
-}
-
-talisman = Talisman(
-    app,
-    content_security_policy=csp,
-    content_security_policy_nonce_in=['script-src', 'style-src']
-)
-
 
 app.config.update(
     DEBUG=WEB_DEBUG,
@@ -57,15 +24,20 @@ def setup_cards(file: str, link: str) -> str:
     for p in players.keys():
         player = players[p]
         str += "<div class=\"card rounded-4\">"
-        if player['image'] == "":
-            str += "<img class=\"card-img-top\" src=\"/static/images/Placeholder.png\">"
-        else:
-            str += "<img class=\"card-img-top\" src=\"/static/" + player['image'] + "\">"
+        str += "<img class=\"card-img-top\" src=\"/static/" + player['image'] + "\">"
         str += "<div class=\"card-body\">"
         str += "<h5 class=\"card-title\">" + player['name'] + "</h5>"
         str += "<a href=\"" + link + p + "\" class=\"stretched-link\"></a></div></div>"
 
     return str
+
+
+@app.before_request
+def before_request():
+    if not request.is_secure and not WEB_DEBUG:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 
 @app.route('/')

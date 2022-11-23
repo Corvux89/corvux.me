@@ -23,7 +23,7 @@ def setup_cards(file: str, link: str) -> str:
     str = ""
     for p in players.keys():
         player = players[p]
-        str += "<div class=\"card\">"
+        str += "<div class=\"card rounded-4\">"
         str += "<img class=\"card-img-top\" src=\"/static/" + player['image'] + "\">"
         str += "<div class=\"card-body\">"
         str += "<h5 class=\"card-title\">" + player['name'] + "</h5>"

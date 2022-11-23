@@ -1,0 +1,65 @@
+{
+  "corvux": {
+    "name": "Corvux Dawnslayer",
+    "subtitle": "Aasimar | Paladin",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQtafCUIlwCSwqyF0TkWER1LTEfZg_sz0eLdOJnOViD_nVHP5_dAD03frUxdfUgIv51fekSpwmt9Ear/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Era 1/Corvux.jpg",
+    "figcaption": "Exmakina. \"Adolin Kholin.\" <em>Tumblr</em>, 15 Oct. 2013, <a href=\"https://exmakina.tumblr.com\">exmakina.tumblr.com</a>"
+  },
+
+  "rannek": {
+    "name": "Rannek(s) & F****ing Boy",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQ4tz8pM00NkLk-bXX8kY6XNeKSXqLhReVLH4LwVnbMdKSLAnMWrDHOvIRSP1J29eg6BJXvtk7mXwSG/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "rosna": {
+    "name": "Rosna Irida & Clawdia",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vTlrEgB4zUxsJV1y5kTiyOtxd9c9--7uXa5FSHYbwC9wdFwFHycJdgovKP-kwvG_zI8OZrHJAoUVsG8/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Era 1/Rosna.jpg",
+    "figcaption": "Esaulov, Igor. \"Wizard of Leandriss Church.\" <em>Deviant Art</em>, 12 Apr. 2012, <a href=\"https://www.deviantart.com/igor-esaulov/art/Wizard-of-Leandriss-Church-295619526\">www.deviantart.com/igor-esaulov/art/Wizard-of-Leandriss-Church-295619526</a>"
+  },
+
+  "silmeria": {
+    "name": "Silmeria & Fafnir",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vSU2pVV7CPohP--oQMm0nbOWu93qpTny1_nmhUy3TjYqFFgwhx7Tt9tE115ZD81VTqzH3WWN06lKBOq/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Era 1/Silmeria.jpg",
+    "figcaption": "LunarRose. \"DesignCrowd.\" <em>DesignCrowd</em>, 20 Mar. 2010, <a href=\"https://www.designcrowd.com/design/8904554\">www.designcrowd.com/design/8904554</a>"
+  },
+
+  "thomious": {
+    "name": "Thomious & Bill",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vR5LNichZ-IpGyJoVWRjxFYpudkCrw6qMiG5FQieVLFRNsBiZl1DPUl2gOUj8i5yAlAI9KDTEubi3PB/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Era 1/Thomious.jpg",
+    "figcaption": "Artwork: Abrantes, Carlina. \"Caleb.\" <em>Artstation</em>, 2017, <a href=\"https://www.artstation.com/artwork/Xlrel\">www.artstation.com/artwork/Xlrel<a>"
+  },
+
+  "wanderer": {
+    "name": "The Wanderer",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQthIKHf4MKHEBLWMJXb5SqbiIOW2I9FYbexawF5LdqjNtxT0zA7b2MM0TlCisfoYpr1LzVIGJh01k8/pub?embedded=true",
+    "image": "images/Placeholder.png",
+    "figcaption": ""
+  },
+
+  "other": {
+    "name": "Other Characters",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vQbjYompo_r2U3FnPgN8qcpCiMOnPxn0VNjDtbH13_7EszDzL5jitTru9vftzzyyWBFHxZdEaAjt9Wk/pub?embedded=true",
+    "image": "images/dice.jpg",
+    "figcaption": ""
+  },
+
+  "synopsis": {
+    "name": "Synopsis",
+    "subtitle": "",
+    "url":"https://docs.google.com/document/d/e/2PACX-1vSI42PliwhxNkM9l_w4CWDOyHHCj9nnoENl7sFjfsONXxM-1Oq--VHqS058yK7TAQtblte0Vfa77pNG/pub?embedded=true",
+    "image": "images/dice.jpg",
+    "figcaption": ""
+  }
+}

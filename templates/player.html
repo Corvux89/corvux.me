@@ -1,0 +1,24 @@
+{% extends "template.html" %} {% block body %}
+
+<div class="banner">
+    <div class="player-pic">
+        <img  class="portrait" src="{{ url_for('static', filename=player.image) }}" >
+            <!--Portrait Caption -->
+        <div class="figcaption">{{ player.figcaption | safe}}</div>
+    </div>
+
+    <div class="name-group">
+        <h1 class="name"> {{ player.name }}</h1>
+        <h3 class="sub-name">{{ player.subtitle }}</h3>
+    </div>
+
+    <a href="{{ button_link }}" class="btn btn-info" role="button">{{ button_caption }}</a>
+
+</div>
+
+<div class="embed-responsive embed-responsive-1by1">
+    <iframe class="embed-responsive-item" src={{ player.url }} allowtransparency="true" frameborder="0">
+    </iframe>
+</div>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+h1{
+    font-family: verdana;
+    margin-left: 15px;
+    color: white;
+    text-align: center;
+}
+
+h2,
+h3,
+h4,
+p {
+    font-family: verdana;
+    margin-left: 15px;
+    color: white;
+}
+
+body {
+    display: inline;
+    font-family: verdana;
+    background-color: #2C2F33;
+}
+
+.card-deck{
+    padding: 1rem;
+}
+
+.card-deck .card{
+    margin-bottom: 15px;
+}
+
+.card {
+    background-color: rgba(166,166,166,1);
+    color: black;
+    max-width: 13rem;
+    min-width: 13rem;
+    position: relative;
+}
+
+.card-title{
+    font-size: 110%;
+    text-align: left;
+    margin-bottom: .75rem;
+    word-wrap: break-word;
+}
+
+.card-img-top {
+    width: auto;
+    height: 100%;
+    object-fit: scale-down;
+}
+
+.player-pic{
+    display: inline-block;
+    width=20rem;
+    height: auto;
+}
+
+.portrait{
+    width: auto;
+    height: 18rem;
+    position: relative;
+    padding: 5px;
+}
+
+.name-group{
+    display: inline-block;
+    flex-direction: column;
+    padding-top: 4rem;
+    vertical-align: top;
+    max-width: 80rem;
+}
+
+.sub-name{
+    font-style: italic;
+    font-size: 95%;
+    text-align: center;
+}
+
+.btn{
+    vertical-align: bottom;
+    display: block;
+    position: relative;
+    width: 200px;
+}
+
+.banner{
+    padding-bottom: 25px;
+    padding-left: 15px;
+}
+
+.biography{
+    width=100%;
+}
+
+.figcaption{
+    color: white;
+    font-size: 70%;
+    max-width: 13rem;
+}
+
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
+}
+
+:root {
+    color: #d5e0e7;
+}
+
+

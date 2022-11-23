@@ -1,13 +1,7 @@
 {% extends "template.html" %} {% block body %}
 
 <div class="bg-image d-flex justify-content-center align-items-center"
-     style="background: url('/static/images/shield.png');
-     background-size: contain;
-     background-repeat: no-repeat;
-     opacity: 30%;
-     height: 100vw;
-     width: auto;
-     box-shadow: 0 0  8px 8px #2C2F33 inset;">
+     nonce="{{ csp_nonce() }}">
 </div>
 
 

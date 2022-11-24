@@ -1,3 +1,4 @@
 flask==2.2.2
 flask_bootstrap
+flask_talisman
 gunicorn

@@ -2,6 +2,7 @@ import json
 
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
+from flask_talisman import Talisman
 
 from constants import WEB_DEBUG
 
@@ -10,7 +11,7 @@ app = Flask(__name__)
 Bootstrap(app)
 
 app.config.update(
-    DEBUG=WEB_DEBUG,
+    DEBUG=WEB_DEBUG
 )
 
 
@@ -91,6 +92,35 @@ def atw_saga_3_player(player):
     return render_template("player.html", player=players[player],
                            button_caption="Back to Saga 3", button_link="/Abeir-Toril_Walkabout/Saga3")
 
+csp = {
+    'default-src': [
+        '\'self\'',
+        'https://docs.google.com',
+        'https://code.jquery.com/'
+        'https://cdn.jsdelivr.net/npm/',
+        'https://www.googletagmanager.com/',
+        'https://analytics.google.com/',
+        'https://www.google-analytics.com/'
+    ],
+    'script-src': [
+        '\'self\'',
+        'https://code.jquery.com/',
+        'https://cdn.jsdelivr.net/',
+        'https://www.googletagmanager.com/'
+        ],
+    'img-src': '*',
+
+    'style-src': [
+        '\'self\'',
+        'https://cdn.jsdelivr.net/'
+    ]
+}
+
+talisman = Talisman(
+    app,
+    content_security_policy=csp,
+    content_security_policy_nonce_in=['script-src', 'style-src']
+)
 
 if __name__ == "__main__":
     app.run()

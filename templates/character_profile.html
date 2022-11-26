@@ -1,0 +1,36 @@
+{% extends "template.html" %} {% block body %}
+
+<div class="banner">
+    <div class="character-pic">
+        <!-- Portrait Image -->
+        {% if character.image == None %}
+        <img  class="portrait" src="{{ url_for('static', filename='/images/Placeholder.png') }}" >
+        {% else %}
+        <img  class="portrait" src="{{ url_for('static', filename=character.image) }}" >
+        {% endif %}
+
+            <!--Portrait Caption -->
+        {% if character.figcaption != None %}
+        <div class="figcaption">{{ character.figcaption | safe}}</div>
+        {% endif %}
+    </div>
+
+    <div class="name-group">
+        <h1 class="name"> {{ character.name }}</h1>
+        {% if character.subtitle != None %}
+        <h3 class="sub-name">{{ character.subtitle }}</h3>
+        {% endif %}
+    </div>
+
+    <a href="{{ button_link }}" class="btn btn-info" role="button">{{ button_caption }}</a>
+
+</div>
+
+{% if character.url != None %}
+<div class="embed-responsive embed-responsive-1by1">
+    <iframe class="embed-responsive-item" src="{{ character.url }}" allowtransparency="true" frameborder="0">
+    </iframe>
+</div>
+{% endif %}
+
+{% endblock %}

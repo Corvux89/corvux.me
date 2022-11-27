@@ -3,21 +3,21 @@
 <div class="banner">
     <div class="character-pic">
         <!-- Portrait Image -->
-        {% if character.image == None %}
+        {% if character.image == None or character.image == "" %}
         <img  class="portrait" src="{{ url_for('static', filename='/images/Placeholder.png') }}" >
         {% else %}
         <img  class="portrait" src="{{ url_for('static', filename=character.image) }}" >
         {% endif %}
 
             <!--Portrait Caption -->
-        {% if character.figcaption != None %}
+        {% if character.figcaption != None or character.figcation == "" %}
         <div class="figcaption">{{ character.figcaption | safe}}</div>
         {% endif %}
     </div>
 
     <div class="name-group">
         <h1 class="name"> {{ character.name }}</h1>
-        {% if character.subtitle != None %}
+        {% if character.subtitle != None  or character.subtitle == "" %}
         <h3 class="sub-name">{{ character.subtitle }}</h3>
         {% endif %}
     </div>
@@ -26,7 +26,7 @@
 
 </div>
 
-{% if character.url != None %}
+{% if character.url != None or character.url == "" %}
 <div class="embed-responsive embed-responsive-1by1">
     <iframe class="embed-responsive-item" src="{{ character.url }}" allowtransparency="true" frameborder="0">
     </iframe>

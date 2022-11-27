@@ -7,7 +7,7 @@
     {% for character in characters %}
 
     <div class="card rounded-4">
-        {% if character.image == None %}
+        {% if character.image == None or character.image == "" %}
         <img class="card-img-top" src="/static/images/Placeholder.png">
         {% else %}
         <img class="card-img-top" src="{{ url_for('static', filename=character.image) }}">

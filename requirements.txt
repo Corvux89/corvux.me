@@ -4,3 +4,4 @@ flask_talisman
 gunicorn
 flask_sqlalchemy
 psycopg2
+flask_login

@@ -1,0 +1,85 @@
+{% extends "template.html" %} {% block body %}
+
+<script nonce="{{csp_nonce()}}">
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+});
+</script>
+
+<h1>Edit Character</h1>
+<br>
+<form action="/admin/modify_characters/{{character.page}}/{{character.key}}" method="post">
+    <div class="form-row">
+         <div class="form-group col-sm">
+            <label for="key">Key</label>
+            <input type="text" class="form-control" id="key" name="key" placeholder="Key" value="{{character.key}}" required>
+        </div>
+
+        <div class="form-group col-sm">
+            <label for="page">Page</label>
+            <input type="number" class="form-control" id="page" name="page"
+                   placeholder="Page" value="{{character.page}}" required>
+        </div>
+
+        <div class="form-group col-sm">
+            <label for="order">Order</label>
+            <input type="number" class="form-control" id="order" name="order"
+                   placeholder="Order" value="{{character.order}}">
+        </div>
+    </div>
+
+
+    <div class="form-row">
+        <div class="form-group col-sm">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name"
+                   placeholder="Character Name" value="{{character.name}}">
+        </div>
+
+        <div class="form-group col-sm">
+            <label for="name">Subtitle</label>
+            <input type="text" class="form-control" id="subtitle" name="subtitle"
+                   placeholder="Subtitle" value="{{character.subtitle}}">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-lg">
+            <label for="name">URL</label>
+            <input type="url" class="form-control" id="url" name="url" placeholder="URL" value="{{character.url}}">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-lg">
+            <label for="image">Image Path</label>
+            <input type="text" class="form-control" id="image" name="image" placeholder="Image Path"
+                   value="{{character.image}}">
+        </div>
+
+        <div class="form-group col-lg">
+            <label for="figcaption">Image Caption/Citation</label>
+            <input type="text" class="form-control" id="figcaption" name="figcaption"
+                   placeholder="Image Caption/Citation" value="{{character.figcaption}}">
+        </div>
+    </div>
+
+    <div class="form-row">
+         <div class="form-group col-sm">
+            <a href="/admin/modify_characters" class="btn btn-light" role="button">Close</a>
+        </div>
+
+        <div class="form-group col-sm">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+
+<form action="/admin/delete_character/{{character.page}}/{{character.key}}", method="post">
+    <div class="form-row">
+        <button type="submit" class="btn btn-danger" data-toggle="confirmation">Delete Character</button>
+    </div>
+</form>
+
+{% endblock %}
+

@@ -1,0 +1,24 @@
+{% extends "template.html" %} {% block body %}
+<br>
+<br>
+<form method="get">
+    <div class="col-sm-3">
+        <a href="/admin/modify_characters" class="btn btn-primary" role="button">Modify Characters</a>
+    </div>
+
+    <br>
+
+    <div class="col-sm-3">
+      <a href="/admin/add_character" class="btn btn-primary" role="button">Add Character</a>
+    </div>
+
+    <br><br><br>
+
+    <div class="col-sm-3">
+        <a href="/admin/logout" class="btn btn-secondary" role="button">Logout</a>
+    </div>
+</form>
+
+
+
+{% endblock %}

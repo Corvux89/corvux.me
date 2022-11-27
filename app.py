@@ -130,7 +130,7 @@ def admin_menu():
     return render_template('/admin/admin.html')
 
 
-@app.route('/logout')
+@app.route('/admin/logout')
 def logout():
     flask_login.logout_user()
     return redirect('/')

@@ -1,5 +1,3 @@
-import json
-
 import flask
 import flask_login
 from flask import Flask, render_template, redirect, url_for
@@ -90,6 +88,10 @@ def edit_character(page, character):
         return redirect(url_for('modify_characters'))
 
     new_char = db.session.query(Character).filter(and_(Character.key == character, Character.page == page)).one()
+    new_char.subtitle = "" if new_char.subtitle is None else new_char.subtitle
+    new_char.url = "" if new_char.url is None else new_char.url
+    new_char.image = "" if new_char.image is None else new_char.image
+    new_char.figcaption = "" if new_char.figcaption is None else new_char.figcaption
     print(new_char.name)
     return render_template('/admin/admin_character_edit.html', character=new_char)
 
@@ -155,7 +157,8 @@ def atw_era_1():
 def atw_era_1_character(character):
     character = db.session.query(Character).filter(and_(Character.key==character, Character.page == 1)).one()
     return render_template("character_profile.html", character=character,
-                           button_caption="Back to Era 1", button_link="/Abeir-Toril_Walkabout/Era1")
+                           button_caption="Back to Era 1", button_link="/Abeir-Toril_Walkabout/Era1",
+                           admin=current_user.is_authenticated)
 
 
 @app.route('/Abeir-Toril_Walkabout/Era2')
@@ -171,7 +174,8 @@ def atw_era_2():
 def atw_era_2_player(character):
     character = db.session.query(Character).filter(and_(Character.key==character, Character.page == 2)).one()
     return render_template("character_profile.html", character=character,
-                           button_caption="Back to Era 2", button_link="/Abeir-Toril_Walkabout/Era2")
+                           button_caption="Back to Era 2", button_link="/Abeir-Toril_Walkabout/Era2",
+                           admin=current_user.is_authenticated)
 
 
 @app.route('/Abeir-Toril_Walkabout/Saga3')
@@ -187,7 +191,8 @@ def atw_saga_3():
 def atw_saga_3_player(character):
     character = db.session.query(Character).filter(and_(Character.key==character, Character.page == 3)).one()
     return render_template("character_profile.html", character=character,
-                           button_caption="Back to Saga 3", button_link="/Abeir-Toril_Walkabout/Saga3")
+                           button_caption="Back to Saga 3", button_link="/Abeir-Toril_Walkabout/Saga3",
+                           admin=current_user.is_authenticated)
 
 
 csp = {

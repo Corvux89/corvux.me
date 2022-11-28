@@ -22,8 +22,15 @@
         {% endif %}
     </div>
 
-    <a href="{{ button_link }}" class="btn btn-info" role="button">{{ button_caption }}</a>
+    <div class="admin">
+         {% if admin == True %}
+         <a href="/admin/modify_characters/{{character.page}}/{{character.key}}" class="btn btn-warning btn-modify" role="button">
+        Modify this character
+        </a>
+        {% endif %}
+    </div>
 
+    <a href="{{ button_link }}" class="btn btn-info" role="button">{{ button_caption }}</a>
 </div>
 
 {% if character.url != None or character.url == "" %}

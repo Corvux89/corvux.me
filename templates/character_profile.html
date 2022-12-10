@@ -1,12 +1,12 @@
 {% extends "template.html" %} {% block body %}
 
-<div class="banner">
+<div class="banner p-2">
     <div class="character-pic">
         <!-- Portrait Image -->
         {% if character.image == None or character.image == "" %}
-        <img  class="portrait" src="{{ url_for('static', filename='/images/Placeholder.png') }}" >
+        <img  class="portrait p-1" src="{{ url_for('static', filename='/images/Placeholder.png') }}" >
         {% else %}
-        <img  class="portrait" src="{{ url_for('static', filename=character.image) }}" >
+        <img  class="portrait p-1" src="{{ url_for('static', filename=character.image) }}" >
         {% endif %}
 
             <!--Portrait Caption -->
@@ -30,13 +30,12 @@
         {% endif %}
     </div>
 
-    <a href="{{ button_link }}" class="btn btn-info" role="button">{{ button_caption }}</a>
+    <a href="{{ button_link }}" class="btn btn-info ms-1" role="button">{{ button_caption }}</a>
 </div>
 
 {% if character.url != None or character.url == "" %}
-<div class="embed-responsive embed-responsive-1by1">
-    <iframe class="embed-responsive-item" src="{{ character.url }}" allowtransparency="true" frameborder="0">
-    </iframe>
+<div class="ratio ratio-1x1">
+    <iframe src="{{ character.url }}" allowtransparency="true" frameborder="0"></iframe>
 </div>
 {% endif %}
 

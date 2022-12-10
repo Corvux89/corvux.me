@@ -6,74 +6,97 @@
 });
 </script>
 
-<h1>Edit Character</h1>
-<br>
-<form action="/admin/modify_characters/{{character.page}}/{{character.key}}" method="post">
-    <div class="form-row">
-         <div class="form-group col-sm">
-            <label for="key">Key</label>
-            <input type="text" class="form-control" id="key" name="key" value="{{character.key}}" required>
+<h1 class="m-2">Edit Character</h1>
+
+<div class="container-fluid m-2">
+    <form action="/admin/modify_characters/{{character.page}}/{{character.key}}" method="post">
+        <div class="row mb-3">
+             <div class="col-sm">
+                <label for="key">Key</label>
+                <input type="text" class="form-control" id="key" name="key" value="{{character.key}}" required>
+            </div>
+
+            <div class="col-sm">
+                <label for="page">Page</label>
+                <input type="number" class="form-control" id="page" name="page" value="{{character.page}}" required>
+            </div>
+
+            <div class="col-sm">
+                <label for="order">Order</label>
+                <input type="number" class="form-control" id="order" name="order" value="{{character.order}}">
+            </div>
         </div>
 
-        <div class="form-group col-sm">
-            <label for="page">Page</label>
-            <input type="number" class="form-control" id="page" name="page" value="{{character.page}}" required>
+        <div class="row mb-3">
+            <div class="form-group col-sm">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{character.name}}">
+            </div>
+
+            <div class="col-sm">
+                <label for="name">Subtitle</label>
+                <input type="text" class="form-control" id="subtitle" name="subtitle" value="{{character.subtitle}}">
+            </div>
         </div>
 
-        <div class="form-group col-sm">
-            <label for="order">Order</label>
-            <input type="number" class="form-control" id="order" name="order" value="{{character.order}}">
-        </div>
-    </div>
-
-
-    <div class="form-row">
-        <div class="form-group col-sm">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{character.name}}">
+        <div class="row mb-3">
+            <div class="col-lg">
+                <label for="name">URL</label>
+                <input type="url" class="form-control" id="url" name="url" value="{{character.url}}">
+            </div>
         </div>
 
-        <div class="form-group col-sm">
-            <label for="name">Subtitle</label>
-            <input type="text" class="form-control" id="subtitle" name="subtitle" value="{{character.subtitle}}">
-        </div>
-    </div>
+        <div class="row mb-3">
+            <div class="col-lg">
+                <label for="image">Image Path</label>
+                <input type="text" class="form-control" id="image" name="image" value="{{character.image}}">
+            </div>
 
-    <div class="form-row">
-        <div class="form-group col-lg">
-            <label for="name">URL</label>
-            <input type="url" class="form-control" id="url" name="url" value="{{character.url}}">
-        </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group col-lg">
-            <label for="image">Image Path</label>
-            <input type="text" class="form-control" id="image" name="image" value="{{character.image}}">
+            <div class="col-lg">
+                <label for="figcaption">Image Caption/Citation</label>
+                <input type="text" class="form-control" id="figcaption" name="figcaption" value="{{character.figcaption}}">
+            </div>
         </div>
 
-        <div class="form-group col-lg">
-            <label for="figcaption">Image Caption/Citation</label>
-            <input type="text" class="form-control" id="figcaption" name="figcaption" value="{{character.figcaption}}">
-        </div>
-    </div>
+        <div class="row mb-3">
+             <div class="col-sm">
+                <a href="/admin/modify_characters" class="btn btn-light" role="button">Close</a>
+            </div>
 
-    <div class="form-row">
-         <div class="form-group col-sm">
-            <a href="/admin/modify_characters" class="btn btn-light" role="button">Close</a>
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container-fluid m-2">
+    <form action="/admin/delete_character/{{character.page}}/{{character.key}}", method="post">
+        <div class="row mb-3">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal">Delete Character</button>
         </div>
 
-        <div class="form-group col-sm">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalLabel">Confirm</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete this character?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
-<form action="/admin/delete_character/{{character.page}}/{{character.key}}", method="post">
-    <div class="form-row">
-        <button type="submit" class="btn btn-danger" data-toggle="confirmation">Delete Character</button>
-    </div>
-</form>
+
 
 {% endblock %}
 

@@ -1,2 +1,2 @@
 from .models import *
-from .UserMixin import *
+from .user import *

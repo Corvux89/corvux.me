@@ -1,20 +1,9 @@
 {% extends "template.html" %} {% block body %}
 <div class="container-fluid m-2 mt-3">
     <form method="get">
-        <div class="col-sm-3">
-            <a href="/admin/modify_characters" class="btn btn-primary" role="button">Modify Characters</a>
-        </div>
-
-        <br>
-
-        <div class="col-sm-3">
-          <a href="/admin/add_character" class="btn btn-primary" role="button">Add Character</a>
-        </div>
-
-        <br><br><br>
-
-        <div class="col-sm-3">
-            <a href="/admin/logout" class="btn btn-secondary" role="button">Logout</a>
+        <div class="col-sm-3 m-3">
+            <a href="{{ url_for('char.add_character') }}" class="btn btn-primary m-2" role="button">Add Character</a>
+            <a href="{{ url_for ('auth.logout') }}" class="btn btn-secondary m-2" role="button">Logout</a>
         </div>
     </form>
 </div>

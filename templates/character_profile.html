@@ -24,7 +24,7 @@
 
     <div class="admin">
          {% if admin == True %}
-         <a href="/admin/modify_characters/{{character.page}}/{{character.key}}" class="btn btn-warning btn-modify" role="button">
+         <a href="{{ url_for('char.modify_characters', page=character.page, key=character.key) }}" class="btn btn-warning btn-modify" role="button">
         Modify this character
         </a>
         {% endif %}

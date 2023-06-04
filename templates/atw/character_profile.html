@@ -3,37 +3,28 @@
 <div class="banner p-2">
     <div class="character-pic">
         <!-- Portrait Image -->
-        {% if character.image == None or character.image == "" %}
+        {% if character.image == None or character.image == "" or not character.image %}
         <img  class="portrait p-1" src="{{ url_for('static', filename='/images/Placeholder.png') }}" >
         {% else %}
         <img  class="portrait p-1" src="{{ url_for('static', filename=character.image) }}" >
         {% endif %}
 
             <!--Portrait Caption -->
-        {% if character.figcaption != None or character.figcation == "" %}
+        {% if character.figcaption != None or character.figcation == "" or character.figcaption %}
         <div class="figcaption">{{ character.figcaption | safe}}</div>
         {% endif %}
     </div>
 
     <div class="name-group">
         <h1 class="name"> {{ character.name }}</h1>
-        {% if character.subtitle != None  or character.subtitle == "" %}
+        {% if character.subtitle != None  or character.subtitle == "" or character.subtitle %}
         <h3 class="sub-name">{{ character.subtitle }}</h3>
         {% endif %}
     </div>
-
-    <div class="admin">
-         {% if admin == True %}
-         <a href="{{ url_for('char.modify_characters', page=character.page, key=character.key) }}" class="btn btn-warning btn-modify" role="button">
-        Modify this character
-        </a>
-        {% endif %}
-    </div>
-
     <a href="{{ button_link }}" class="btn btn-info ms-1" role="button">{{ button_caption }}</a>
 </div>
 
-{% if character.url != None or character.url == "" %}
+{% if character.url != None or character.url == "" or character.url %}
 <div class="ratio ratio-1x1">
     <iframe src="{{ character.url }}" allowtransparency="true" frameborder="0"></iframe>
 </div>

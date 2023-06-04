@@ -1,0 +1,66 @@
+[
+  {
+    "key": "Archimedes",
+    "page": 3,
+    "name": "Archimedes Charp Darnamin",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vS8Hy8WgzySlCDKjanxf9XraqaGAH0imBvoQPEIf_WxpLEaapz_YoAAKFRin4bteLAPCFB5XiQa9PCk/pub?embedded=true",
+    "order": 1
+  },
+  {
+    "key": "Cilleck",
+    "page": 3,
+    "name": "Cilleck",
+    "subtitle": "Ewok | Fighter",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vRch9ZwOKB7FrMJQ9qssFQ7cRwR6qrbpJE-ZqmdqhwT2droQ98e9PkezT2JfAQSNDonXsEvOZaCgkck/pub?embedded=true",
+    "order": 1
+  },
+  {
+    "key": "Caludite",
+    "page": 3,
+    "name": "Claudite Yoshin",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vQFbr7Cd653dFtrRz6y4iD1WClznO7Mxo1J3UsdLImjOLa328_GEZUFzh3pJWB0rAf_Cl4wpLt4iS0K/pub?embedded=true",
+    "order": 1
+  },
+  {
+    "key": "Goda",
+    "page": 3,
+    "name": "Goda",
+    "subtitle": "Zabrak | Guardian",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vS14reA8znzRY-cvUqA5fS_5cLQ098qGL4sjg8QSuy29WeEcx_K_QjWMGoRZ8C6iB8lVEpJD1KtNLDW/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Saga 3/goda.png",
+    "order": 1
+  },
+  {
+    "key": "Stan",
+    "page": 3,
+    "name": "Stan Q",
+    "subtitle": "Human | Engineer",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vQog3LHOvdM__rlFAtpZExWIwiZoDb6Pw4S5KUQ_yjiJflJ3dsIYOyAhlst6bBKLtWIWjml_LfZ04gE/pub?embedded=true",
+    "image": "images/Abeir-Toril Walkabout/Saga 3/stan.png",
+    "order": 1
+  },
+  {
+    "key": "Other",
+    "page": 3,
+    "name": "Other Characters",
+    "subtitle": "NULL",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vQN1FnZrPa1vihYIq95MI8HwGfm_6YBWWcooZanrpez6LJQJB9Ysh3q2SMwTsEHU0GFwEvnpHsIR-XZ/pub?embedded=true",
+    "image": "images/dice.jpg",
+    "order": 2
+  },
+  {
+    "key": "Synopsis",
+    "page": 3,
+    "name": "Synopsis",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vTEF_F_7NCyHCcRe3dRQDTS0aB4GKukaxZcTFby39DbTyiDduyCDUSZFKC8rOe5yaoxr8d6oTcywMYs/pub?embedded=true",
+    "image": "images/dice.jpg",
+    "order": 2
+  },
+  {
+    "key": "Reno",
+    "page": 3,
+    "name": "Reno",
+    "url": "https://docs.google.com/document/d/e/2PACX-1vRAE2kJqWJZleB4OLIqe2eou1LHT69wFvpnMrATXRciEMGPvj8P8HpZG3mzzjzIAEb2iFXZfLpikhH1/pub?embedded=true",
+    "order": 1
+  }
+]

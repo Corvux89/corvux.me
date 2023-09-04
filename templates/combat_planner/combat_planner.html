@@ -1,0 +1,13 @@
+{% extends "template.html" %} {% block body %}
+<div class="container m-2">
+    <div class="row m-2 border border-rounded">
+        <h3>Monster Example</h3>
+
+        <form method="post" id="monInventory"></form>
+        <div id="madd" class="text-white"></div>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>
+
+{% endblock %}

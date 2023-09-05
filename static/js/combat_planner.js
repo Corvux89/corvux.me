@@ -27,7 +27,7 @@ function addRow(){
 function buildRow(num){
     var row = document.createElement("div")
     row.id = `monster${num}`
-    row.className = "row m-2 border border-rounded monster"
+    row.className = "row m-2 border rounded monster"
 
     // Header
     header = document.createElement("h3")
@@ -87,7 +87,7 @@ function buildRow(num){
 
     mQtyLabel = document.createElement("label")
     mQtyLabel.setAttribute("for", mQty.id)
-    mQtyLabel.innerHTML = "Quantity"
+    mQtyLabel.innerHTML = "Qty"
 
     mQtyForm = document.createElement("div")
     mQtyForm.className = "form-floating"
@@ -95,7 +95,7 @@ function buildRow(num){
     mQtyForm.appendChild(mQtyLabel)
 
     mQtyCol = document.createElement("div")
-    mQtyCol.className = "col-sm-2"
+    mQtyCol.className = "col-sm-1"
     mQtyCol.appendChild(mQtyForm)
 
     // Monster Size
@@ -146,8 +146,20 @@ function buildRow(num){
     mToken.className = "form-control"
     mToken.id = `mToken${row}`
     mToken.name = mToken.id
+    mToken.placeholder = "Token Shortcode"
 
-    mTokenLabel = document.createElement("")
+    mTokenLabel = document.createElement("label")
+    mTokenLabel.setAttribute("for", mToken.id)
+    mTokenLabel.innerHTML = "Token Shortcode"
+
+    mTokenForm = document.createElement("div")
+    mTokenForm.className = "form-floating"
+    mTokenForm.appendChild(mToken)
+    mTokenForm.appendChild(mTokenLabel)
+
+    mtokenCol = document.createElement("div")
+    mtokenCol.className = "col-sm-2"
+    mtokenCol.appendChild(mTokenForm)
 
 
 
@@ -158,10 +170,15 @@ function buildRow(num){
     row1.appendChild(mQtyCol)
     row1.appendChild(mSizeCol)
 
+    row2 = document.createElement("div")
+    row2.className = "row m-2"
+    row2.appendChild(mtokenCol)
 
 
-    row
-        .appendChild(row1)
+
+    row.appendChild(row1)
+    row.appendChild(row2)
+
     return row
 }
 

@@ -173,13 +173,18 @@ function validateToken(e){
     helpDom = document.getElementById(`mTokenHelp${row}`)
 
     if (isValidHttpUrl(val)){
+        var base64 = btoa(val)
+        var queryUrl = `https://token.otfbm.io/meta/${base64}`
+
         if (helpDom){
             helpDom.innerHTML = "We cannot process URL's at this time."
+            helpDom.innerHTML += `<br><a href="${queryUrl}" target="_blank" rel="noopener noreferrer">Click here</a> to get the shortcode and replace your URL`
         } else {
             helpDom = document.createElement("small")
             helpDom.id = `mTokenHelp${row}`
             helpDom.className = "form-text text-white-50"
             helpDom.innerHTML = "We cannot process URL's at this time."
+            helpDom.innerHTML += `<br><a href="${queryUrl}" target="_blank" rel="noopener noreferrer">Click here</a> to get the shortcode and replace your URL`
             parent.appendChild(helpDom)
         }
     } else {

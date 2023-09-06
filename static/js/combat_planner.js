@@ -175,6 +175,7 @@ function validateToken(e){
     if (isValidHttpUrl(val)){
         var base64 = btoa(val)
         var queryUrl = `https://token.otfbm.io/meta/${base64}`
+        document.getElementById(e.srcElement.id).value = ""
 
         if (helpDom){
             helpDom.innerHTML = "We cannot process URL's at this time."

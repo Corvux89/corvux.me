@@ -3,7 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
 from blueprints.atw import atw_blueprint
-from blueprints.combat_planner.combat_planner import combat_planner_blueprint
+from blueprints.combat_planner import combat_planner_blueprint
 from constants import WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
 

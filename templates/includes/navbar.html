@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -12,32 +13,37 @@
              alt="Corvux.me">
     </a>
 
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
 
-        <!-- Home -->
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home</a>
-      </li>
+            <!-- Home -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home</a>
+            </li>
 
-        <!-- Abeir-Toril Walkabout -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle"
-           href="/Abeir-Toril_Walkabout/Era1"
-           id="navbarDropdownMenuLink"
-           role="button"
-           data-bs-toggle="dropdown"
-           aria-haspopup="true"
-           aria-expanded="false">
-          Abeir-Toril Walkabout
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="{{ url_for('atw.era_all', era='Era1') }}">Era 1</a>
-          <a class="dropdown-item" href="/Abeir-Toril_Walkabout/Era2">Era 2</a>
-          <a class="dropdown-item" href="/Abeir-Toril_Walkabout/Saga3">Saga 3</a>
-        </div> <!-- dropdown-menu -->
-      </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('complanner.planner') }}">Avrae Combat Planner</a>
+            </li>
 
-    </ul>
-  </div> <!-- navbarNavDropdown -->
+
+            <!-- Abeir-Toril Walkabout -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="/Abeir-Toril_Walkabout/Era1"
+                   id="navbarDropdownMenuLink"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    Abeir-Toril Walkabout
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ url_for('atw.era_all', era='Era1') }}">Era 1</a>
+                    <a class="dropdown-item" href="/Abeir-Toril_Walkabout/Era2">Era 2</a>
+                    <a class="dropdown-item" href="/Abeir-Toril_Walkabout/Saga3">Saga 3</a>
+                </div> <!-- dropdown-menu -->
+            </li>
+
+        </ul>
+    </div> <!-- navbarNavDropdown -->
 </nav>

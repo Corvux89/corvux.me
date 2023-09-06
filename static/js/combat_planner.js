@@ -86,6 +86,7 @@ function updateMap(){
 function buildMapCommand(){
     var types = $('#mapPlanner div.monGroup').length
     var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
+    var out = ""
     coords = []
     var map = []
 
@@ -110,7 +111,9 @@ function buildMapCommand(){
         }
     }
 
-    var out = "!map " + map.join(" ")
+    if (map.length > 0){
+        out = "!map " + map.join(" ")
+    }
     document.getElementById("mapCmd").innerHTML = out
     localStorage.setItem("monsters", JSON.stringify(monsters))
 }

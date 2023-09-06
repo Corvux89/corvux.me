@@ -7,7 +7,8 @@ def get_csp():
             'https://cdn.jsdelivr.net/npm/',
             'https://www.googletagmanager.com/',
             'https://analytics.google.com/',
-            'https://www.google-analytics.com/'
+            'https://www.google-analytics.com/',
+            'https://use.fontawesome.com'
         ],
         'script-src': [
             '\'self\'',
@@ -19,9 +20,9 @@ def get_csp():
             '*',
             'data:'
         ],
-
         'style-src': [
             '\'self\'',
+            'https://use.fontawesome.com',
             'https://cdn.jsdelivr.net/',
         ]
     }

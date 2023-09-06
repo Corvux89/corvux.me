@@ -1,6 +1,7 @@
 {% extends "template.html" %} {% block body %}
 
-<div class="bg-image d-flex justify-content-center align-items-center" nonce="{{ csp_nonce() }} "></div>
-
+<div class="card main text-bg-dark">
+    <img src="{{ url_for('static', filename='/images/shield.png') }}" class="card-img opacity-25">
+</div>
 
 {% endblock %}

@@ -5,127 +5,25 @@ h1{
     text-align: center;
 }
 
-h2,
-h3,
-h4,
-p {
+h2, h3, h4, p{
     font-family: verdana;
     margin-left: 15px;
     color: white;
 }
 
-body {
+.nav-item{
+    font-size: 120%;
+}
+
+body{
     display: inline;
     font-family: verdana;
     background-color: #2C2F33;
 }
 
-.bg-image{
-    background: url('/static/images/shield.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 30%;
-    height: 100vw;
-    width: auto;
-    box-shadow: 0 0  8px 8px #2C2F33 inset
-}
 
-.card {
-    background-color: rgba(166,166,166,1);
-    color: black;
-    max-width: 13rem;
-    min-width: 13rem;
-    position: relative;
-    border-radius: 10px;
-    box-shadow: 0 3px 6px
-    rgba(0,0,0,0.16), 0 3px 6px
-    rgba(0,0,0,0.23);
-}
-
-.card:hover{
-    box-shadow: 0 12px 24px rgba(0,0,0,0.16), 0 12px 24px rgba(0,0,0,0.23);
-}
-
-.card-title{
-    font-size: 110%;
-    text-align: left;
-    word-wrap: break-word;
-}
-
-.card-img-top {
-    width: auto;
-    height: 100%;
-    object-fit: scale-down;
-}
-
-.character-pic{
-    display: inline-block;
-    width=20rem;
-    height: auto;
-}
-
-.portrait{
-    width: auto;
-    height: 18rem;
-    position: relative;
-}
-
-.name-group{
-    display: inline-block;
-    flex-direction: column;
-    padding-top: 4rem;
-    vertical-align: top;
-    max-width: 80rem;
-}
-
-.admin{
- position: relative;
- float: right;
- clear: right;
-}
-
-.sub-name{
-    font-style: italic;
-    font-size: 95%;
-    text-align: center;
-}
-
-.btn{
-    vertical-align: bottom;
-    display: block;
-    position: relative;
-    width: 200px;
-}
-
-.biography{
-    width=100%;
-}
-
-.figcaption{
-    color: white;
-    font-size: 70%;
-    max-width: 13rem;
-}
-
-.stretched-link::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: auto;
-    content: "";
-    background-color: rgba(0,0,0,0);
-}
-
-:root {
+:root{
     color: #d5e0e7;
-}
-
-@media only screen and (max-width: 479px) {
-   .character-pic{ display: none !important; }
-   .btn-warning {display: none !important;}
 }
 
 .nav-link.complanner{

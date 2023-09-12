@@ -1,169 +1,197 @@
-function addListeners(){
+function onLoad(){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+
+    combat_plan.forEach(function(monster, index){
+        $('#monInventory').append(cloneRow(index))
+        $('#mapPlanner').append(buildMapTab(index+1, monster))
+    })
+
+    // Reset Button
     document.getElementById("comReset").addEventListener('click', function(event){
-        localStorage.removeItem("monsters")
+        localStorage.removeItem("combat_plan")
         location.reload()
     })
 
-    document.getElementById("maddCopy").addEventListener('click', function(event){
-        var copyText = document.getElementById("madd").innerHTML
-        copyText = copyText.replace(/<br>/g, '\n')
-
-        if (copyText){
-            navigator.clipboard.writeText(copyText)
-        }
-    })
-
-    document.getElementById("mapCmdCopy").addEventListener('click', function(event){
-        var copyText = document.getElementById("mapplanner").innerHTML
-
-        copyText = copyText.replace(/<br>/g, '\n')
-
-        if (copyText){
-            navigator.clipboard.writeText(copyText)
-        }
-    })
-
+    // Form
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
-        updateMap()
+        updateMapTab()
     })
 
     document.getElementById("mapPlanner").addEventListener('change', function(event){
         buildMapCommand()
     })
-}
 
-function initialSetup(){
-    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
+    // Setup input listener and load initial row
+    var fields = document.querySelectorAll('input, select')
+    fields.forEach(input => {
+        input.addEventListener('input', saveToLocalStorage)
 
-    if (monsters.length > 0){
-        monsters.forEach(function(monster, index){
-            $('#monInventory').append(buildRow(index+1, monster))
-            $('#mapPlanner').append(buildMap(index+1, monster))
-
-            document.getElementById(`mToken${index+1}`).addEventListener('change', function(event){
+        if (input.name.includes("Name")){
+            input.addEventListener('change', function(event){
+                evaluateRow(event)
+            })
+        } else if (input.name.includes("Token")){
+            input.addEventListener('change', function(event){
                 validateToken(event)
             })
+        }
 
-            document.getElementById(`mName${index+1}`).addEventListener('change', function(event){
-                checkName(event)
-            })
-        })
-    }
-
-    var row = $('#monInventory div.monster').length
-    $('#monInventory').append(buildRow(row+1))
-
-    document.getElementById(`mToken${row+1}`).addEventListener('change', function(event){
-        validateToken(event)
-    })
-
-    document.getElementById(`mName${row+1}`).addEventListener('change', function(event){
-        checkName(event)
+        loadFromLocalStorage(input)
     })
 
     buildMaddCommand()
     buildMapCommand()
 }
 
-function updateMap(){
-    var mapPlanner = document.getElementById("mapPlanner")
-    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
-    mapPlanner.innerHTML = ''
+function saveToLocalStorage(){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var inputName = this.name
+    var inputValue = this.value
+    var node =parseInt(this.id.match(/\d+/)[0])-1
+    var monster = combat_plan[node] || {}
 
-    if (monsters.length > 0){
-        monsters.forEach(function(monster, index){
-            $('#mapPlanner').append(buildMap(index+1, monster))
-            document.getElementById(`mName${index+1}`).addEventListener('change', function(event){
-                checkName(event)
-            })
-        })
+    if (inputName == "monCoord"){
+        node = parseInt(this.id.split("-")[0].match(/\d+/)[0])-1
+        monster = combat_plan[node] || {}
+        monster[inputName] = monster[inputName] ? monster[inputName] : []
+        monster[inputName][parseInt(this.id.split("-")[1])-1] = inputValue
+    } else if (this.type == 'checkbox' && this.checked == false){
+        delete monster[inputName]
+    } else {
+        monster[inputName] = inputValue
+
+        if (inputName == "monQty"){
+            monster["monCoord"] = monster["monCoord"] || []
+            monster["monCoord"].length = inputValue
+        }
     }
-
-//    buildMapCommand()
+    combat_plan[node] = monster
+    localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
 }
 
-function buildMapCommand(){
-    var types = $('#mapPlanner div.monGroup').length
-    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
-    var out = ""
-    coords = []
-    var map = []
+function loadFromLocalStorage(input){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var inputName = input.name
+    var node =parseInt(input.id.match(/\d+/)[0])-1
+    monster = combat_plan[node] || {}
+    var value = monster[inputName]
+    var change_event = new Event("change")
 
-    for (var i = 0; i < types; i++){
-        var indviduals = $(`#map${i+1} div.monPos`).length
-        var monster = monsters[i]
-        monster.coord = []
-        var size = monster.size
-        var token = monster.token
+    if (inputName == "monCoord"){
+        node = parseInt(input.id.split("-")[0].match(/\d+/)[0]-1)
+        monster = combat_plan[node]
+        value = monster[inputName] || []
+        subNode = parseInt(input.id.split("-")[1])-1
+        input.value = (value.length > 0 ? value[subNode]:"")
+        input.value = (value[parseInt(input.id.split("-")[1])-1] ? value[parseInt(input.id.split("-")[1])-1]:"")
 
-        for (var j = 0; j < indviduals; j++){
-            var str = ""
-            var monField = document.getElementById(`mapMon${i+1}${j+1}`)
-            var monName = monField.placeholder
-            var monCoord = monField.value
-            monster.coord[j] = monCoord
-
-            if (monCoord){
-                str = `-t "${monName}"|${monCoord}|${size}|r` + (token ? `|\$${token}`:"")
+    } else if (value !== null && value){
+        if (input.type === 'radio' || input.type == 'checkbox'){
+            if (input.value == value){
+                input.checked = true
             }
-            map.push(str)
+        } else{
+            input.value = value
         }
-    }
 
-    if (map.length > 0){
-        out = "!map " + map.join(" ")
+        input.dispatchEvent(change_event)
     }
-    document.getElementById("mapCmd").innerHTML = out
-    localStorage.setItem("monsters", JSON.stringify(monsters))
 }
 
-function buildMaddCommand(){
-    var rows = $('#monInventory div.monster').length
-    var form = document.getElementById('monInventory')
-    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
-    var madd = []
-    var out = ""
-
-    // Build the MADD String
-    for (i = 1; i < rows; i++){
-        var str = ""
-        var name = document.getElementById(`mName${i}`).value
-        var label = document.getElementById(`mLabel${i}`).value
-        var qt = document.getElementById(`mQty${i}`).value
-        var args = document.getElementById(`mArgs${i}`).value
-        var size = document.getElementById(`mSize${i}`).value
-        var token = document.getElementById(`mToken${i}`).value
-        var monster = (monsters.length >= i ? monsters[i-1]:{})
-        monster.name = name
-        monster.label = label
-        monster.size = size
-        monster.qty = qt
-        monster.args = args
-        monster.token = token
-        monster.coord = (monster.coord && monster.coord.length>0 ? monster.coord:[])
-        if (monster.coord.length > parseInt(qt)){
-            monster.coord.length = parseInt(qt)
-        }
-        if (monsters.length >= i-1){
-            monsters[i-1] = monster
-        } else {
-            monsters.push(monster)
-        }
-
-
-        if (name){
-           str = `!madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (args ? ` ${args}`:'')
-        }
-        madd.push(str)
+function cloneRow(num){
+    var base = document.getElementById("monster1")
+    var row = base.cloneNode(true)
+    var fields = row.querySelectorAll('input, label, select')
+    var header = row.querySelectorAll('h3')
+    row.id = `monster${num+1}`
+    if (row.id == base.id){
+        return
     }
 
-    if (madd.length > 1){
-        out += "!multiline<br>"
+    fields.forEach(input => {
+        var val = input.id || input.getAttribute("for")
+        var oldNum = val.match(/\d+/)[0]
+        var newID = val.replace(oldNum, num+1)
+
+        if (input.id){
+            input.id = newID
+            if (input.type == "number"){
+                input.value = 1
+            } else if (input.tagName == "SELECT"){
+                return
+            } else {
+                input.value = ""
+            }
+        }
+
+//        if (input.name){input.name = newID}
+
+        if (input.getAttribute("for")){input.setAttribute("for", newID)}
+
+    })
+
+    header.forEach(element => {
+        element.innerHTML = `Monster ${num+1}`
+    })
+
+    removeButton = document.createElement("button")
+    removeButton.type="button"
+    removeButton.id=`monRemove${num+1}`
+    removeButton.className = "btn-close ms-auto removeMon"
+
+
+    row.querySelector('div.monHeader').appendChild(removeButton)
+
+    // Add Events
+
+    removeButton.addEventListener('click', function(event){
+        var e = event.srcElement
+        var row = $('#monInventory div.monster').length
+        var current_row = parseInt(e.id.match(/\d+/)[0])
+        if (row == current_row){
+            alert("Can't remove the last row")
+        } else{
+            var monster = document.getElementById(`monster${current_row}`)
+            var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+            combat_plan.splice(current_row-1, 1)
+            localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
+            monster.remove()
+            location.reload()
+        }
+    })
+
+    var fields = row.querySelectorAll('input, select')
+    fields.forEach(input => {
+        input.addEventListener('input', saveToLocalStorage)
+    })
+
+    return row
+}
+
+function evaluateRow(e){
+    var row = $('#monInventory div.monster').length
+    var name = e.srcElement
+    var current_row = parseInt(name.id.match(/\d+/)[0])
+    var previous_name = document.getElementById(`monName${current_row-1}`)
+    var next_name = document.getElementById(`monName${current_row+1}`)
+
+    if (name.value != "" && current_row == row){
+        var newRow = cloneRow(row)
+        $('#monInventory').append(newRow)
+
+        document.getElementById(`monName${row+1}`).addEventListener('change', function(event){
+            evaluateRow(event)
+        })
+
+        document.getElementById(`monToken${row+1}`).addEventListener('change', function(event){
+            validateToken(event)
+        })
+
+    } else if (name.value == "" && ((previous_name && previous_name.value == "") || (next_name && next_name.value == ""))){
+        var last_row = document.getElementById(`monster${row}`)
+        last_row.remove()
     }
-    out += madd.join("<br>")
-    document.getElementById('madd').innerHTML = out
-    localStorage.setItem("monsters", JSON.stringify(monsters))
 }
 
 function validateToken(e){
@@ -207,265 +235,184 @@ function isValidHttpUrl(string) {
     return url.protocol === "http:" || url.protocol === "https:";
 }
 
-function checkName(e){
-    var row = $('#monInventory div.monster').length
-    var monName = e.srcElement
-    var curRow = monName.id.match(/\d+/)[0]
-    var prevName = document.getElementById(`mName${row-1}`)
-    console.log(curRow)
+function buildMaddCommand(){
+    var rows = $('#monInventory div.monster').length
+    var inventory_header = document.getElementById('inventory-header')
+    var form = document.getElementById('monInventory')
+    var madd = []
+    var out = ""
 
-    if (monName.value != "" && curRow == row){
-        $('#monInventory').append(buildRow(row+1))
-        var newName = document.getElementById(`mName${row+1}`)
-        newName.addEventListener('change', function(event){
-            checkName(event)
+    // Build the MADD String
+    for (i = 1; i < rows; i++){
+        var str = ""
+        var name = document.getElementById(`monName${i}`).value
+        var label = document.getElementById(`monLabel${i}`).value
+        var qt = document.getElementById(`monQty${i}`).value
+        var args = document.getElementById(`monArgs${i}`).value
+        var size = document.getElementById(`monSize${i}`).value
+        var token = document.getElementById(`monToken${i}`).value
+
+        if (name){
+           str = `!madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (args ? ` ${args}`:'')
+        }
+        madd.push(str)
+    }
+
+    if (madd.length > 1){
+        out += "!multiline<br>"
+    }
+    out += madd.join("<br>")
+    if (out.length > 1){
+        inventory_header.hidden = false
+        document.getElementById("maddCopy").addEventListener('click', function(event){
+            var copyText = document.getElementById("madd").innerHTML
+            copyText = copyText.replace(/<br>/g, '\n')
+
+            if (copyText){
+                navigator.clipboard.writeText(copyText)
+            }
         })
-    } else if (monName.value == "" && prevName && prevName.value == ""){
-        var lRow = document.getElementById(`monster${row}`)
-        lRow.remove()
+    } else {
+        inventory_header.hidden = true
     }
+
+    document.getElementById('madd').innerHTML = out
 }
 
-function buildRow(num, monster){
-    var row = document.createElement("div")
-    row.id = `monster${num}`
-    row.className = "row m-2 border rounded monster bg-secondary"
+function buildMapTab(num, monster){
+    if (!monster || !monster.monName && (!monster.monQty || monster.monQty < 1)){
+        return
+    }
+
+    var monster_row = document.createElement("div")
+    var prefix = (monster.monLabel ? monster.monLabel.replace("#","") : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+    var quantity = monster.monQty ? parseInt(monster.monQty): 1
+    monster_row.id=`map${num}`
+    monster_row.className = "row m-2 border rounded monGroup bg-secondary"
 
     // Header
+    header_row = document.createElement("div")
+    header_row.className = "row mt-2"
+
+    header_col = document.createElement("div")
+    header_col.className = "col-md-12 d-flex monHeader"
+
     header = document.createElement("h3")
-    header.innerHTML = `Monster ${num}`
-    row.appendChild(header)
+    header.innerHTML = `${monster.monName}`
+    header_col.appendChild(header)
 
-    // All Fields
-    // Monster Name
-    mName = document.createElement("input")
-    mName.type = "text"
-    mName.className = "form-control"
-    mName.id= `mName${num}`
-    mName.name = mName.id
-    mName.placeholder = "Monster Name"
-    mName.value = (monster && monster.name ? monster.name:"")
+    button = document.createElement("button")
+    button.type = "button"
+    button.id =`${prefix}${num}-remove`
+    button.className = "btn-close ms-auto"
+    header_col.appendChild(button)
 
-    mNameLabel = document.createElement("label")
-    mNameLabel.setAttribute("for",mName.id)
-    mNameLabel.innerHTML = mName.placeholder
+    header_row.appendChild(header_col)
+    monster_row.appendChild(header_row)
 
-    mNameForm = document.createElement("div")
-    mNameForm.className="form-floating"
-    mNameForm.appendChild(mName)
-    mNameForm.appendChild(mNameLabel)
-
-    mNameCol = document.createElement("div")
-    mNameCol.className = "col-sm mb-3"
-    mNameCol.appendChild(mNameForm)
-
-    // Monster Label
-    mLabel = document.createElement("input")
-    mLabel.type = "text"
-    mLabel.className = "form-control"
-    mLabel.id = `mLabel${num}`
-    mLabel.name = mLabel.id
-    mLabel.placeholder = "Label"
-    mLabel.value = (monster && monster.label ? monster.label:"")
-
-    mLabelLabel = document.createElement("label")
-    mLabelLabel.setAttribute("for", mLabel.id)
-    mLabelLabel.innerHTML = mLabel.placeholder
-
-    mLabelForm = document.createElement("div")
-    mLabelForm.className="form-floating"
-    mLabelForm.appendChild(mLabel)
-    mLabelForm.appendChild(mLabelLabel)
-
-    mLabelCol = document.createElement("div")
-    mLabelCol.className = "col-sm mb-3"
-    mLabelCol.appendChild(mLabelForm)
-
-    // Monster Quantity
-    mQty = document.createElement("input")
-    mQty.type = "number"
-    mQty.className = "form-control"
-    mQty.id = `mQty${num}`
-    mQty.name = mQty.id
-    mQty.value = (monster && monster.qty ? monster.qty:"1")
-
-    mQtyLabel = document.createElement("label")
-    mQtyLabel.setAttribute("for", mQty.id)
-    mQtyLabel.innerHTML = "Quantity"
-
-    mQtyForm = document.createElement("div")
-    mQtyForm.className = "form-floating"
-    mQtyForm.appendChild(mQty)
-    mQtyForm.appendChild(mQtyLabel)
-
-    mQtyCol = document.createElement("div")
-    mQtyCol.className = "col-sm-2"
-    mQtyCol.appendChild(mQtyForm)
-
-    // Monster Size
-    st = document.createElement("option")
-    st.value = "T"
-    st.innerHTML = "Tiny"
-    if (monster && monster.size == st.value){
-        st.setAttribute("selected", true)
-    }
-    ss = document.createElement("option")
-    ss.value = "S"
-    ss.innerHTML = "Small"
-    if (monster && monster.size == ss.value){
-        ss.setAttribute("selected", true)
-    }
-    sm = document.createElement("option")
-    sm.value = "M"
-    sm.innerHTML = "Medium"
-    if (monster && monster.size == sm.value || !monster){
-        sm.setAttribute("selected", true)
-    }
-    sl = document.createElement("option")
-    sl.value = "L"
-    sl.innerHTML = "Large"
-    if (monster && monster.size == sl.value){
-        sl.setAttribute("selected", true)
-    }
-    sg = document.createElement("option")
-    sg.value = "G"
-    sg.innerHTML = "Gargantuan"
-    if (monster && monster.size == sg.value){
-        sg.setAttribute("selected", true)
-    }
-
-
-    mSize = document.createElement("select")
-    mSize.className = "form-select"
-    mSize.setAttribute("aria-label","Monster Size")
-    mSize.id = `mSize${num}`
-    mSize.name = mSize.id
-    mSize.appendChild(st)
-    mSize.appendChild(ss)
-    mSize.appendChild(sm)
-    mSize.appendChild(sl)
-    mSize.appendChild(sg)
-
-    mSizeLabel = document.createElement("label")
-    mSizeLabel.setAttribute("for", mSize.id)
-    mSizeLabel.innerHTML = "Size"
-
-    mSizeForm = document.createElement("div")
-    mSizeForm.className = "form-floating"
-    mSizeForm.appendChild(mSize)
-    mSizeForm.appendChild(mSizeLabel)
-
-    mSizeCol = document.createElement("div")
-    mSizeCol.className = "col-sm-2"
-    mSizeCol.appendChild(mSizeForm)
-
-    //Token Fields
-    mToken = document.createElement("input")
-    mToken.type = "text"
-    mToken.className = "form-control"
-    mToken.id = `mToken${num}`
-    mToken.name = mToken.id
-    mToken.placeholder = "Token Shortcode"
-    mToken.value = (monster && monster.token ? monster.token:"")
-
-    mTokenLabel = document.createElement("label")
-    mTokenLabel.setAttribute("for", mToken.id)
-    mTokenLabel.innerHTML = mToken.placeholder
-
-    mTokenForm = document.createElement("div")
-    mTokenForm.className = "form-floating"
-    mTokenForm.appendChild(mToken)
-    mTokenForm.appendChild(mTokenLabel)
-
-    mtokenCol = document.createElement("div")
-    mtokenCol.className = "col-sm-3"
-    mtokenCol.appendChild(mTokenForm)
-
-    // Additional Arguments
-    mArgs = document.createElement("input")
-    mArgs.type = "text"
-    mArgs.className = "form-control"
-    mArgs.id = `mArgs${num}`
-    mArgs.name = mArgs.id
-    mArgs.placeholder = "Additional Arguments"
-    mArgs.value = (monster && monster.args ? monster.args:"")
-
-    mArgsLabel = document.createElement("label")
-    mArgsLabel.setAttribute("for", mArgs.id)
-    mArgsLabel.innerHTML = mArgs.placeholder
-
-    mArgsForm = document.createElement("div")
-    mArgsForm.className = "form-floating"
-    mArgsForm.appendChild(mArgs)
-    mArgsForm.appendChild(mArgsLabel)
-
-    mArgsCol = document.createElement("div")
-    mArgsCol.className = "col-sm"
-    mArgsCol.appendChild(mArgsForm)
-
-
-    row1 = document.createElement("div")
-    row1.className = "row m-2"
-    row1.appendChild(mNameCol)
-    row1.appendChild(mLabelCol)
-    row1.appendChild(mQtyCol)
-    row1.appendChild(mSizeCol)
-
-    row2 = document.createElement("div")
-    row2.className = "row m-2"
-    row2.appendChild(mtokenCol)
-    row2.appendChild(mArgsCol)
-
-
-
-    row.appendChild(row1)
-    row.appendChild(row2)
-
-    return row
-}
-
-function buildMap(num, monster){
-    if (!monster || !monster.name || !monster.label || !monster.qty || monster.qty < 1){
-        return ""
-    }
-
-    var prow = document.createElement("div")
-    var prefix = monster.label.replace("#", "")
-    prow.id = `map${num}`
-    prow.className = "row m-2 border rounded monGroup"
-
-    // Header
-    header = document.createElement("h3")
-    header.innerHTML = `${monster.name}`
-    prow.appendChild(header)
-
-    for (var i = 0; i < parseInt(monster.qty); i++){
+    for (var i=0; i < quantity; i++){
         coord = document.createElement("input")
-        coord.type = "text"
+        coord.type="text"
         coord.className = "form-control"
-        coord.id = `mapMon${num}${i+1}`
-        coord.Name = coord.id
+        coord.id = `mapMon${num}-${i+1}`
+        coord.name = "monCoord"
         coord.placeholder = `${prefix}${i+1}`
-        coord.value = (monster.coord && monster.coord.length>=i && monster.coord[i] ? monster.coord[i]:"")
+        coord.value = monster && monster.monCoord && monster.monCoord[i] ? monster.monCoord[i]:""
 
-        coordLabel = document.createElement("label")
-        coordLabel.setAttribute("for", coord.id)
-        coordLabel.innerHTML = coord.placeholder
+        label = document.createElement("label")
+        label.setAttribute("for", coord.id)
+        label.innerHTML = coord.placeholder
 
-        coordForm = document.createElement("div")
-        coordForm.className = "form-floating"
-        coordForm.appendChild(coord)
-        coordForm.appendChild(coordLabel)
+        form = document.createElement("div")
+        form.className = "form-floating"
+        form.appendChild(coord)
+        form.appendChild(label)
 
-        coordCol = document.createElement("div")
-        coordCol.className = "col-sm-2 mb-3 monPos"
-        coordCol.appendChild(coordForm)
+        col = document.createElement("div")
+        col.className = "col-sm-2 mb-3 monPos"
+        col.appendChild(form)
 
-        prow.appendChild(coordCol)
+        monster_row.appendChild(col)
     }
 
-    return prow
+    var fields = monster_row.querySelectorAll('input, select')
+    fields.forEach(input => {
+        input.addEventListener('input', saveToLocalStorage)
+    })
+
+    var buttons = monster_row.querySelectorAll('button')[0].addEventListener('click', function(event){
+        var row = parseInt(event.srcElement.id.match(/\d+/)[0])
+        var row = document.getElementById(`map${row}`)
+        input_event = new Event("input")
+        change_event = new Event("change")
+
+
+        row.querySelectorAll('input').forEach(input => {
+            input.value = ""
+            input.dispatchEvent(input_event)
+        })
+
+        document.getElementById('mapPlanner').dispatchEvent(change_event)
+    })
+
+    return monster_row
 }
 
-initialSetup()
-addListeners()
+function updateMapTab(){
+    var mapPlanner = document.getElementById("mapPlanner")
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
+    var event = new Event('change')
+
+    mapPlanner.innerHTML = ''
+
+    combat_plan.forEach(function(monster, index){
+        $('#mapPlanner').append(buildMapTab(index+1, monster))
+        document.getElementById('mapPlanner').dispatchEvent(event)
+    })
+}
+
+function buildMapCommand(){
+    var rows = $('#mapPlanner div.monGroup').length
+    map_header = document.getElementById('map-header')
+    var coords = []
+    var out = ""
+
+    for (var i = 0; i < rows; i++){
+        var positions = $(`#map${i+1} div.monPos`).length
+        var size = document.getElementById(`monSize${i+1}`).value
+        var token = document.getElementById(`monToken${i+1}`).value
+
+        for (var j = 0; j < positions; j++){
+            var str = ""
+            var monElement = document.getElementById(`mapMon${i+1}-${j+1}`)
+            var monName = monElement.placeholder
+            var monCoord = monElement.value
+
+            if (monCoord){
+                str = `-t "${monName}"|${monCoord}|${size}|r` + (token ? `|\$${token}`:"")
+                coords.push(str)
+            }
+        }
+    }
+
+    if (coords.length > 0){
+        out = "!map " + coords.join(" ")
+        map_header.hidden=false
+        document.getElementById("mapCopy").addEventListener('click', function(event){
+
+            var copyText = document.getElementById("mapCmd").innerHTML
+            copyText = copyText.replace(/<br>/g, '\n')
+
+            if (copyText){
+                navigator.clipboard.writeText(copyText)
+            }
+        })
+    } else{
+        map_header.hidden=true
+    }
+
+    document.getElementById("mapCmd").innerHTML = out
+}
+
+onLoad()

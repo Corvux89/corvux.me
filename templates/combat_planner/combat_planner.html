@@ -1,7 +1,8 @@
 {% extends "template.html" %} {% block body %}
 
 <div class="container m-2">
-    <button type="button" class="btn btn-danger" id="comReset">Reset</button>
+    <h1>Avrae Combat Planner</h1>
+    <button type="button" class="btn btn-danger" id="comReset">Reset All</button>
 </div>
 
 <nav>
@@ -17,35 +18,98 @@
 </nav>
 
 <div class="tab-content" id="complannerTabContent">
+    <!--    Monster Inventory   -->
     <div class="tab-pane fade show active" id="inventory" role="tabpanel" aria-labelledby="inventory-tab" tabindex="0">
         <div class="container m-2">
-            <div class="row border rounded border-success bg-light">
+            <div class="row border rounded border-success bg-light" id="inventory-header" hidden>
                 <div class="col-sm">
                     <p class="text-black">Avrae Command String</p>
                     <div id="madd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-1 m-0 p-0">
                     <button class="btn" id="maddCopy"><i class="fa-solid fa-copy"></i></button>
                 </div>
             </div>
-            <form method="post" id="monInventory"></form>
+            <form method="post" id="monInventory">
+                <div class="row monster border rounded bg-secondary m-2" id="monster1">
+                    <div class="row mt-2">
+                        <div class="col-md-12 d-flex monHeader">
+                            <h3>Monster 1</h3>
+<!--                            <button type="button" id="monRemove1" class="btn-close ms-auto"></button>-->
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-sm mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="monName1" name="monName"
+                                       placeholder="Monster Name">
+                                <label for="monName1">Monster Name</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="monLabel1" name="monLabel"
+                                       placeholder="Label">
+                                <label for="monLabel1">Label</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="monQty1" name="monQty" max="20"
+                                       value="1">
+                                <label for="monQty1">Quantity</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" aria-label="Monster Size" id="monSize1" name="monSize">
+                                    <option value="T">Tiny</option>
+                                    <option value="S">Small</option>
+                                    <option value="M" selected>Medium</option>
+                                    <option value="L">Large</option>
+                                    <option value="G">Gargantuan</option>
+                                </select>
+                                <label for="monSize1">Size</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="monToken1" name="monToken"
+                                       placeholder="Token Shortcode">
+                                <label for="monToken1">Token Shortcode</label>
+                            </div>
+                        </div>
+                        <div class="col-sm mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="monArgs1" name="monArgs"
+                                       placeholder="Additional Arguments">
+                                <label for="monArgs1">Additional Arguments</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
+    <!--    Map Commands    -->
     <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
         <div class="container m-2">
-            <div class="row border rounded border-success bg-light">
+            <div class="row border rounded border-success bg-light" id="map-header" hidden>
                 <div class="col-sm">
                     <p class="text-black">Avrae Command String</p>
                     <div id="mapCmd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                 </div>
-                <div class="col-sm-2">
-                    <button class="btn" id="mapCmdCopy"><i class="fa-solid fa-copy"></i></button>
+                <div class="col-1 m-0 p-0">
+                    <button class="btn" id="mapCopy"><i class="fa-solid fa-copy"></i></button>
                 </div>
             </div>
             <form method="post" id="mapPlanner"></form>
         </div>
     </div>
+
 </div>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>

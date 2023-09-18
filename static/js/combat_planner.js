@@ -22,6 +22,10 @@ function onLoad(){
         buildMapCommand()
     })
 
+    document.getElementById("map-setup").addEventListener('change', function(event){
+        buildMapPlannerCommand()
+    })
+
     // Setup input listener and load initial row
     var fields = document.querySelectorAll('input, select')
     fields.forEach(input => {
@@ -42,61 +46,80 @@ function onLoad(){
 
     buildMaddCommand()
     buildMapCommand()
+    buildMapPlannerCommand()
 }
 
 function saveToLocalStorage(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
     var inputName = this.name
     var inputValue = this.value
-    var node =parseInt(this.id.match(/\d+/)[0])-1
-    var monster = combat_plan[node] || {}
 
     if (inputName == "monCoord"){
-        node = parseInt(this.id.split("-")[0].match(/\d+/)[0])-1
-        monster = combat_plan[node] || {}
+        var node = parseInt(this.id.split("-")[0].match(/\d+/)[0])-1
+        var monster = combat_plan[node] || {}
+
         monster[inputName] = monster[inputName] ? monster[inputName] : []
         monster[inputName][parseInt(this.id.split("-")[1])-1] = inputValue
-    } else if (this.type == 'checkbox' && this.checked == false){
-        delete monster[inputName]
-    } else {
-        monster[inputName] = inputValue
+    } else if (inputName.split('-')[0] == "map"){
+        combat_plan_map[inputName] = inputValue
 
-        if (inputName == "monQty"){
-            monster["monCoord"] = monster["monCoord"] || []
-            monster["monCoord"].length = inputValue
+    } else {
+        var node =parseInt(this.id.match(/\d+/)[0])-1
+        var monster = combat_plan[node] || {}
+
+        if (this.type == 'checkbox' && this.checked == false){
+            delete monster[inputName]
+        } else {
+            monster[inputName] = inputValue
+
+            if (inputName == "monQty"){
+                monster["monCoord"] = monster["monCoord"] || []
+                monster["monCoord"].length = inputValue
+            }
         }
     }
     combat_plan[node] = monster
     localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
+    localStorage.setItem("combat_map", JSON.stringify(combat_plan_map))
 }
 
 function loadFromLocalStorage(input){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
     var inputName = input.name
-    var node =parseInt(input.id.match(/\d+/)[0])-1
-    monster = combat_plan[node] || {}
-    var value = monster[inputName]
     var change_event = new Event("change")
 
     if (inputName == "monCoord"){
-        node = parseInt(input.id.split("-")[0].match(/\d+/)[0]-1)
-        monster = combat_plan[node]
-        value = monster[inputName] || []
+        var node = parseInt(input.id.split("-")[0].match(/\d+/)[0]-1)
+        var monster = combat_plan[node]
+        var value = monster[inputName] || []
         subNode = parseInt(input.id.split("-")[1])-1
         input.value = (value.length > 0 ? value[subNode]:"")
         input.value = (value[parseInt(input.id.split("-")[1])-1] ? value[parseInt(input.id.split("-")[1])-1]:"")
 
-    } else if (value !== null && value){
-        if (input.type === 'radio' || input.type == 'checkbox'){
-            if (input.value == value){
-                input.checked = true
-            }
-        } else{
+    } else if (inputName.split("-")[0] == "map"){
+        var value = combat_plan_map[inputName]
+        if (value !== null && value){
             input.value = value
         }
+    } else{
+        var node =parseInt(input.id.match(/\d+/)[0])-1
+        var monster = combat_plan[node] || {}
+        var value = monster[inputName]
 
-        input.dispatchEvent(change_event)
+        if (value !== null && value){
+            if (input.type === 'radio' || input.type == 'checkbox'){
+                if (input.value == value){
+                    input.checked = true
+                }
+            } else{
+                input.value = value
+            }
+        }
     }
+
+    input.dispatchEvent(change_event)
 }
 
 function cloneRow(num){
@@ -238,7 +261,6 @@ function isValidHttpUrl(string) {
 function buildMaddCommand(){
     var rows = $('#monInventory div.monster').length
     var inventory_header = document.getElementById('inventory-header')
-    var form = document.getElementById('monInventory')
     var madd = []
     var out = ""
 
@@ -374,7 +396,7 @@ function updateMapTab(){
 
 function buildMapCommand(){
     var rows = $('#mapPlanner div.monGroup').length
-    map_header = document.getElementById('map-header')
+    var map_header = document.getElementById('map-header')
     var coords = []
     var out = ""
 
@@ -413,6 +435,33 @@ function buildMapCommand(){
     }
 
     document.getElementById("mapCmd").innerHTML = out
+}
+
+function buildMapPlannerCommand(){
+    var maps_header = document.getElementById('maps-header')
+    var url = document.getElementById("map-url").value
+    var out = ""
+
+    if (url){
+        var size = document.getElementById('map-size').value
+        var csettings = document.getElementById('map-csettings').value
+
+        out = `!map -bg ${url}` + (size ? `-mapsize ${size}`:"") + (csettings ? `-options c${csettings}`:"")
+
+        maps_header.hidden=false
+        document.getElementById("map-command-copy").addEventListener('click', function(event){
+            var copyText = document.getElementById("map-command").innerHTML
+            copyText = copyText.replace(/<br>/g, '\n')
+
+            if (copyText){
+                navigator.clipboard.writeText(copyText)
+            }
+        })
+    } else{
+        maps_header.hidden=true
+    }
+
+    document.getElementById("map-command").innerHTML = out
 }
 
 onLoad()

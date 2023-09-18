@@ -7,19 +7,27 @@
 
 <nav>
     <div class="nav nav-tabs complanner-tabs m-2" id="complannerTab" role="tablist">
-        <button class="nav-link active complanner" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory"
-                type="button" role="tab" aria-selected="true" aria-controls="inventory">Monster Inventory
+        <button class="nav-link active complanner" id="inventory-tab" data-bs-toggle="tab"
+                data-bs-target="#monster-inventory"
+                type="button" role="tab" aria-selected="true" aria-controls="monster-inventory">Monster Inventory
         </button>
 
-        <button class="nav-link complanner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button"
-                role="tab" aria-selected="true" aria-controls="map">Monster Map
+        <button class="nav-link complanner" id="monster-map-tab" data-bs-toggle="tab" data-bs-target="#monster-map"
+                type="button"
+                role="tab" aria-selected="true" aria-controls="monster-map">Monster Map
+        </button>
+
+        <button class="nav-link complanner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
+                type="button"
+                role="tab" aria-selected="true" aria-controls="map-planner">Map Planner
         </button>
     </div>
 </nav>
 
 <div class="tab-content" id="complannerTabContent">
     <!--    Monster Inventory   -->
-    <div class="tab-pane fade show active" id="inventory" role="tabpanel" aria-labelledby="inventory-tab" tabindex="0">
+    <div class="tab-pane fade show active" id="monster-inventory" role="tabpanel" aria-labelledby="inventory-tab"
+         tabindex="0">
         <div class="container m-2">
             <div class="row border rounded border-success bg-light" id="inventory-header" hidden>
                 <div class="col-sm">
@@ -35,7 +43,7 @@
                     <div class="row mt-2">
                         <div class="col-md-12 d-flex monHeader">
                             <h3>Monster 1</h3>
-<!--                            <button type="button" id="monRemove1" class="btn-close ms-auto"></button>-->
+                            <!--                            <button type="button" id="monRemove1" class="btn-close ms-auto"></button>-->
                         </div>
                     </div>
                     <div class="row m-2">
@@ -94,8 +102,8 @@
         </div>
     </div>
 
-    <!--    Map Commands    -->
-    <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+    <!--    Monster Map Commands    -->
+    <div class="tab-pane fade" id="monster-map" role="tabpanel" aria-labelledby="monster-map-tab" tabindex="0">
         <div class="container m-2">
             <div class="row border rounded border-success bg-light" id="map-header" hidden>
                 <div class="col-sm">
@@ -110,8 +118,52 @@
         </div>
     </div>
 
+    <!--    Map Commands    -->
+    <div class="tab-pane fade" id="map-planner" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+        <div class="container m-2">
+            <div class="row border rounded border-success bg-light" id="maps-header" hidden>
+                <div class="col-sm">
+                    <p class="text-black">Avrae Command String</p>
+                    <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                </div>
+                <div class="col-1 m-0 p-0">
+                    <button class="btn" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+                </div>
+            </div>
+            <form method="post" id="map-setup">
+                <div class="row border rounded bg-secondary m-2">
+                    <div class="row mt-2">
+                        <div class="col-sm mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="map-url" name="map-url"
+                                       placeholder="Map URL">
+                                <label for="map-url">Map URL</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="map-size" name="map-size"
+                                       placeholder="Map Size">
+                                <label for="map-url">Map Size</label>
+                                <small id="map-url-help" class="form-text text-white-50">Ex: 25x25</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="map-csettings" name="map-csettings"
+                                       placeholder="Map CSettings">
+                                <label for="map-url">Map CSettings</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>
 
 {% endblock %}
+

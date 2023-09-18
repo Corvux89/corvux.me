@@ -275,7 +275,7 @@ function buildMaddCommand(){
         var token = document.getElementById(`monToken${i}`).value
 
         if (name){
-           str = `!madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (args ? ` ${args}`:'')
+           str = `!i madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (args ? ` ${args}`:'')
         }
         madd.push(str)
     }

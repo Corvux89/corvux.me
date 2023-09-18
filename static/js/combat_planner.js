@@ -446,7 +446,7 @@ function buildMapPlannerCommand(){
         var size = document.getElementById('map-size').value
         var csettings = document.getElementById('map-csettings').value
 
-        out = `!map -bg "${url}"` + (size ? `-mapsize ${size}`:"") + (csettings ? `-options c${csettings}`:"")
+        out = `!map -bg "${url}"` + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
 
         maps_header.hidden=false
         document.getElementById("map-command-copy").addEventListener('click', function(event){

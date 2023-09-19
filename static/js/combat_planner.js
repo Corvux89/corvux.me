@@ -9,6 +9,7 @@ function onLoad(){
     // Reset Button
     document.getElementById("comReset").addEventListener('click', function(event){
         localStorage.removeItem("combat_plan")
+        localStorage.removeItem("combat_map")
         location.reload()
     })
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, send_from_directory
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
@@ -18,6 +18,10 @@ app.config.update(
 @app.route('/home')
 def homepage():
     return render_template("main.html")
+
+@app.route('/sitemap.xml')
+def site_map():
+    return send_from_directory(app.static_folder, 'sitemap.xml')
 
 
 csp = get_csp()

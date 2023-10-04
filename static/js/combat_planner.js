@@ -339,7 +339,12 @@ function buildMapTab(num, monster){
         coord.className = "form-control"
         coord.id = `mapMon${num}-${i+1}`
         coord.name = "monCoord"
-        coord.placeholder = `${prefix}${i+1}`
+        if (quantity>1 || monster.monLabel.includes("#")){
+            coord.placeholder = `${prefix}${i+1}`
+        } else {
+            coord.placeholder = `${prefix}`
+        }
+
         coord.value = monster && monster.monCoord && monster.monCoord[i] ? monster.monCoord[i]:""
 
         label = document.createElement("label")

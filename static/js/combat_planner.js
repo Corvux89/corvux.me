@@ -229,6 +229,13 @@ function validateToken(e){
         var queryUrl = `https://token.otfbm.io/meta/${base64}`
         document.getElementById(e.srcElement.id).value = ""
 
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", queryUrl, false);
+        xmlHttp.send(null)
+
+        console.log(xmlHttp)
+
+
         if (helpDom){
             helpDom.innerHTML = "We cannot process URL's at this time."
             helpDom.innerHTML += `<br><a href="${queryUrl}" target="_blank" rel="noopener noreferrer">Click here</a> to get the shortcode and replace your URL`

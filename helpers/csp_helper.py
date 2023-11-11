@@ -8,7 +8,8 @@ def get_csp():
             'https://www.googletagmanager.com/',
             'https://analytics.google.com/',
             'https://www.google-analytics.com/',
-            'https://use.fontawesome.com'
+            'https://use.fontawesome.com',
+            'https://token.otfbm.io/'
         ],
         'script-src': [
             '\'self\'',

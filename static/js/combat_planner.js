@@ -229,6 +229,7 @@ function validateToken(e){
         var queryUrl = `https://token.otfbm.io/meta/${base64}`
         var tokenDom = document.getElementById(e.srcElement.id)
         tokenDom.value = "Loading..."
+        err_str = "Something went wrong with that image. Either OTFBM doesn't have access to the image, or it is malformed.<br>Try a different image URL please"
 
         var request = new XMLHttpRequest();
         var url = `${document.URL}shortcode`
@@ -247,12 +248,12 @@ function validateToken(e){
                 } else {
                     tokenDom.value = ""
                     if (helpDom){
-                        helpDom.innerHTML = "Something went wrong with that image. Either OTFBM doesn't have access, or it is malformed.<br>Try a different image URL please"
+                        helpDom.innerHTML = err_str
                     } else {
                         helpDom = document.createElement("small")
                         helpDom.id = `mTokenHelp${row}`
                         helpDom.className = "form-text text-white-50"
-                        helpDom.innerHTML = "Something went wrong with that image. Either OTFBM doesn't have access, or it is malformed.<br>Try a different one please"
+                        helpDom.innerHTML = err_str
                         parent.appendChild(helpDom)
                     }
                 }

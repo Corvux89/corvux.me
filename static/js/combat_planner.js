@@ -227,24 +227,60 @@ function validateToken(e){
     if (isValidHttpUrl(val)){
         var base64 = btoa(val)
         var queryUrl = `https://token.otfbm.io/meta/${base64}`
-        document.getElementById(e.srcElement.id).value = ""
+        var tokenDom = document.getElementById(e.srcElement.id)
+        tokenDom.value = "Loading..."
 
-        if (helpDom){
-            helpDom.innerHTML = "We cannot process URL's at this time."
-            helpDom.innerHTML += `<br><a href="${queryUrl}" target="_blank" rel="noopener noreferrer">Click here</a> to get the shortcode and replace your URL`
-        } else {
-            helpDom = document.createElement("small")
-            helpDom.id = `mTokenHelp${row}`
-            helpDom.className = "form-text text-white-50"
-            helpDom.innerHTML = "We cannot process URL's at this time."
-            helpDom.innerHTML += `<br><a href="${queryUrl}" target="_blank" rel="noopener noreferrer">Click here</a> to get the shortcode and replace your URL`
-            parent.appendChild(helpDom)
+        var request = new XMLHttpRequest();
+        var url = `${document.URL}shortcode`
+        request.open('POST', url, true)
+        request.setRequestHeader('Content-Type', 'application/json')
+
+        request.onreadystatechange = function(){
+            if (request.readyState === 4 && request.status === 200){
+                var response = JSON.parse(request.responseText)
+                if (response.token != ""){
+                    tokenDom.value = response.token
+
+                    if (helpDom){
+                        helpDom.remove()
+                    }
+                } else {
+                    tokenDom.value = ""
+                    if (helpDom){
+                        helpDom.innerHTML = "Something went wrong with that image. Either OTFBM doesn't have access, or it is malformed.<br>Try a different image URL please"
+                    } else {
+                        helpDom = document.createElement("small")
+                        helpDom.id = `mTokenHelp${row}`
+                        helpDom.className = "form-text text-white-50"
+                        helpDom.innerHTML = "Something went wrong with that image. Either OTFBM doesn't have access, or it is malformed.<br>Try a different one please"
+                        parent.appendChild(helpDom)
+                    }
+                }
+            }
         }
+
+        request.send(JSON.stringify({"url": queryUrl}))
     } else {
         if (helpDom){
             helpDom.remove()
         }
     }
+}
+
+function getShortcode(queryUrl){
+    var request = new XMLHttpRequest();
+    var url = `${document.URL}shortcode`
+    request.open('POST', url, true)
+    request.setRequestHeader('Content-Type', 'application/json')
+
+    request.onreadystatechange = function(){
+        if (request.readyState === 4 && request.status === 200){
+            var response = JSON.parse(request.responseText)
+            alert('Data: ' + response.token)
+        }
+    }
+
+    request.send(JSON.stringify({"url": queryUrl}))
 }
 
 function isValidHttpUrl(string) {
@@ -339,7 +375,7 @@ function buildMapTab(num, monster){
         coord.className = "form-control"
         coord.id = `mapMon${num}-${i+1}`
         coord.name = "monCoord"
-        if (quantity>1 || monster.monLabel.includes("#")){
+        if (quantity>1 || (monster.monLabel && monster.monLabel.includes("#"))){
             coord.placeholder = `${prefix}${i+1}`
         } else {
             coord.placeholder = `${prefix}`

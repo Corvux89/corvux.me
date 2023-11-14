@@ -1,8 +1,10 @@
 {% extends "template.html" %} {% block body %}
 
 <div class="container m-2">
-    <h1>Avrae Combat Planner</h1>
+    <h1>Avrae/OTFBM Combat Planner</h1>
     <button type="button" class="btn btn-danger" id="comReset">Reset All</button>
+    <button type="button" class="btn btn-primary" id="comMonReset">Reset Monsters Only</button>
+    <button type="button" class="btn btn-primary" id="comMapReset">Reset Map Only</button>
 </div>
 
 <nav>
@@ -115,7 +117,14 @@
                     <button class="btn" id="mapCopy"><i class="fa-solid fa-copy"></i></button>
                 </div>
             </div>
-            <form method="post" id="mapPlanner"></form>
+            <div class="row m-2">
+                <div class="col-md">
+                    <form method="post" id="mapPlanner">
+                    </form>
+                </div>
+                <div class="col-md-5 text-center" id="monMapPreview" hidden>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -133,7 +142,7 @@
             </div>
             <form method="post" id="map-setup">
                 <div class="row border rounded bg-secondary m-2">
-                    <div class="row mt-2">
+                    <div class="row m-2">
                         <div class="col-sm mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="map-url" name="map-url"
@@ -157,8 +166,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row m-2">
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" arial-label="Overlay Type" id="map-overlay-type" name="map-overlay-type">
+                                    <option value="" selected></option>
+                                    <option value="circle">Circle</option>
+                                    <option value="cone">Cone</option>
+                                    <option value="line">Line</option>
+                                </select>
+                                <label for="map-overlay-type">Overlay</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-2" id="overlay-row">
+                    </div>
                 </div>
             </form>
+            <div id="mapPreview" class="text-center" hidden>
+            </div>
         </div>
     </div>
 

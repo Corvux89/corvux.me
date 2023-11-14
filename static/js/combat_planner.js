@@ -13,6 +13,18 @@ function onLoad(){
         location.reload()
     })
 
+    // Reset Monsters Button
+    document.getElementById("comMonReset").addEventListener('click', function(event){
+        localStorage.removeItem("combat_plan")
+        location.reload()
+    })
+
+    // Reset Map Button
+    document.getElementById("comMapReset").addEventListener('click', function(event){
+        localStorage.removeItem("combat_map")
+        location.reload()
+    })
+
     // Form
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
@@ -21,10 +33,16 @@ function onLoad(){
 
     document.getElementById("mapPlanner").addEventListener('change', function(event){
         buildMapCommand()
+        buildMapPreview()
     })
 
     document.getElementById("map-setup").addEventListener('change', function(event){
         buildMapPlannerCommand()
+        buildMapPreview()
+    })
+
+    document.getElementById("map-overlay-type").addEventListener('change', function(event){
+        handleOverlay()
     })
 
     // Setup input listener and load initial row
@@ -48,6 +66,7 @@ function onLoad(){
     buildMaddCommand()
     buildMapCommand()
     buildMapPlannerCommand()
+    buildMapPreview()
 }
 
 function saveToLocalStorage(){
@@ -148,8 +167,6 @@ function cloneRow(num){
                 input.value = ""
             }
         }
-
-//        if (input.name){input.name = newID}
 
         if (input.getAttribute("for")){input.setAttribute("for", newID)}
 
@@ -394,7 +411,7 @@ function buildMapTab(num, monster){
         form.appendChild(label)
 
         col = document.createElement("div")
-        col.className = "col-sm-2 mb-3 monPos"
+        col.className = "col-sm-3 mb-3 monPos"
         col.appendChild(form)
 
         monster_row.appendChild(col)
@@ -505,6 +522,263 @@ function buildMapPlannerCommand(){
     }
 
     document.getElementById("map-command").innerHTML = out
+}
+
+function handleOverlay(){
+    var overlayType = document.getElementById("map-overlay-type")
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var columns = []
+
+    formFloating = document.createElement("div")
+    formFloating.className = "form-floating"
+
+    column = document.createElement("div")
+    column.className = "col-sm-3 mb-3"
+
+    // Radius
+    if (overlayType.value == "circle"){
+
+        radiusField = document.createElement("input")
+        radiusField.type = "number"
+        radiusField.className = "form-control"
+        radiusField.id = "map-overlay-radius"
+        radiusField.name = radiusField.id
+        radiusField.max = "200"
+        radiusField.value = combat_plan_map[radiusField.id] ? combat_plan_map[radiusField.id]:"1"
+
+        radiusLabel = document.createElement("label")
+        radiusLabel.setAttribute("for", radiusField.id)
+        radiusLabel.innerHTML = "Radius"
+
+        radiusForm = formFloating.cloneNode(true)
+        radiusForm.appendChild(radiusField)
+        radiusForm.appendChild(radiusLabel)
+
+        radiusColumn = column.cloneNode(true)
+        radiusColumn.appendChild(radiusForm)
+
+        columns.push(radiusColumn)
+
+        centerField = document.createElement("input")
+        centerField.type = "text",
+        centerField.className = "form-control"
+        centerField.id = "map-overlay-center"
+        centerField.name = centerField.id
+        centerField.placeholder = "Center"
+        centerField.value = combat_plan_map[centerField.id] ? combat_plan_map[centerField.id]:""
+
+        centerLabel = document.createElement("label")
+        centerLabel.setAttribute("for", centerField.id)
+        centerLabel.innerHTML = "Center"
+
+        centerForm = formFloating.cloneNode(true)
+        centerForm.appendChild(centerField)
+        centerForm.appendChild(centerLabel)
+
+        centerColumn = column.cloneNode(true)
+        centerColumn.appendChild(centerForm)
+
+        columns.push(centerColumn)
+    }
+
+    // Size
+    if (overlayType.value == "cone" || overlayType.value == "square"){
+        sizeField = document.createElement("input")
+        sizeField.type = "number"
+        sizeField.className = "form-control"
+        sizeField.id = "map-overlay-size"
+        sizeField.name = sizeField.id
+        sizeField.max = "200"
+        sizeField.value = combat_plan_map[sizeField.id] ? combat_plan_map[sizeField.id]:"1"
+
+        sizeLabel = document.createElement("label")
+        sizeLabel.setAttribute("for", sizeField.id)
+        sizeLabel.innerHTML = "Size"
+
+        sizeForm = formFloating.cloneNode(true)
+        sizeForm.appendChild(sizeField)
+        sizeForm.appendChild(sizeLabel)
+
+        sizeColumn = column.cloneNode(true)
+        sizeColumn.appendChild(sizeForm)
+
+        columns.push(sizeColumn)
+    }
+
+    // Start and End
+    if (overlayType.value == "cone" || overlayType.value == "line"){
+        startField = document.createElement("input")
+        startField.type = "text",
+        startField.className = "form-control"
+        startField.id = "map-overlay-start"
+        startField.name = startField.id
+        startField.placeholder = "Start"
+        startField.value = combat_plan_map[startField.id] ? combat_plan_map[startField.id]:""
+
+        starLabel = document.createElement("label")
+        starLabel.setAttribute("for", startField.id)
+        starLabel.innerHTML = "Start"
+
+        starForm = formFloating.cloneNode(true)
+        starForm.appendChild(startField)
+        starForm.appendChild(starLabel)
+
+        startColumn = column.cloneNode(true)
+        startColumn.appendChild(starForm)
+
+        columns.push(startColumn)
+
+        endField = document.createElement("input")
+        endField.type = "text",
+        endField.className = "form-control"
+        endField.id = "map-overlay-end"
+        endField.name = endField.id
+        endField.placeholder = "End"
+        endField.value = combat_plan_map[endField.id] ? combat_plan_map[endField.id]:""
+
+        endLabel = document.createElement("label")
+        endLabel.setAttribute("for", endField.id)
+        endLabel.innerHTML = "End"
+
+        endForm = formFloating.cloneNode(true)
+        endForm.appendChild(endField)
+        endForm.appendChild(endLabel)
+
+        endColumn = column.cloneNode(true)
+        endColumn.appendChild(endForm)
+
+        columns.push(endColumn)
+    }
+
+    // Lengths and Width
+    if (overlayType.value == "line"){
+        lenField = document.createElement("input")
+        lenField.type = "text",
+        lenField.className = "form-control"
+        lenField.id = "map-overlay-len"
+        lenField.name = lenField.id
+        lenField.placeholder = "Length"
+        lenField.value = combat_plan_map[lenField.id] ? combat_plan_map[lenField.id]:""
+
+        lenLabel = document.createElement("label")
+        lenLabel.setAttribute("for", lenField.id)
+        lenLabel.innerHTML = "Length"
+
+        lenForm = formFloating.cloneNode(true)
+        lenForm.appendChild(lenField)
+        lenForm.appendChild(lenLabel)
+
+        lenColumn = column.cloneNode(true)
+        lenColumn.appendChild(lenForm)
+
+        columns.push(lenColumn)
+
+        widField = document.createElement("input")
+        widField.type = "text",
+        widField.className = "form-control"
+        widField.id = "map-overlay-width"
+        widField.name = widField.id
+        widField.placeholder = "Width"
+        widField.value = combat_plan_map[widField.id] ? combat_plan_map[widField.id]:""
+
+        widLabel = document.createElement("label")
+        widLabel.setAttribute("for", widField.id)
+        widLabel.innerHTML = "Width"
+
+        widForm = formFloating.cloneNode(true)
+        widForm.appendChild(widField)
+        widForm.appendChild(widLabel)
+
+        widColumn = column.cloneNode(true)
+        widColumn.appendChild(widForm)
+
+        columns.push(widColumn)
+    }
+
+
+    // Color
+    if (overlayType.value != ""){
+        colorField = document.createElement("input")
+        colorField.type = "text",
+        colorField.className = "form-control"
+        colorField.id = "map-overlay-color"
+        colorField.name = colorField.id
+        colorField.placeholder = "Color"
+        colorField.value = combat_plan_map[colorField.id] ? combat_plan_map[colorField.id]:""
+
+        colorLabel = document.createElement("label")
+        colorLabel.setAttribute("for", colorField.id)
+        colorLabel.innerHTML = "Color"
+
+        colorForm = formFloating.cloneNode(true)
+        colorForm.appendChild(colorField)
+        colorForm.appendChild(colorLabel)
+
+        colorColumn = column.cloneNode(true)
+        colorColumn.appendChild(colorForm)
+
+        columns.push(colorColumn)
+    }
+
+
+    var overlayRow = document.getElementById("overlay-row")
+    overlayRow.innerHTML = ""
+
+    // Add Elements
+    columns.forEach((element) => {
+        overlayRow.appendChild(element)
+        element.querySelectorAll('input, select').forEach(input =>{
+            input.addEventListener('input', saveToLocalStorage)
+        })
+    })
+}
+
+function buildMapPreview(){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+
+    if (combat_plan_map["map-url"]){
+        var imgUrl = 'https://otfbm.io/' + (combat_plan_map["map-size"] ? combat_plan_map["map-size"]:"10x10") + (combat_plan_map["map-csettings"] ? `/@c${combat_plan_map["map-csettings"]}`:"")
+
+        // Overlay
+        if (combat_plan_map["map-overlay-type"]){
+            if (combat_plan_map["map-overlay-type"] == "circle" && combat_plan_map["map-overlay-radius"] && combat_plan_map["map-overlay-color"] && combat_plan_map["map-overlay-center"]){
+                imgUrl += '/*c' + combat_plan_map["map-overlay-radius"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-center"]
+            } else if (combat_plan_map["map-overlay-type"] == "cone" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"] && combat_plan_map["map-overlay-color"]){
+                imgUrl += '/*t' + combat_plan_map["map-overlay-size"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-start"] + combat_plan_map["map-overlay-end"]
+            } else if (combat_plan_map["map-overlay-type"] == "line" && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"] && combat_plan_map["map-overlay-len"] && combat_plan_map["map-overlay-width"] && combat_plan_map["map-overlay-color"] ){
+                imgUrl += '/*l' + combat_plan_map["map-overlay-len"] + ',' + combat_plan_map["map-overlay-width"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-start"] + combat_plan_map["map-overlay-end"]
+            }
+
+        }
+
+
+        // Token Placement here
+        imgUrl+= '/'
+
+        imgUrl +=  `/?a=2&bg=${combat_plan_map["map-url"]}`
+
+        imgDom = document.createElement("img")
+        imgDom.className = "img-fluid"
+        imgDom.src = imgUrl
+
+        mapPreview = document.getElementById("mapPreview")
+        if (imgDom.outerHTML.localeCompare(mapPreview.innerHTML)!=0){
+            mapPreview.innerHTML = ""
+            mapPreview.hidden=false
+            mapPreview.appendChild(imgDom)
+        }
+
+//        monPreview = document.getElementById("monMapPreview")
+//        monPreview.innerHTML = ""
+//        monPreview.hidden=false
+//        monPreview.appendChild(imgDom.cloneNode(true))
+
+    } else{
+        document.getElementById("mapPreview").hidden=true
+        document.getElementById("monMapPreview").hidden=true
+
+    }
 }
 
 onLoad()

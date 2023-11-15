@@ -783,6 +783,7 @@ function buildMapPreview(){
         imgDom.src = imgUrl
 
         mapPreview = document.getElementById("mapPreview")
+        monPreview = document.getElementById("monMapPreview")
         if (imgDom.outerHTML.localeCompare(mapPreview.innerHTML)!=0){
             mapPreview.innerHTML = ""
             mapPreview.hidden=false

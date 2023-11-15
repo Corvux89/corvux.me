@@ -30,4 +30,6 @@ body{
     background-color: silver;
 }
 
-
+#mapOverlayModal {
+  overflow: hidden;
+}

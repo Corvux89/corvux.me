@@ -25,6 +25,19 @@ function onLoad(){
         location.reload()
     })
 
+    document.getElementById("overlay-clear-button").addEventListener('click', function(event){
+        var form = document.getElementById("overlay-setup")
+        input_event = new Event("input")
+        change_event = new Event("change")
+
+        form.querySelectorAll('input, select').forEach(input =>{
+            input.value = ""
+            input.dispatchEvent(input_event)
+        })
+
+        form.dispatchEvent(change_event)
+    })
+
     // Form
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
@@ -39,11 +52,44 @@ function onLoad(){
     document.getElementById("map-setup").addEventListener('change', function(event){
         buildMapPlannerCommand()
         buildMapPreview()
+    })
+
+    document.getElementById("overlay-setup").addEventListener('change', function(event){
         handleOverlay()
+        buildMapPreview()
+        buildOverlayCommand()
     })
 
     document.getElementById("map-overlay-type").addEventListener('change', function(event){
         handleOverlay()
+    })
+
+    // Copy Buttons
+    document.getElementById("maddCopy").addEventListener('click', function(event){
+        var copyText = document.getElementById("madd").innerHTML
+        copyText = copyText.replace(/<br>/g, '\n')
+
+        if (copyText){
+            navigator.clipboard.writeText(copyText)
+        }
+    })
+
+    document.getElementById("mapCopy").addEventListener('click', function(event){
+        var copyText = document.getElementById("mapCmd").innerHTML
+        copyText = copyText.replace(/<br>/g, '\n')
+
+        if (copyText){
+            navigator.clipboard.writeText(copyText)
+        }
+    })
+
+    document.getElementById("overlayCopy").addEventListener('click', function(event){
+        var copyText = document.getElementById("overlay-command").innerHTML
+        copyText = copyText.replace(/<br>/g, '\n')
+
+        if (copyText){
+            navigator.clipboard.writeText(copyText)
+        }
     })
 
     // Setup input listener and load initial row
@@ -64,8 +110,21 @@ function onLoad(){
         loadFromLocalStorage(input)
     })
 
+    $("#monsterMapModal").draggable({
+        handle: ".modal-header"
+    })
+
+    $("#mapOverlayModal").draggable({
+        handle: ".modal-header"
+    })
+
+    $("#mapSettingsModal").draggable({
+        handle: ".modal-header"
+    })
+
     buildMaddCommand()
     buildMapCommand()
+    buildOverlayCommand()
     buildMapPlannerCommand()
     buildMapPreview()
 }
@@ -343,14 +402,6 @@ function buildMaddCommand(){
     out += madd.join("<br>")
     if (out.length > 1){
         inventory_header.hidden = false
-        document.getElementById("maddCopy").addEventListener('click', function(event){
-            var copyText = document.getElementById("madd").innerHTML
-            copyText = copyText.replace(/<br>/g, '\n')
-
-            if (copyText){
-                navigator.clipboard.writeText(copyText)
-            }
-        })
     } else {
         inventory_header.hidden = true
     }
@@ -483,15 +534,6 @@ function buildMapCommand(){
     if (coords.length > 0){
         out = "!map " + coords.join(" ")
         map_header.hidden=false
-        document.getElementById("mapCopy").addEventListener('click', function(event){
-
-            var copyText = document.getElementById("mapCmd").innerHTML
-            copyText = copyText.replace(/<br>/g, '\n')
-
-            if (copyText){
-                navigator.clipboard.writeText(copyText)
-            }
-        })
     } else{
         map_header.hidden=true
     }
@@ -499,16 +541,46 @@ function buildMapCommand(){
     document.getElementById("mapCmd").innerHTML = out
 }
 
+function buildOverlayCommand(){
+    var overlay_header = document.getElementById('overlay-header')
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var out = ""
+
+    if (combat_plan_map["map-overlay-type"] && combat_plan_map["map-overlay-type"] != null && combat_plan_map["map-overlay-color"]){
+        overlay_header.hidden=false
+        if (combat_plan_map["map-overlay-type"] == "circle" && combat_plan_map["map-overlay-radius"] && combat_plan_map["map-overlay-center"]){
+            out += "!map -over circle," + combat_plan_map["map-overlay-radius"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-center"]
+        } else if (combat_plan_map["map-overlay-type"] == "cone" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"]){
+            out += "!map -over cone," + combat_plan_map["map-overlay-size"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-start"] + "," + combat_plan_map["map-overlay-end"]
+        } else if (combat_plan_map["map-overlay-type"] == "line" && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"] && combat_plan_map["map-overlay-len"] && combat_plan_map["map-overlay-width"]){
+            out += "!map -over line," + combat_plan_map["map-overlay-len"] + "," + combat_plan_map["map-overlay-width"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-start"] + "," + combat_plan_map["map-overlay-end"]
+        } else if (combat_plan_map["map-overlay-type"] == "square" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-top-left"]){
+            out += "!map -over square," + combat_plan_map["map-overlay-size"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-top-left"]
+        } else {
+            overlay_header.hidden=true
+        }
+
+    } else{
+        overlay_header.hidden=true
+    }
+
+    if (out.length > 1 && combat_plan_map["map-overlay-target"] && combat_plan_map["map-overlay-target"] != null){
+        out += " -t " + combat_plan_map["map-overlay-target"]
+    }
+
+    document.getElementById('overlay-command').innerHTML = out
+}
+
 function buildMapPlannerCommand(){
     var maps_header = document.getElementById('maps-header')
     var url = document.getElementById("map-url").value
+    var size = document.getElementById('map-size').value
+    var csettings = document.getElementById('map-csettings').value
+
     var out = ""
 
-    if (url){
-        var size = document.getElementById('map-size').value
-        var csettings = document.getElementById('map-csettings').value
-
-        out = `!map -bg "${url}"` + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
+    if (url || size || csettings){
+        out = `!map` +  (url ?` -bg "${url}"`:"") + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
 
         maps_header.hidden=false
         document.getElementById("map-command-copy").addEventListener('click', function(event){
@@ -546,7 +618,7 @@ function handleOverlay(){
         radiusField.id = "map-overlay-radius"
         radiusField.name = radiusField.id
         radiusField.max = "200"
-        radiusField.value = combat_plan_map[radiusField.id] ? combat_plan_map[radiusField.id]:"1"
+        radiusField.value = combat_plan_map[radiusField.id] ? combat_plan_map[radiusField.id]:""
 
         radiusLabel = document.createElement("label")
         radiusLabel.setAttribute("for", radiusField.id)
@@ -591,7 +663,7 @@ function handleOverlay(){
         sizeField.id = "map-overlay-size"
         sizeField.name = sizeField.id
         sizeField.max = "200"
-        sizeField.value = combat_plan_map[sizeField.id] ? combat_plan_map[sizeField.id]:"1"
+        sizeField.value = combat_plan_map[sizeField.id] ? combat_plan_map[sizeField.id]:""
 
         sizeLabel = document.createElement("label")
         sizeLabel.setAttribute("for", sizeField.id)
@@ -697,6 +769,29 @@ function handleOverlay(){
         columns.push(widColumn)
     }
 
+    // Top Left
+    if (overlayType.value == "square"){
+        topLeftField = document.createElement("input")
+        topLeftField.type = "text",
+        topLeftField.className = "form-control"
+        topLeftField.id = "map-overlay-top-left"
+        topLeftField.name = topLeftField.id
+        topLeftField.placeholder = "Top left"
+        topLeftField.value = combat_plan_map[topLeftField.id] ? combat_plan_map[topLeftField.id]:""
+
+        topLeftLabel = document.createElement("label")
+        topLeftLabel.setAttribute("for", topLeftField.id)
+        topLeftLabel.innerHTML = "Top left"
+
+        topLeftForm = formFloating.cloneNode(true)
+        topLeftForm.appendChild(topLeftField)
+        topLeftForm.appendChild(topLeftLabel)
+
+        topLeftColumn = column.cloneNode(true)
+        topLeftColumn.appendChild(topLeftForm)
+
+        columns.push(topLeftColumn)
+    }
 
     // Color
     if (overlayType.value != ""){
@@ -738,11 +833,23 @@ function handleOverlay(){
 function buildMapPreview(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
     var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var mon_placed = false
 
-    if (combat_plan_map["map-url"]){
+    combat_plan.forEach(monster => {
+        if (monster.monCoord){
+            monster.monCoord.forEach(coord =>{
+                if (coord != null){
+                    mon_placed = true
+                }
+            })
+        }
+    })
+
+    if (combat_plan_map["map-url"] || combat_plan_map["map-size"] || mon_placed){
         var imgUrl = 'https://otfbm.io/' + (combat_plan_map["map-size"] ? combat_plan_map["map-size"]:"10x10") + (combat_plan_map["map-csettings"] ? `/@c${combat_plan_map["map-csettings"]}`:"")
 
         // Overlay
+        // https://otfbm.io/20x28/@c60/H3Mb-DEV_Ori~5b83g/*s30bb4/?a=2&bg=https://i.imgur.com/qItSZqb.jpg
         if (combat_plan_map["map-overlay-type"]){
             if (combat_plan_map["map-overlay-type"] == "circle" && combat_plan_map["map-overlay-radius"] && combat_plan_map["map-overlay-color"] && combat_plan_map["map-overlay-center"]){
                 imgUrl += '/*c' + combat_plan_map["map-overlay-radius"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-center"]
@@ -750,52 +857,49 @@ function buildMapPreview(){
                 imgUrl += '/*t' + combat_plan_map["map-overlay-size"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-start"] + combat_plan_map["map-overlay-end"]
             } else if (combat_plan_map["map-overlay-type"] == "line" && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"] && combat_plan_map["map-overlay-len"] && combat_plan_map["map-overlay-width"] && combat_plan_map["map-overlay-color"] ){
                 imgUrl += '/*l' + combat_plan_map["map-overlay-len"] + ',' + combat_plan_map["map-overlay-width"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-start"] + combat_plan_map["map-overlay-end"]
+            } else if (combat_plan_map["map-overlay-type"] == "square" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-color"] && combat_plan_map["map-overlay-top-left"]){
+                imgUrl+= '/*s' + combat_plan_map["map-overlay-size"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-top-left"]
             }
-
         }
 
         // Token Placement here
         combat_plan.forEach(monster => {
             var prefix = (monster.monLabel ? monster.monLabel.replace("#","") : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
-            for (var i =0; i < monster.monCoord.length; i++){
-                if (monster.monCoord[i] != null){
-                    var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + "r-"
+            if (monster.monCoord){
+                for (var i =0; i < monster.monCoord.length; i++){
+                    if (monster.monCoord[i] != null){
+                        var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + "r-"
 
-                    if (monster.monCoord.length > 1 || (monster.monLabel && monster.monLabel.includes("#"))){
-                        monStr += `${prefix}${i+1}`
-                    } else {
-                        monStr += prefix
+                        if (monster.monCoord.length > 1 || (monster.monLabel && monster.monLabel.includes("#"))){
+                            monStr += `${prefix}${i+1}`
+                        } else {
+                            monStr += prefix
+                        }
+
+                        if (monster.monToken){monStr += "~"+monster.monToken}
+
+                        imgUrl += monStr
                     }
-
-                    if (monster.monToken){monStr += "~"+monster.monToken}
-
-                    imgUrl += monStr
                 }
             }
         })
 
         imgUrl+= '/'
 
-        imgUrl +=  `/?a=2&bg=${combat_plan_map["map-url"]}`
+        if (combat_plan_map["map-url"]){imgUrl +=  `/?a=2&bg=${combat_plan_map["map-url"]}`}
 
         imgDom = document.createElement("img")
         imgDom.className = "img-fluid"
         imgDom.src = imgUrl
 
         mapPreview = document.getElementById("mapPreview")
-        monPreview = document.getElementById("monMapPreview")
         if (imgDom.outerHTML.localeCompare(mapPreview.innerHTML)!=0){
             mapPreview.innerHTML = ""
             mapPreview.hidden=false
             mapPreview.appendChild(imgDom)
-
-            monPreview.innerHTML = ""
-            monPreview.hidden=false
-            monPreview.appendChild(imgDom.cloneNode(true))
         }
     } else{
         document.getElementById("mapPreview").hidden=true
-        document.getElementById("monMapPreview").hidden=true
     }
 }
 

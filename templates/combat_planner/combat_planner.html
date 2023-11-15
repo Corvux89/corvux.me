@@ -14,11 +14,6 @@
                 type="button" role="tab" aria-selected="true" aria-controls="monster-inventory">Monster Inventory
         </button>
 
-        <button class="nav-link complanner" id="monster-map-tab" data-bs-toggle="tab" data-bs-target="#monster-map"
-                type="button"
-                role="tab" aria-selected="true" aria-controls="monster-map">Monster Map
-        </button>
-
         <button class="nav-link complanner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
                 type="button"
                 role="tab" aria-selected="true" aria-controls="map-planner">Map Planner
@@ -85,11 +80,11 @@
                         </div>
                     </div>
                     <div class="row m-2">
-                        <div class="col-sm-3 mb-3">
+                        <div class="col-sm-4 mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="monToken1" name="monToken"
-                                       placeholder="Token Shortcode">
-                                <label for="monToken1">Token Shortcode</label>
+                                       placeholder="Token Shortcode/URL">
+                                <label for="monToken1">Token Shortcode/URL</label>
                             </div>
                         </div>
                         <div class="col-sm mb-3">
@@ -105,89 +100,178 @@
         </div>
     </div>
 
-    <!--    Monster Map Commands    -->
-    <div class="tab-pane fade" id="monster-map" role="tabpanel" aria-labelledby="monster-map-tab" tabindex="0">
-        <div class="container m-2">
-            <div class="row border rounded border-success bg-light" id="map-header" hidden>
-                <div class="col-sm">
-                    <p class="text-black">Avrae Command String</p>
-                    <div id="mapCmd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
-                </div>
-                <div class="col-1 m-0 p-0">
-                    <button class="btn" id="mapCopy"><i class="fa-solid fa-copy"></i></button>
-                </div>
-            </div>
-            <div class="row m-2">
-                <div class="col-md">
-                    <form method="post" id="mapPlanner">
-                    </form>
-                </div>
-                <div class="col-md-5 text-center" id="monMapPreview" hidden>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!--    Map Commands    -->
     <div class="tab-pane fade" id="map-planner" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
         <div class="container m-2">
-            <div class="row border rounded border-success bg-light" id="maps-header" hidden>
-                <div class="col-sm">
-                    <p class="text-black">Avrae Command String</p>
-                    <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+            <div class="row m-3">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#monsterMapModal">Place Monsters
+                    </button>
                 </div>
-                <div class="col-1 m-0 p-0">
-                    <button class="btn" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#mapSettingsModal">Map Settings
+                    </button>
+                </div>
+
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#mapOverlayModal">Overlay Settings
+                    </button>
                 </div>
             </div>
-            <form method="post" id="map-setup">
-                <div class="row border rounded bg-secondary m-2">
-                    <div class="row m-2">
-                        <div class="col-sm mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="map-url" name="map-url"
-                                       placeholder="Map URL">
-                                <label for="map-url">Map URL</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="map-size" name="map-size"
-                                       placeholder="Map Size">
-                                <label for="map-url">Map Size</label>
-                                <small id="map-url-help" class="form-text text-white-50">Ex: 25x25</small>
-                            </div>
-                        </div>
-                        <div class="col-sm-3 mb-3">
-                            <div class="form-floating">
-                                <input type="number" class="form-control" id="map-csettings" name="map-csettings"
-                                       placeholder="Map CSettings">
-                                <label for="map-url">Map CSettings</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row m-2">
-                        <div class="col-sm-3 mb-3">
-                            <div class="form-floating">
-                                <select class="form-select" arial-label="Overlay Type" id="map-overlay-type" name="map-overlay-type">
-                                    <option value="" selected></option>
-                                    <option value="circle">Circle</option>
-                                    <option value="cone">Cone</option>
-                                    <option value="line">Line</option>
-                                </select>
-                                <label for="map-overlay-type">Overlay</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row m-2" id="overlay-row">
-                    </div>
-                </div>
-            </form>
-            <div id="mapPreview" class="text-center" hidden>
-            </div>
+            <div id="mapPreview" class="text-center" hidden></div>
         </div>
     </div>
 
+</div>
+
+<! -- Modal -->
+<div class="modal fade" id="monsterMapModal" tabindex="-1" role="dialog" aria-labelledby="monsterMapModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="monsterMapModalLabel">Monster
+                    Coordinates</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="map-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="mapCmd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn" id="mapCopy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-md">
+                            <form method="post" id="mapPlanner">
+                            </form>
+                        </div>
+                        <div class="col-md-5 text-center" id="monMapPreview" hidden>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapSettingsModalLabel">Map Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="maps-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <form method="post" id="map-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-url" name="map-url"
+                                               placeholder="Map URL">
+                                        <label for="map-url">Map URL</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-size" name="map-size"
+                                               placeholder="Map Size">
+                                        <label for="map-url">Map Size</label>
+                                        <small id="map-url-help" class="form-text text-white-50">Ex: 25x25</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="map-csettings"
+                                               name="map-csettings"
+                                               placeholder="Map CSettings">
+                                        <label for="map-url">Map CSettings</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mapOverlayModal" tabindex="-1" role="dialog" aria-labelledby="mapOverlayModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapOverlayModalLabel">Overlay
+                    Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="overlay-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn" id="overlayCopy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <form method="post" id="overlay-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <button type="button" class="btn-close ms-auto" id="overlay-clear-button"></button>
+                            <div class="row m-2">
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" arial-label="Overlay Type" id="map-overlay-type"
+                                                name="map-overlay-type">
+                                            <option value="" selected></option>
+                                            <option value="circle">Circle</option>
+                                            <option value="cone">Cone</option>
+                                            <option value="line">Line</option>
+                                            <option value="square">Square</option>
+                                        </select>
+                                        <label for="map-overlay-type">Overlay</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-overlay-target" name="map-overlay-target" placeholder="Target">
+                                        <label for="map-overlay-target">Target</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-2" id="overlay-row">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>

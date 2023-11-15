@@ -39,6 +39,7 @@ function onLoad(){
     document.getElementById("map-setup").addEventListener('change', function(event){
         buildMapPlannerCommand()
         buildMapPreview()
+        handleOverlay()
     })
 
     document.getElementById("map-overlay-type").addEventListener('change', function(event){
@@ -257,7 +258,9 @@ function validateToken(e){
             if (request.readyState === 4 && request.status === 200){
                 var response = JSON.parse(request.responseText)
                 if (response.token != ""){
+                    input_event = new Event("input")
                     tokenDom.value = response.token
+                    tokenDom.dispatchEvent(input_event)
 
                     if (helpDom){
                         helpDom.remove()
@@ -294,7 +297,6 @@ function getShortcode(queryUrl){
     request.onreadystatechange = function(){
         if (request.readyState === 4 && request.status === 200){
             var response = JSON.parse(request.responseText)
-            alert('Data: ' + response.token)
         }
     }
 
@@ -752,8 +754,26 @@ function buildMapPreview(){
 
         }
 
-
         // Token Placement here
+        combat_plan.forEach(monster => {
+            var prefix = (monster.monLabel ? monster.monLabel.replace("#","") : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+            for (var i =0; i < monster.monCoord.length; i++){
+                if (monster.monCoord[i] != null){
+                    var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + "r-"
+
+                    if (monster.monCoord.length > 1 || (monster.monLabel && monster.monLabel.includes("#"))){
+                        monStr += `${prefix}${i+1}`
+                    } else {
+                        monStr += prefix
+                    }
+
+                    if (monster.monToken){monStr += "~"+monster.monToken}
+
+                    imgUrl += monStr
+                }
+            }
+        })
+
         imgUrl+= '/'
 
         imgUrl +=  `/?a=2&bg=${combat_plan_map["map-url"]}`
@@ -767,17 +787,14 @@ function buildMapPreview(){
             mapPreview.innerHTML = ""
             mapPreview.hidden=false
             mapPreview.appendChild(imgDom)
+
+            monPreview.innerHTML = ""
+            monPreview.hidden=false
+            monPreview.appendChild(imgDom.cloneNode(true))
         }
-
-//        monPreview = document.getElementById("monMapPreview")
-//        monPreview.innerHTML = ""
-//        monPreview.hidden=false
-//        monPreview.appendChild(imgDom.cloneNode(true))
-
     } else{
         document.getElementById("mapPreview").hidden=true
         document.getElementById("monMapPreview").hidden=true
-
     }
 }
 

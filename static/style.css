@@ -29,3 +29,8 @@ body{
 .nav-link.complanner{
     background-color: silver;
 }
+
+#kofi-link{
+    height: 36px;
+    border: 0px;
+}

@@ -1,12 +1,13 @@
 function onLoad(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
 
+    // Setup the inventory page and the monster table from local storage
     combat_plan.forEach(function(monster, index){
         $('#monInventory').append(cloneRow(index))
-        $('#mapPlanner').append(buildMapTab(index+1, monster))
+        $('#mapPlanner').append(buildMaddTable(index+1, monster))
     })
 
-    // Reset Button
+    // Reset Monster Inventory Button
     document.getElementById("comReset").addEventListener('click', function(event){
         localStorage.removeItem("combat_plan")
         localStorage.removeItem("combat_map")
@@ -25,6 +26,7 @@ function onLoad(){
         location.reload()
     })
 
+    // Reset Overlay Button
     document.getElementById("overlay-clear-button").addEventListener('click', function(event){
         var form = document.getElementById("overlay-setup")
         input_event = new Event("input")
@@ -38,28 +40,32 @@ function onLoad(){
         form.dispatchEvent(change_event)
     })
 
-    // Form
+    // Monster Inventory
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
-        updateMapTab()
+        updateMaddTable()
     })
 
+     // Monster position table
     document.getElementById("mapPlanner").addEventListener('change', function(event){
         buildMapCommand()
         buildMapPreview()
     })
 
+    // Map settings
     document.getElementById("map-setup").addEventListener('change', function(event){
         buildMapPlannerCommand()
         buildMapPreview()
     })
 
+    // Map Overlay
     document.getElementById("overlay-setup").addEventListener('change', function(event){
         handleOverlay()
         buildMapPreview()
         buildOverlayCommand()
     })
 
+    // Map overlay type
     document.getElementById("map-overlay-type").addEventListener('change', function(event){
         handleOverlay()
     })
@@ -74,6 +80,7 @@ function onLoad(){
         }
     })
 
+    // Copy monster add command
     document.getElementById("mapCopy").addEventListener('click', function(event){
         var copyText = document.getElementById("mapCmd").innerHTML
         copyText = copyText.replace(/<br>/g, '\n')
@@ -83,6 +90,17 @@ function onLoad(){
         }
     })
 
+    // Copy map command
+    document.getElementById("map-command-copy").addEventListener('click', function(event){
+        var copyText = document.getElementById("map-command").innerHTML
+        copyText = copyText.replace(/<br>/g, '\n')
+
+        if (copyText){
+            navigator.clipboard.writeText(copyText)
+        }
+    })
+
+    // Copy overlay command
     document.getElementById("overlayCopy").addEventListener('click', function(event){
         var copyText = document.getElementById("overlay-command").innerHTML
         copyText = copyText.replace(/<br>/g, '\n')
@@ -129,251 +147,6 @@ function onLoad(){
     buildMapPreview()
 }
 
-function saveToLocalStorage(){
-    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
-    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
-    var inputName = this.name
-    var inputValue = this.value
-
-    if (inputName == "monCoord"){
-        var node = parseInt(this.id.split("-")[0].match(/\d+/)[0])-1
-        var monster = combat_plan[node] || {}
-
-        monster[inputName] = monster[inputName] ? monster[inputName] : []
-        monster[inputName][parseInt(this.id.split("-")[1])-1] = inputValue
-    } else if (inputName.split('-')[0] == "map"){
-        combat_plan_map[inputName] = inputValue
-
-    } else {
-        var node =parseInt(this.id.match(/\d+/)[0])-1
-        var monster = combat_plan[node] || {}
-
-        if (this.type == 'checkbox' && this.checked == false){
-            delete monster[inputName]
-        } else {
-            monster[inputName] = inputValue
-
-            if (inputName == "monQty"){
-                monster["monCoord"] = monster["monCoord"] || []
-                monster["monCoord"].length = inputValue
-            }
-        }
-    }
-    combat_plan[node] = monster
-    localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
-    localStorage.setItem("combat_map", JSON.stringify(combat_plan_map))
-}
-
-function loadFromLocalStorage(input){
-    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
-    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
-    var inputName = input.name
-    var change_event = new Event("change")
-
-    if (inputName == "monCoord"){
-        var node = parseInt(input.id.split("-")[0].match(/\d+/)[0]-1)
-        var monster = combat_plan[node]
-        var value = monster[inputName] || []
-        subNode = parseInt(input.id.split("-")[1])-1
-        input.value = (value.length > 0 ? value[subNode]:"")
-        input.value = (value[parseInt(input.id.split("-")[1])-1] ? value[parseInt(input.id.split("-")[1])-1]:"")
-
-    } else if (inputName.split("-")[0] == "map"){
-        var value = combat_plan_map[inputName]
-        if (value !== null && value){
-            input.value = value
-        }
-    } else{
-        var node =parseInt(input.id.match(/\d+/)[0])-1
-        var monster = combat_plan[node] || {}
-        var value = monster[inputName]
-
-        if (value !== null && value){
-            if (input.type === 'radio' || input.type == 'checkbox'){
-                if (input.value == value){
-                    input.checked = true
-                }
-            } else{
-                input.value = value
-            }
-        }
-    }
-
-    input.dispatchEvent(change_event)
-}
-
-function cloneRow(num){
-    var base = document.getElementById("monster1")
-    var row = base.cloneNode(true)
-    var fields = row.querySelectorAll('input, label, select')
-    var header = row.querySelectorAll('h3')
-    row.id = `monster${num+1}`
-    if (row.id == base.id){
-        return
-    }
-
-    fields.forEach(input => {
-        var val = input.id || input.getAttribute("for")
-        var oldNum = val.match(/\d+/)[0]
-        var newID = val.replace(oldNum, num+1)
-
-        if (input.id){
-            input.id = newID
-            if (input.type == "number"){
-                input.value = 1
-            } else if (input.tagName == "SELECT"){
-                return
-            } else {
-                input.value = ""
-            }
-        }
-
-        if (input.getAttribute("for")){input.setAttribute("for", newID)}
-
-    })
-
-    header.forEach(element => {
-        element.innerHTML = `Monster ${num+1}`
-    })
-
-    removeButton = document.createElement("button")
-    removeButton.type="button"
-    removeButton.id=`monRemove${num+1}`
-    removeButton.className = "btn-close ms-auto removeMon"
-
-
-    row.querySelector('div.monHeader').appendChild(removeButton)
-
-    // Add Events
-
-    removeButton.addEventListener('click', function(event){
-        var e = event.srcElement
-        var row = $('#monInventory div.monster').length
-        var current_row = parseInt(e.id.match(/\d+/)[0])
-        if (row == current_row){
-            alert("Can't remove the last row")
-        } else{
-            var monster = document.getElementById(`monster${current_row}`)
-            var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
-            combat_plan.splice(current_row-1, 1)
-            localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
-            monster.remove()
-            location.reload()
-        }
-    })
-
-    var fields = row.querySelectorAll('input, select')
-    fields.forEach(input => {
-        input.addEventListener('input', saveToLocalStorage)
-    })
-
-    return row
-}
-
-function evaluateRow(e){
-    var row = $('#monInventory div.monster').length
-    var name = e.srcElement
-    var current_row = parseInt(name.id.match(/\d+/)[0])
-    var previous_name = document.getElementById(`monName${current_row-1}`)
-    var next_name = document.getElementById(`monName${current_row+1}`)
-
-    if (name.value != "" && current_row == row){
-        var newRow = cloneRow(row)
-        $('#monInventory').append(newRow)
-
-        document.getElementById(`monName${row+1}`).addEventListener('change', function(event){
-            evaluateRow(event)
-        })
-
-        document.getElementById(`monToken${row+1}`).addEventListener('change', function(event){
-            validateToken(event)
-        })
-
-    } else if (name.value == "" && ((previous_name && previous_name.value == "") || (next_name && next_name.value == ""))){
-        var last_row = document.getElementById(`monster${row}`)
-        last_row.remove()
-    }
-}
-
-function validateToken(e){
-    var val = document.getElementById(e.srcElement.id).value
-    var row = $('#monInventory div.monster').length
-    var parent = e.srcElement.parentElement
-    helpDom = document.getElementById(`mTokenHelp${row}`)
-
-    if (isValidHttpUrl(val)){
-        var base64 = btoa(val)
-        var queryUrl = `https://token.otfbm.io/meta/${base64}`
-        var tokenDom = document.getElementById(e.srcElement.id)
-        tokenDom.value = "Loading..."
-        err_str = "Something went wrong with that image. Either OTFBM doesn't have access to the image, or it is malformed.<br>Try a different image URL please"
-
-        var request = new XMLHttpRequest();
-        var url = `${document.URL}shortcode`
-        request.open('POST', url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onreadystatechange = function(){
-            if (request.readyState === 4 && request.status === 200){
-                var response = JSON.parse(request.responseText)
-                if (response.token != ""){
-                    input_event = new Event("input")
-                    tokenDom.value = response.token
-                    tokenDom.dispatchEvent(input_event)
-
-                    if (helpDom){
-                        helpDom.remove()
-                    }
-                } else {
-                    tokenDom.value = ""
-                    if (helpDom){
-                        helpDom.innerHTML = err_str
-                    } else {
-                        helpDom = document.createElement("small")
-                        helpDom.id = `mTokenHelp${row}`
-                        helpDom.className = "form-text text-white-50"
-                        helpDom.innerHTML = err_str
-                        parent.appendChild(helpDom)
-                    }
-                }
-            }
-        }
-
-        request.send(JSON.stringify({"url": queryUrl}))
-    } else {
-        if (helpDom){
-            helpDom.remove()
-        }
-    }
-}
-
-function getShortcode(queryUrl){
-    var request = new XMLHttpRequest();
-    var url = `${document.URL}shortcode`
-    request.open('POST', url, true)
-    request.setRequestHeader('Content-Type', 'application/json')
-
-    request.onreadystatechange = function(){
-        if (request.readyState === 4 && request.status === 200){
-            var response = JSON.parse(request.responseText)
-        }
-    }
-
-    request.send(JSON.stringify({"url": queryUrl}))
-}
-
-function isValidHttpUrl(string) {
-    let url;
-
-    try {
-        url = new URL(string);
-    } catch (_) {
-        return false;
-    }
-
-    return url.protocol === "http:" || url.protocol === "https:";
-}
-
 function buildMaddCommand(){
     var rows = $('#monInventory div.monster').length
     var inventory_header = document.getElementById('inventory-header')
@@ -409,7 +182,7 @@ function buildMaddCommand(){
     document.getElementById('madd').innerHTML = out
 }
 
-function buildMapTab(num, monster){
+function buildMaddTable(num, monster){
     if (!monster || !monster.monName && (!monster.monQty || monster.monQty < 1)){
         return
     }
@@ -431,15 +204,10 @@ function buildMapTab(num, monster){
     header.innerHTML = `${monster.monName}`
     header_col.appendChild(header)
 
-    button = document.createElement("button")
-    button.type = "button"
-    button.id =`${prefix}${num}-remove`
-    button.className = "btn-close ms-auto"
-    header_col.appendChild(button)
-
     header_row.appendChild(header_col)
     monster_row.appendChild(header_row)
 
+    // Add fields per monster
     for (var i=0; i < quantity; i++){
         coord = document.createElement("input")
         coord.type="text"
@@ -470,6 +238,22 @@ function buildMapTab(num, monster){
         monster_row.appendChild(col)
     }
 
+    // Footer Row
+    footer_row = document.createElement("div")
+    footer_row.className = "row mt-2"
+
+    footer_col = document.createElement("div")
+    footer_col.className = "col mb-3"
+
+    button = document.createElement("button")
+    button.type = "button"
+    button.id =`${prefix}${num}-remove`
+    button.className = "btn btn-light float-end"
+    button.innerHTML = "Clear"
+    footer_col.appendChild(button)
+    footer_row.appendChild(footer_col)
+    monster_row.appendChild(footer_row)
+
     var fields = monster_row.querySelectorAll('input, select')
     fields.forEach(input => {
         input.addEventListener('input', saveToLocalStorage)
@@ -493,7 +277,7 @@ function buildMapTab(num, monster){
     return monster_row
 }
 
-function updateMapTab(){
+function updateMaddTable(){
     var mapPlanner = document.getElementById("mapPlanner")
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
     var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
@@ -502,9 +286,27 @@ function updateMapTab(){
     mapPlanner.innerHTML = ''
 
     combat_plan.forEach(function(monster, index){
-        $('#mapPlanner').append(buildMapTab(index+1, monster))
+        $('#mapPlanner').append(buildMaddTable(index+1, monster))
         document.getElementById('mapPlanner').dispatchEvent(event)
     })
+}
+
+function buildMapPlannerCommand(){
+    var maps_header = document.getElementById('maps-header')
+    var url = document.getElementById("map-url").value
+    var size = document.getElementById('map-size').value
+    var csettings = document.getElementById('map-csettings').value
+
+    var out = ""
+
+    if (url || size || csettings){
+        out = `!map` +  (url ?` -bg "${url}"`:"") + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
+        maps_header.hidden=false
+    } else{
+        maps_header.hidden=true
+    }
+
+    document.getElementById("map-command").innerHTML = out
 }
 
 function buildMapCommand(){
@@ -569,33 +371,6 @@ function buildOverlayCommand(){
     }
 
     document.getElementById('overlay-command').innerHTML = out
-}
-
-function buildMapPlannerCommand(){
-    var maps_header = document.getElementById('maps-header')
-    var url = document.getElementById("map-url").value
-    var size = document.getElementById('map-size').value
-    var csettings = document.getElementById('map-csettings').value
-
-    var out = ""
-
-    if (url || size || csettings){
-        out = `!map` +  (url ?` -bg "${url}"`:"") + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
-
-        maps_header.hidden=false
-        document.getElementById("map-command-copy").addEventListener('click', function(event){
-            var copyText = document.getElementById("map-command").innerHTML
-            copyText = copyText.replace(/<br>/g, '\n')
-
-            if (copyText){
-                navigator.clipboard.writeText(copyText)
-            }
-        })
-    } else{
-        maps_header.hidden=true
-    }
-
-    document.getElementById("map-command").innerHTML = out
 }
 
 function handleOverlay(){
@@ -816,7 +591,6 @@ function handleOverlay(){
 
         columns.push(colorColumn)
     }
-
 
     var overlayRow = document.getElementById("overlay-row")
     overlayRow.innerHTML = ""

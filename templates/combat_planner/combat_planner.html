@@ -155,8 +155,6 @@
                             <form method="post" id="mapPlanner">
                             </form>
                         </div>
-                        <div class="col-md-5 text-center" id="monMapPreview" hidden>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -242,7 +240,6 @@
                     </div>
                     <form method="post" id="overlay-setup">
                         <div class="row border rounded bg-secondary m-2">
-                            <button type="button" class="btn-close ms-auto" id="overlay-clear-button"></button>
                             <div class="row m-2">
                                 <div class="col-sm-3 mb-3">
                                     <div class="form-floating">
@@ -259,12 +256,18 @@
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="map-overlay-target" name="map-overlay-target" placeholder="Target">
+                                        <input type="text" class="form-control" id="map-overlay-target"
+                                               name="map-overlay-target" placeholder="Target">
                                         <label for="map-overlay-target">Target</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row m-2" id="overlay-row">
+                            </div>
+                            <div class="row m-2">
+                                <div class="col mb-3">
+                                    <button type="button" class="btn btn-light float-end" id="overlay-clear-button">Clear</button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -274,6 +277,7 @@
     </div>
 </div>
 
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_helpers.js')}}"></script>
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>
 
 {% endblock %}

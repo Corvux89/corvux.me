@@ -29,7 +29,3 @@ body{
 .nav-link.complanner{
     background-color: silver;
 }
-
-#mapOverlayModal {
-  overflow: hidden;
-}

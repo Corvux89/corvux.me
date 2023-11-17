@@ -8,7 +8,7 @@
   },
   {
     "name": "TheBrokenProphecy.com",
-    "image": "images/Guild_star.png",
+    "image": "images/Guild_Star.png",
     "desc": "Website for the Broken Prophecy D&D 5e server and ProphetBot. Allows login via Discord, displays information to players, and various configuration pages for server administrators depending on their role on the Discord server.",
     "webLink": "https://www.thebrokenprophecy.com/",
     "github": "https://github.com/Corvux89/thebrokenprophecy.com",

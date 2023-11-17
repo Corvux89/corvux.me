@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Corvux.me",
+    "image": "/images/mainlogo.png",
+    "desc": "This website! This is a big testing ground as I learn more about python, and various aspects of programming that I don't get to explore in my normal job. Corvux has been my username for years, so this domain made sense.",
+    "github": "https://github.com/Corvux89/corvux.me",
+    "tags": ["py", "js"]
+  },
+  {
+    "name": "TheBrokenProphecy.com",
+    "image": "images/Guild_star.png",
+    "desc": "Website for the Broken Prophecy D&D 5e server and ProphetBot. Allows login via Discord, displays information to players, and various configuration pages for server administrators depending on their role on the Discord server.",
+    "webLink": "https://www.thebrokenprophecy.com/",
+    "github": "https://github.com/Corvux89/thebrokenprophecy.com",
+    "discord": "https://disboard.org/server/679749063414906985",
+    "tags": ["py", "js"]
+  },
+  {
+    "name": "ProphetBot",
+    "image": "images/BP-icon.png",
+    "desc": "Discord bot for Broken Prophecy D&D 5e Server. Logs player transactions and tracks player xp/gold progress. Helps facilitate mini-campaigns, player managed channels, shops, and server moderation.",
+    "github": "https://github.com/ShardlessBun/blind-prophet",
+    "tags": ["py"]
+  },
+  {
+    "name": "G0-T0 Resolute",
+    "image": "/images/goto-icon.png",
+    "desc": "Similar to ProphetBot, this bot has been tweaked, and altered to work within the Star Wars 5E ruleset using their currencies, and helping track characters, ships, classes, and everything unique to this system.",
+    "github": "https://github.com/Corvux89/G0-T0-Resolute",
+    "tags": ["py"]
+  },
+  {
+    "name": "SW5E Things",
+    "image": "/images/sw5e-things.png",
+    "desc": "Avrae collection of Aliases and Snippets to help facilitate playing Star Wars 5E with Avrae bot in Discord, from class features, powers (spells), and monsters.",
+    "github": "https://github.com/Corvux89/Corvux-Avrae-Aliases/tree/master/Collections/SW5E%20Things",
+    "webLink": "https://avrae.io/dashboard/workshop/63e066ecd6596a5e18f1604f",
+    "tags": ["py"]
+  }
+]

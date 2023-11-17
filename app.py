@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlparse
 
 from flask import Flask, render_template, request, make_response
@@ -19,7 +20,9 @@ app.config.update(
 @app.route('/')
 @app.route('/home')
 def homepage():
-    return render_template("main.html")
+    f = open('static/json/projects.json', encoding="utf8")
+    projects = json.load(f)
+    return render_template("main.html", projects = projects)
 
 @app.route('/sitemap.xml')
 def site_map():

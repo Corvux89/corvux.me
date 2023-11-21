@@ -32,11 +32,24 @@
                     <select class="form-select" id="{{field.name}}" name="{{field.name}}" aria-label="{{field.name}}"
                             title="{{field.desc if field.desc}}">
                         {% for point in field.points %}
+                        {% if field.default == point %}
                         <option value="{{point}}"
-                                point-cost="{{field.prices[field.points.index(point)] if field.prices else 0}}"
-                                point-weight="{{field.weights[field.points.index(point)] if field.weights else 0}}">
+                                weight-override="{{field.weights[field.points.index(point)] if field.weights}}"
+                                cost-override="{{field.costs[field.points.index(point)] if field.costs}}"
+                                range-mod="{{ field.rangeMod[field.points.index(point)] if field.rangeMod }}"
+                                reload-mod="{{ field.reloadMod[field.points.index(point)] if field.reloadMod }}"
+                                selected>
                             {{point}}
                         </option>
+                        {% else %}
+                        <option value="{{point}}"
+                                weight-override="{{field.weights[field.points.index(point)] if field.weights}}"
+                                cost-override="{{field.costs[field.points.index(point)] if field.costs}}"
+                                range-mod="{{ field.rangeMod[field.points.index(point)] if field.rangeMod }}"
+                                reload-mod="{{ field.reloadMod[field.points.index(point)] if field.reloadMod }}">
+                            {{point}}
+                        </option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                     <label for="{{field.name}}">{{field.name}}</label>
@@ -96,6 +109,9 @@
 <script nonce="{{ csp_nonce() }}">
     var weights = {{ fields.weights|tojson|safe }}
     var properties = {{ fields.fields|tojson|safe }}
+
+
+
 </script>
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>
 

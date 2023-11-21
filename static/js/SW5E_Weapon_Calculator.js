@@ -15,6 +15,8 @@ function calc_total(){
     var short = def_weight.short || ""
     var long = def_weight.long || ""
     var reload = def_weight.reload || ""
+    var range_mod = 1
+    var reload_mod = 0
 
     // Sum everything up
     form.querySelectorAll('select').forEach(input =>{
@@ -22,8 +24,31 @@ function calc_total(){
         var property = properties.filter(obj => {return obj.name == input.id})[0]
 
         total += parseFloat(input.value) || 0
-        cost += parseFloat(input.selectedIndex) * parseFloat(property.cost) || 0
-        weight += parseFloat(input.selectedIndex) * parseFloat(property.weight) || 0
+
+        // Cost
+        if (selection.getAttribute("cost-override") != ""){
+            cost += parseFloat(selection.getAttribute("cost-override")) || 0
+        } else{
+            cost += parseFloat(input.selectedIndex) * parseFloat(property.cost) || 0
+        }
+
+        // Weight
+        if (selection.getAttribute("weight-override") != ""){
+            weight += parseFloat(selection.getAttribute("weight-override")) || 0
+        } else{
+            weight += parseFloat(input.selectedIndex) * parseFloat(property.weight) || 0
+        }
+
+        // Range
+        if (selection.getAttribute("range-mod") != ""){
+            range_mod = parseFloat(selection.getAttribute("range-mod"))
+        }
+
+        // Reload
+        if (selection.getAttribute("reload-mod") != ""){
+            reload_mod = parseFloat(selection.getAttribute("reload-mod"))
+        }
+
     })
 
     // Adjust total
@@ -40,9 +65,9 @@ function calc_total(){
         if (!isNaN(points) && adj_total >= points && (i === (weights.length-1) || adj_total < parseFloat(weights[i+1].points))){
             cost += parseFloat(w.cost) || 0
             weight += parseFloat(w.weight) || 0
-            short = w.short
-            long = w.long
-            reload = w.reload
+            short = parseFloat(w.short) * range_mod
+            long = parseFloat(w.long) * range_mod
+            reload = parseFloat(w.reload) + reload_mod
             die = w.die
             break;
         }

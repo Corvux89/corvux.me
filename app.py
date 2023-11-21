@@ -6,6 +6,7 @@ from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
 from blueprints.combat_planner import combat_planner_blueprint
+from blueprints.sw5e_weapon_calculator import weapon_calc
 from constants import WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
 
@@ -51,6 +52,7 @@ talisman = Talisman(
 )
 
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
+app.register_blueprint(weapon_calc, url_prefix="/SW5E_Weapon_Calculator")
 
 if __name__ == "__main__":
     app.run()

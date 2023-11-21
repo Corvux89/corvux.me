@@ -1,0 +1,263 @@
+{
+  "weights": [
+    {
+      "points": "default",
+      "die": "d3",
+      "cost": "50",
+      "short": "20",
+      "long": "80",
+      "reload": "20",
+      "weight": "2"
+    },
+    {
+      "points": "0",
+      "die": "d4",
+      "cost": "50",
+      "short": "20",
+      "long": "80",
+      "reload": "20",
+      "weight": "2"
+    },
+    {
+      "points": "1",
+      "die": "d6",
+      "cost": "125",
+      "short": "40",
+      "long": "160",
+      "reload": "16",
+      "weight": "2"
+    },
+    {
+      "points": "2",
+      "die": "d8",
+      "cost": "225",
+      "short": "60",
+      "long": "240",
+      "reload": "12",
+      "weight": "4"
+    },
+    {
+      "points": "3",
+      "die": "2d4",
+      "cost": "425",
+      "short": "80",
+      "long": "320",
+      "reload": "8",
+      "weight": "6"
+    },
+    {
+      "points": "4",
+      "die": "d10",
+      "cost": "750",
+      "short": "100",
+      "long": "400",
+      "reload": "4",
+      "weight": "8"
+    },
+    {
+      "points": "5",
+      "die": "d12",
+      "cost": "1000",
+      "short": "120",
+      "long": "480",
+      "reload": "2",
+      "weight": "10"
+    },
+    {
+      "points": "6",
+      "die": "2d6",
+      "cost": "1250",
+      "short": "120",
+      "long": "480",
+      "reload": "2",
+      "weight": "11"
+    },
+    {
+      "points": "7",
+      "die": "3d4",
+      "cost": "1750",
+      "short": "120",
+      "long": "480",
+      "reload": "2",
+      "weight": "12"
+    }
+  ],
+  "notes": [
+    {
+      "title": "Final value of .5",
+      "text": "If a weapon has a final value of .5, it will automatically be treated as if rounded up. If you instead wish to round down, you'll have to manually correct through the final Damage Die."
+    },
+    {
+      "title": "Auto",
+      "text": "Auto weapons must include the burst, rapid, or penetrating property."
+    },
+    {
+      "title": "Burst/Penetrating/Rapid",
+      "text": "Burst number should equal base reload number. Penetrating/rapid number should equal half the base reload number. You can halve the number again at the cost of another damage die step. Number can't be reduced below 2."
+    },
+    {
+      "title": "Range",
+      "text": "Range should align with the Die Base Values, Ranges, Reload and Weight table. Range can increase or decrease by 25% of base at a cost or bonus of .5 per step."
+    }
+  ],
+  "fields": [
+    {
+      "name": "Simple/Martial",
+      "points": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "Auto",
+      "points": [
+        0,
+        1
+      ],
+      "desc": "Automatic weapons can only fire in burst or rapid modes. If the weapon has both burst and rapid properties, you choose which mode to use. You can only use one mode at a time.",
+      "cost": 100,
+      "weight": ".5"
+    },
+    {
+      "name": "Brutal 1",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "When you score a critical hit with a weapon with the brutal property, you roll a number of additional weapon damage dice equal to the brutal number.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Burst",
+      "points": [0, "-1", "-2", "-3", "-4", "-5"],
+      "desc": "When you would make a ranged weapon attack with a weapon with the burst property, you can instead spray a 10-foot-cube area within range with shots, consuming ammunition equal to the burst number. Each creature in the area must make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon) or take the weapon’s normal damage. If the targeted area is beyond normal range but within long range, affected targets have advantage on the save.",
+      "cost": 150,
+      "weight": "1"
+    },
+    {
+      "name": "Dire 1",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "Before you make a weapon attack with a weapon with the dire property, you can choose to suffer a penalty to the attack roll up to the dire number. If you do so and you hit with it, you gain the same bonus to the damage roll.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Disguised",
+      "points": [
+        0,
+        "-.5"
+      ],
+      "desc": "You have advantage on Charisma (Deception) checks made to hide the nature of a disguised weapon.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Disintegrate",
+      "points": [
+        0,
+        "-.5"
+      ],
+      "desc": "When a creature is forced to make a Constitution saving throw to maintain concentration due to taking damage from a weapon with the disruptive property, the DC for the check equals 10 or the full damage taken, whichever number is higher, instead of only half.",
+      "cost": 100,
+      "weight": ".5"
+    },
+    {
+      "name": "Disruptive",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "When a creature is forced to make a Constitution saving throw to maintain concentration due to taking damage from a weapon with the disruptive property, the DC for the check equals 10 or the full damage taken, whichever number is higher, instead of only half.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Fixed",
+      "points": [
+        0,
+        "-.5"
+      ],
+      "desc": "A weapon with the fixed property does not fill the hand, but you can’t use the weapon while the hand is full. Additionally, you have a +10 bonus to ability checks and saving throws to avoid being disarmed of this weapon.",
+      "cost": 25,
+      "weight": ".5"
+    },
+    {
+      "name": "Hidden",
+      "points": [
+        0,
+        "-.5"
+      ],
+      "desc": "You have advantage on Dexterity (Sleight of Hand) checks made to conceal a hidden weapon.",
+      "cost": 25,
+      "weight": "0"
+    },
+    {
+      "name": "Keen 1",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Light",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+      "cost": 50,
+      "weight": "-1"
+    },
+    {
+      "name": "Mighty",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "When making an attack with a mighty weapon, you use your choice of your Strength or Dexterity modifier for the attack and damage rolls. You must use the same modifier for both rolls.",
+      "cost": 50,
+      "weight": ".5"
+    },
+    {
+      "name": "Penetrating",
+      "points": [
+        0,
+        "-1",
+        "-2",
+        "-3",
+        "-4",
+        "-5"
+      ],
+      "desc": "When you would make a ranged weapon attack with a weapon with this property, you can instead attempt to penetrate and hit a creature behind the target, consuming ammunition equal to the penetrating number. Make an attack roll against the initial target. If the attack hits, there is a creature within 15 feet of that creature and directly behind it, and the original attack roll would hit the second creature, it also takes normal weapon damage.",
+      "cost": 150,
+      "weight": ".5"
+    },
+    {
+      "name": "Piercing 1",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "Before you make a weapon attack with a weapon with the piercing property, you can choose to gain a bonus to the attack roll up to the piercing number. If you do so and you hit with it, you suffer an equivalent penalty to the damage roll.",
+      "cost": 250,
+      "weight": ".5"
+    },
+    {
+      "name": "Range",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "Before you make a weapon attack with a weapon with the piercing property, you can choose to gain a bonus to the attack roll up to the piercing number. If you do so and you hit with it, you suffer an equivalent penalty to the damage roll.",
+      "cost": 250,
+      "weight": ".5"
+    }
+  ]
+}

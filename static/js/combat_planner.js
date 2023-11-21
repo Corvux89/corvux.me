@@ -40,6 +40,10 @@ function onLoad(){
         form.dispatchEvent(change_event)
     })
 
+    document.getElementById("exportSettings").addEventListener('click', function(event){
+        exportToURL()
+    })
+
     // Monster Inventory
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
@@ -677,4 +681,5 @@ function buildMapPreview(){
     }
 }
 
+importFromURL()
 onLoad()

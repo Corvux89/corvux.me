@@ -5,6 +5,7 @@
     <button type="button" class="btn btn-danger m-2" id="comReset">Reset All</button>
     <button type="button" class="btn btn-primary m-2" id="comMonReset">Reset Monsters Only</button>
     <button type="button" class="btn btn-primary m-2" id="comMapReset">Reset Map Only</button>
+    <button type="button" class="btn btn-primary m-2" id="exportSettings">Export</button>
 </div>
 
 <nav>
@@ -281,4 +282,3 @@
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>
 
 {% endblock %}
-

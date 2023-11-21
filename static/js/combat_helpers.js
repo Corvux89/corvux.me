@@ -245,3 +245,35 @@ function validateToken(e){
         }
     }
 }
+
+function exportToURL(){
+    var data = JSON.stringify(localStorage)
+    var encodedData = encodeURIComponent(data)
+    var url = `?data=${encodedData}`
+
+    //window.history.replaceState({}, document.title, url)
+    navigator.clipboard.writeText(`${window.location.href}${url}`)
+    $('#exportSettings').tooltip({title: "Build copied to clipboard!", delay: {show: 500, hide: 1500}})
+    $('#exportSettings').tooltip('show')
+}
+
+function importFromURL(){
+    var urlParams = new URLSearchParams(window.location.search)
+    var encodedData = urlParams.get('data')
+
+    if (encodedData){
+        var data = decodeURIComponent(encodedData)
+
+        try {
+           var parsedData = JSON.parse(data)
+
+           for (var key in parsedData){
+            localStorage.setItem(key, parsedData[key])
+           }
+
+           window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error){
+            console.error('Error parsing data: ', error)
+        }
+    }
+}

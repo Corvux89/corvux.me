@@ -31,26 +31,26 @@ function calc_total(){
         total += (parseFloat(input.value) * point_mod) || 0
 
         // Cost
-        if (selection.getAttribute("cost-override") != ""){
+        if (selection.getAttribute("cost-override")){
             cost += parseFloat(selection.getAttribute("cost-override")) || 0
         } else{
             cost += parseFloat(input.selectedIndex) * parseFloat(property.cost) || 0
         }
 
         // Weight
-        if (selection.getAttribute("weight-override") != ""){
+        if (selection.getAttribute("weight-override")){
             weight += parseFloat(selection.getAttribute("weight-override")) || 0
         } else{
             weight += parseFloat(input.selectedIndex) * parseFloat(property.weight) || 0
         }
 
         // Range
-        if (selection.getAttribute("range-mod") != ""){
+        if (selection.getAttribute("range-mod")){
             range_mod = parseFloat(selection.getAttribute("range-mod"))
         }
 
         // Reload
-        if (selection.getAttribute("reload-mod") != ""){
+        if (selection.getAttribute("reload-mod")){
             reload_mod = parseFloat(selection.getAttribute("reload-mod"))
         }
 
@@ -58,8 +58,6 @@ function calc_total(){
 
     // Adjust total
     var adj_total = Math.ceil(total)
-
-    console.log("Total: " + total + " Adjusted Total: " + adj_total)
 
     // Adjust based on points
     for (var i = 0; i < weights.length; i++){

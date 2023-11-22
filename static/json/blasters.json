@@ -98,6 +98,30 @@
     {
       "title": "Range",
       "text": "Range should align with the Die Base Values, Ranges, Reload and Weight table. Range can increase or decrease by 25% of base at a cost or bonus of .5 per step."
+    },
+    {
+      "title": "Reload",
+      "text": "Reload should align with the table. Reload can increase or decrease by an amount equal to 50% of base (max 4 reload a step) at a cost or bonus of .5 per step, to a max/min of 20/2 reload."
+    },
+    {
+      "title": "Special",
+      "text": "The special property is subjective and thus not given a particular weight or cost. A number entered in this column will affect the weapon's total value."
+    },
+    {
+      "title": "Strength",
+      "text": "Higher strength requirements can increase the damage die further. Strength 13 for 2 points, 15 for 3 points, 17 for 4 points, 19 for 5 points, or 21 for 6 points."
+    },
+    {
+      "title": "Strength/Might",
+      "text": "Strength and mighty are mutually exclusive."
+    },
+    {
+      "title": "Switch",
+      "text": "A switch weapon's alternate damage should be one step lower, without affecting base value, range, reload, or weight. Additionally, it's reload should drop one step."
+    },
+    {
+      "title": "Alternate Damage Types (from energy or kinetic to acid, cold, fire, ion, lightning)",
+      "text": "Alternate damage types should force the weapon's damage down by one step, without affecting base value, range, reload, or weight. Additionally, it should double the weapon's base value manually through the SPECIAL column. Ion damage should be two steps down or half the weapon's damage, whichever is higher."
     }
   ],
   "fields": [
@@ -406,14 +430,48 @@
       "weight": ".5"
     },
     {
-      "name": "Smart",
+      "name": "Smart (No points)",
       "points": [
         0,
         "500"
       ],
-      "values": [0, 0],
+      "overrideValue": [0, 0],
       "desc": "This weapon ignores your Dexterity score and proficiency bonus. Two numbers appear in parentheses with the property - the first is the weapon’s Dexterity score, and the second is the weapon’s proficiency bonus. The weapon uses these values instead of yours when you make attack and damage rolls with it. If you lack proficiency with the weapon, the weapon does not benefit from its proficiency bonus.",
       "cost": 500,
+      "weight": ".5"
+    },
+    {
+      "name": "Switch (No points)",
+      "points": [
+        0,
+        500,
+        1000,
+        1500,
+        2000
+      ],
+      "overrideValue": [0, 0, 0, 0, 0],
+      "desc": "A weapon with the switch property can deal an alternate type of damage. A damage value appears in parentheses appears with the property-the damage when the weapon uses its alternate damage type. On your turn, you can use your object interaction to change the weapon’s damage type.",
+      "cost": 500,
+      "weight": "2"
+    },
+    {
+      "name": "Two-Handed",
+      "points": [
+        0,
+        1
+      ],
+      "desc": "This weapon requires two hands to use.",
+      "cost": 150,
+      "weight": "2"
+    },
+    {
+      "name": "Vicious",
+      "points": [
+        0,
+        "-1"
+      ],
+      "desc": "Whenever you deal damage with a weapon with the vicious property and roll the maximum on a weapon damage die, you gain a bonus to damage equal to the vicious number.",
+      "cost": 250,
       "weight": ".5"
     }
   ]

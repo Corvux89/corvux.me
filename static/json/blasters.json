@@ -404,6 +404,17 @@
       "desc": "A weapon with this special property has a heavy kickback. While wielding it, you have disadvantage on attack rolls unless you meet the Strength requirement. If the weapon has the burst or rapid property, you must meet the Strength requirement to use this feature.",
       "cost": 50,
       "weight": ".5"
+    },
+    {
+      "name": "Smart",
+      "points": [
+        0,
+        "500"
+      ],
+      "values": [0, 0],
+      "desc": "This weapon ignores your Dexterity score and proficiency bonus. Two numbers appear in parentheses with the property - the first is the weapon’s Dexterity score, and the second is the weapon’s proficiency bonus. The weapon uses these values instead of yours when you make attack and damage rolls with it. If you lack proficiency with the weapon, the weapon does not benefit from its proficiency bonus.",
+      "cost": 500,
+      "weight": ".5"
     }
   ]
 }

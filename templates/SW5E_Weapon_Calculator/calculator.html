@@ -32,24 +32,18 @@
                     <select class="form-select" id="{{field.name}}" name="{{field.name}}" aria-label="{{field.name}}"
                             title="{{field.desc if field.desc}}">
                         {% for point in field.points %}
-                        {% if field.default == point %}
-                        <option value="{{point}}"
-                                {% if field.weights %}weight-override="{{field.weights[field.points.index(point)]}}"{% endif %}
-                                {% if field.costs %}cost-override="{{field.costs[field.points.index(point)]}}" {% endif %}
-                                range-mod="{{ field.rangeMod[field.points.index(point)] if field.rangeMod }}"
-                                reload-mod="{{ field.reloadMod[field.points.index(point)] if field.reloadMod }}"
-                                selected>
+                        <option value="{{field.values[field.points.index(point)] or point}}"
+                                {% if field.weights %}weight-override="{{field.weights[field.points.index(point)]}}" {%
+                                endif %}
+                                {% if field.costs %}cost-override="{{field.costs[field.points.index(point)]}}" {% endif
+                                %}
+                                {% if field.rangeMod %}range-mod="{{ field.rangeMod[field.points.index(point)]}}" {%
+                                endif %}
+                                {% if field.reloadMod %}reload-mod="{{ field.reloadMod[field.points.index(point)]}}" {%
+                                endif %}
+                                {% if field.default== point %}selected{% endif %}>
                             {{point}}
                         </option>
-                        {% else %}
-                        <option value="{{point}}"
-                                {% if field.weights %}weight-override="{{field.weights[field.points.index(point)]}}"{% endif %}
-                                cost-override="{{field.costs[field.points.index(point)] if field.costs}}"
-                                range-mod="{{ field.rangeMod[field.points.index(point)] if field.rangeMod }}"
-                                reload-mod="{{ field.reloadMod[field.points.index(point)] if field.reloadMod }}">
-                            {{point}}
-                        </option>
-                        {% endif %}
                         {% endfor %}
                     </select>
                     <label for="{{field.name}}">{{field.name}}</label>
@@ -109,6 +103,10 @@
 <script nonce="{{ csp_nonce() }}">
     var weights = {{ fields.weights|tojson|safe }}
     var properties = {{ fields.fields|tojson|safe }}
+
+
+
+
 
 
 

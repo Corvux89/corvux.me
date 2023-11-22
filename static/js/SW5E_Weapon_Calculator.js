@@ -15,6 +15,7 @@ function calc_total(){
     var short = def_weight.short || ""
     var long = def_weight.long || ""
     var reload = def_weight.reload || ""
+    var point_mod = 1
     var range_mod = 1
     var reload_mod = 0
 
@@ -23,7 +24,11 @@ function calc_total(){
         var selection = input.options[input.selectedIndex]
         var property = properties.filter(obj => {return obj.name == input.id})[0]
 
-        total += parseFloat(input.value) || 0
+        if (selection.getAttribute("point-mod")){
+            point_mod = parseFloat(selection.getAttribute("point-mod"))
+        }
+
+        total += (parseFloat(input.value) * point_mod) || 0
 
         // Cost
         if (selection.getAttribute("cost-override") != ""){

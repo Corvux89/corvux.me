@@ -88,9 +88,9 @@ function calc_total(key){
     // Some error validation
     if (total > parseFloat(reference[key].weights[reference[key].weights.length-1].points) || adj_total <= -1){
         die = "Invalid weapon"
-        document.getElementById('summary-row').classList.add("bg-danger")
-    } else if (document.getElementById('summary-row').classList.contains("bg-danger")) {
-        document.getElementById('summary-row').classList.remove("bg-danger")
+        document.getElementById(`${key}-summary-row`).classList.add("bg-danger")
+    } else if (document.getElementById(`${key}-summary-row`).classList.contains("bg-danger")) {
+        document.getElementById(`${key}-summary-row`).classList.remove("bg-danger")
     }
 
     if (document.getElementById(`${key}-point-total`) !== null){

@@ -1,5 +1,7 @@
 {
   "blasters": {
+    "title": "Blasters",
+    "weight_headers": {"points":  "Points", "die":  "Die Size", "cost":  "Cost", "weight":  "Weight", "range":  "Range", "reload":  "Reload"},
     "weights": [
       {
         "points": "default",
@@ -488,7 +490,17 @@
     ]
   },
   "lightweapons": {
+    "title": "Lightweapons",
+    "weight_headers": {"points":  "Points", "die":  "Die Size", "cost":  "Cost", "weight":  "Weight", "range":  "Thrown Range"},
     "weights": [
+      {
+        "points": "default",
+        "die": "d4",
+        "cost": 175,
+        "short": 20,
+        "long": 60,
+        "weight": 1
+      },
       {
         "points": 0,
         "die": "d4",
@@ -763,7 +775,13 @@
       }
     ]
   },
-  "vibroweapons": {}
+  "vibroweapons": {
+    "title": "Vibroweapons",
+    "weight_headers": {},
+    "weights": [],
+    "notes": [],
+    "fields": []
+  }
 }
 
 

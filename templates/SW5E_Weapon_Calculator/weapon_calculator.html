@@ -6,318 +6,206 @@
 
 <nav>
     <div class="nav nav-tabs sw5eCalc-tabs m-2" id="sw5eCalcTab" role="tablist">
-        <button class="nav-link active sw5ecalc" id="blaster-tab" data-bs-toggle="tab" data-bs-target="#blaster-calc"
-                type="button" role="tab" aria-selected="true" aria-controls="blaster-calc">Blasters
+        {% for key in data %}
+        <button class="nav-link sw5ecalc {{'active' if data|first == key}}" id="{{key}}-tab" data-bs-toggle="tab"
+                data-bs-target="#{{key}}-calc"
+                type="button" role="tab" aria-selected="true" aria-controls="{key}-calc">{{ data[key].title }}
         </button>
-
-        <button class="nav-link sw5ecalc" id="lightweapon-tab" data-bs-toggle="tab" data-bs-target="#lightweapon-calc"
-                type="button" role="tab" aria-selected="false" aria-controls="lightweapon-calc">Lightweapons
-        </button>
+        {% endfor %}
     </div>
 </nav>
 
 <div class="tab-content" id="sw5eCalcContent">
-    <!-- Blasters -->
-    <div class="tab-pane fade show active" id="blaster-calc" role="tabpanel" aria-labelledby="blaster-tab">
-        {% set blasters = data["blasters"] %}
-        <div class="row m-2">
-            <div class="col-1 m-2">
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#blaster-note-collapse"
-                   role="button">Notes</a>
-            </div>
-            <div class="col-2 m-2">
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#blaster-base-collapse" role="button">Base
-                    Values</a>
-            </div>
-            <div class="collapse" id="blaster-note-collapse">
-                <table class="table table-bordered text-white">
-                    {% for note in blasters.notes %}
-                    <tr>
-                        <td>{{note.title}}</td>
-                        <td>{{note.text}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="collapse" id="blaster-base-collapse">
-                <table class="table table-bordered text-white">
-                    <thead>
-                    <tr>
-                        <th>Points</th>
-                        <th>Die Size</th>
-                        <th>Cost</th>
-                        <th>Weight</th>
-                        <th>Range</th>
-                        <th>Reload</th>
-                    </tr>
-                    </thead>
-                    {% for weight in blasters.weights %}
-                    <tr>
-                        <td>{{ weight.points }}</td>
-                        <td>{{ weight.die }}</td>
-                        <td>{{ weight.cost }}</td>
-                        <td>{{ weight.weight }}</td>
-                        <td>{{ weight.short}}/{{weight.long}}</td>
-                        <td>{{weight.reload}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-        <form id="blastersCalcForm">
-            <div class="row m-2 border rounded">
-                <div class="col-12 m-2">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="blasters-weap-name" name="blasters-weap-name"
-                               required>
-                        <label for="blasters-weap-name">Weapon Name</label>
-                    </div>
+    {% for key in data %}
+    {% set ref_data = data[key] %}
+    <div class="tab-pane fade {{'active show' if data|first == key else ''}}" id="{{key}}-calc" role="tabpanel"
+         aria-labelledby="{{key}}-tab" tabindex="0">
+        <div class="container m-2">
+            <div class="row  row-cols-auto m-2">
+                <div class="col-sm-1 m-2">
+                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{key}}-note-collapse"
+                       role="button">Notes</a>
                 </div>
-                {% for field in blasters.fields %}
-                <div class="col-4 m-2">
-                    <div class="form-floating" id="blasters-weapon-form">
-                        <select class="form-select" id="blasters-{{field.name}}" name="blasters-{{field.name}}"
-                                aria-label="{{field.name}}"
-                                title="{{field.desc if field.desc}}">
-                            {% for point in field.points %}
-                            <option
-                                    value="{{field.overrideValue[field.points.index(point)] if field.overrideValue else point}}"
-                                    {% if field.weights %}
-                                    weight-override="{{field.weights[field.points.index(point)]}}"
-                                    {% endif %}
-                                    {% if field.costs %}
-                                    cost-override="{{field.costs[field.points.index(point)]}}"
-                                    {% endif %}
-                                    {% if field.rangeMod %}
-                                    range-mod="{{ field.rangeMod[field.points.index(point)]}}"
-                                    {% endif %}
-                                    {% if field.reloadMod %}
-                                    reload-mod="{{ field.reloadMod[field.points.index(point)]}}"
-                                    {% endif %}
-                                    {% if field.default== point %}
-                                    selected
-                                    {% endif %}>
-                                {{point}}
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <label for="blasters-{{field.name}}">{{field.name}}</label>
-                        {% if field.cost %}
-                        <small id="blasters-{{field.cost}}-help" class="form-text text-muted"><p class="m-0">Cost
-                            Adjustment:
-                            {{field.cost}} cr</p></small>
-                        {% endif %}
-                        {% if field.weight %}
-                        <small id="blasters-{{field.weight}}-help" class="form-text text-muted"><p class="m-0">Weight
-                            Adjustment:
-                            {{field.weight}} lbs
-                            <p/></small>
-                        {% endif %}
-                    </div>
+                <div class="col-sm-3 m-2">
+                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{key}}-base-collapse"
+                       role="button">Base
+                        Values</a>
                 </div>
-                {% endfor %}
             </div>
-        </form>
-        <div class="row m-2 justify-content-end">
-            <table class="table table-sm table-borderless text-white w-50" align="right">
-                <tr id="summary-row">
-                    <td>Total:</td>
-                    <td><p id="blasters-point-total" class="d-inline">0</p></td>
-                </tr>
-                <tr>
-                    <td>Damage Die:</td>
-                    <td><p id="blasters-damage-die" class="d-inline">{{blasters.weights | selectattr("points",
-                        "equalto",
-                        "default") |
-                        map(attribute="die") | first }}</p></td>
-                </tr>
-                <tr>
-                    <td>Cost:</td>
-                    <td><p id="blasters-cost-total" class="d-inline">{{blasters.weights | selectattr("points",
-                        "equalto",
-                        "default") |
-                        map(attribute="cost") | first }}</p> cr
-                    </td>
-                </tr>
-                <tr>
-                    <td>Weight:</td>
-                    <td><p id="blasters-weight-total" class="d-inline">{{blasters.weights | selectattr("points",
-                        "equalto",
-                        "default")
-                        | map(attribute="weight") | first }}</p> lbs
-                    </td>
-                </tr>
-                <tr>
-                    <td>Min/Max Range:</td>
-                    <td><p id="blasters-short-range" class="d-inline">{{blasters.weights | selectattr("points",
-                        "equalto",
-                        "default") |
-                        map(attribute="short") | first }}</p> / <p id="blasters-long-range" class="d-inline m-0 p-0">
-                        {{blasters.weights
-                        | selectattr("points", "equalto", "default") | map(attribute="long") | first }}</p> ft
-                    </td>
-                </tr>
-                <tr>
-                    <td>Reload:</td>
-                    <td><p id="blasters-reload" class="d-inline">{{blasters.weights | selectattr("points", "equalto",
-                        "default") |
-                        map(attribute="reload") | first }}</p></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Lightweapons -->
-    <div class="tab-pane fade" id="lightweapon-calc" role="tabpanel" aria-labelledby="lightweapon-tab" tabindex="0">
-        {% set lightweapons = data["lightweapons"] %}
-        <div class="row m-2">
-            <div class="col-1 m-2">
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#lightweapon-note-collapse" role="button">Notes</a>
-            </div>
-            <div class="col-2 m-2">
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#lightweapon-base-collapse" role="button">Base
-                    Values</a>
-            </div>
-            <div class="collapse" id="lightweapon-note-collapse">
-                <table class="table table-bordered text-white">
-                    {% for note in lightweapons.notes %}
-                    <tr>
-                        <td>{{note.title}}</td>
-                        <td>{{note.text}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="collapse" id="lightweapon-base-collapse">
-                <table class="table table-bordered text-white">
-                    <thead>
-                    <tr>
-                        <th>Points</th>
-                        <th>Die Size</th>
-                        <th>Cost</th>
-                        <th>Weight</th>
-                        <th>Thrown Range</th>
-                    </tr>
-                    </thead>
-                    {% for weight in lightweapons.weights %}
-                    <tr>
-                        <td>{{ weight.points }}</td>
-                        <td>{{ weight.die }}</td>
-                        <td>{{ weight.cost }}</td>
-                        <td>{{ weight.weight }}</td>
-                        <td>{{ weight.short}}/{{weight.long}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-        <form id="lightweaponsCalcForm">
-            <div class="table-responsive">
-                <table class="table table-bordered text-white text-nowrap">
-                    <thead>
-                    <th class="align-text-top">
-                        <h5>Weapon</h5>
-                        <small><p class="m-0">Cost Adjustment</p></small>
-                        <small><p class="m-0">Weight Adjustment</p></small>
-                    </th>
-                    {% for field in lightweapons.fields %}
-                    <th class="align-text-top">
-                        <h5>{{field.name}}</h5>
-                        {% if field.cost %}
-                        <small id="lightweapons-{{field.cost}}-help" class="form-text text-muted"><p class="m-0">
-                            {{field.cost}} cr</p></small>
-                        {% endif %}
-                        {% if field.weight %}
-                        <small id="lightweapons-{{field.weight}}-help" class="form-text text-muted"><p class="m-0">
-                            {{field.weight}} lbs
-                            <p/></small>
-                        {% endif %}
-                    </th>
-                    {% endfor %}
-                    </thead>
-                    <tr>
-                        <td>Name goes here later</td>
-                        {% for field in lightweapons.fields %}
-                        <td>
-                            <select class="form-select" id="lightweapons-{{field.name}}"
-                                    name="lightweapons-{{field.name}}"
-                                    aria-label="{{field.name}}"
-                                    title="{{field.desc if field.desc}}">
-                                {% for point in field.points %}
-                                <option
-                                        value="{{field.overrideValue[field.points.index(point)] if field.overrideValue else point}}"
-                                        {% if field.weights %}
-                                        weight-override="{{field.weights[field.points.index(point)]}}"
-                                        {% endif %}
-                                        {% if field.costs %}
-                                        cost-override="{{field.costs[field.points.index(point)]}}"
-                                        {% endif %}
-                                        {% if field.rangeMod %}
-                                        range-mod="{{ field.rangeMod[field.points.index(point)]}}"
-                                        {% endif %}
-                                        {% if field.reloadMod %}
-                                        reload-mod="{{ field.reloadMod[field.points.index(point)]}}"
-                                        {% endif %}
-                                        {% if field.default== point %}
-                                        selected
-                                        {% endif %}>
-                                    {{point}}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </td>
+            <div class="row">
+                <div class="collapse" id="{{key}}-note-collapse">
+                    <table class="table table-bordered text-white">
+                        {% for note in ref_data.notes %}
+                        <tr>
+                            <td>{{note.title}}</td>
+                            <td>{{note.text}}</td>
+                        </tr>
                         {% endfor %}
-                    </tr>
-                </table>
+                    </table>
+                </div>
+                <div class="collapse" id="{{key}}-base-collapse">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-white">
+                            <thead>
+                            <tr>
+                                {% for header in ref_data.weight_headers %}
+                                <th>{{ref_data.weight_headers[header]}}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            {% for weight in ref_data.weights %}
+                            <tr>
+                                {% for header in ref_data.weight_headers %}
+                                {% if 'range' in header|lower %}
+                                <td>{{weight.short}}/{{weight.long}}</td>
+                                {% else %}
+                                <td>{{ weight[header] }}</td>
+                                {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
             </div>
-        </form>
-        <div class="row m-2 justify-content-end">
-            <table class="table table-sm table-borderless text-white w-50" align="right">
-                <tr id="summary-row">
-                    <td>Total:</td>
-                    <td><p id="lightweapons-point-total" class="d-inline">0</p></td>
-                </tr>
-                <tr>
-                    <td>Damage Die:</td>
-                    <td><p id="lightweapons-damage-die" class="d-inline">{{lightweapons.weights | selectattr("points",
-                        "equalto",
-                        0) |
-                        map(attribute="die") | first }}</p></td>
-                </tr>
-                <tr>
-                    <td>Cost:</td>
-                    <td><p id="lightweapons-cost-total" class="d-inline">{{lightweapons.weights | selectattr("points",
-                        "equalto",
-                        0) |
-                        map(attribute="cost") | first }}</p> cr
-                    </td>
-                </tr>
-                <tr>
-                    <td>Weight:</td>
-                    <td><p id="lightweapons-weight-total" class="d-inline">{{lightweapons.weights | selectattr("points",
-                        "equalto",
-                        0)
-                        | map(attribute="weight") | first }}</p> lbs
-                    </td>
-                </tr>
-                <tr>
-                    <td>Min/Max Thrown Range:</td>
-                    <td><p id="lightweapons-short-range" class="d-inline">{{lightweapons.weights | selectattr("points",
-                        "equalto",
-                        0) |
-                        map(attribute="short") | first }}</p> / <p id="lightweapons-long-range" class="d-inline m-0 p-0">
-                        {{lightweapons.weights
-                        | selectattr("points", "equalto", 0) | map(attribute="long") | first }}</p> ft
-                    </td>
-                </tr>
-            </table>
+            <div class="row">
+                <div class="col">
+                    <form id="{{key}}CalcForm">
+                        <div class="table-responsive m-2">
+                            <table class="table table-bordered text-white text-nowrap ">
+                                <thead>
+                                <tr>
+                                    <th class="align-text-top">
+                                        <h5>Weapon</h5>
+                                        <small><p class="m-0">Cost Adjustment</p></small>
+                                        <small><p class="m-0">Weight Adjustment</p></small>
+                                    </th>
+                                    <th class="align-text-top">
+                                        <h5>Selection</h5>
+                                    </th>
+                                </tr>
+                                </thead>
+                                {% for field in ref_data.fields %}
+                                <tr>
+                                    <td class="align-text-top">
+                                        <h5>{{field.name}}</h5>
+                                        {% if field.cost %}
+                                        <small id="{{key}}-{{field.cost}}-help" class="form-text text-muted"><p
+                                                class="m-0">
+                                            {{field.cost}} cr</p></small>
+                                        {% endif %}
+                                        {% if field.weight %}
+                                        <small id="{{key}}-{{field.weight}}-help" class="form-text text-muted"><p
+                                                class="m-0">
+                                            {{field.weight}} lbs
+                                            <p/></small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <select class="form-select" id="{{key}}-{{field.name}}"
+                                                name="{{key}}-{{field.name}}"
+                                                aria-label="{{key}}-{{field.name}}"
+                                                title="{{field.desc if field.desc}}">
+                                            {% for point in field.points %}
+                                            <option
+                                                    value="{{field.overrideValue[field.points.index(point)] if field.overrideValue else point}}"
+                                                    {% if field.weights %}
+                                                    weight-override="{{field.weights[field.points.index(point)]}}"
+                                                    {% endif %}
+                                                    {% if field.costs %}
+                                                    cost-override="{{field.costs[field.points.index(point)]}}"
+                                                    {% endif %}
+                                                    {% if field.rangeMod %}
+                                                    range-mod="{{ field.rangeMod[field.points.index(point)]}}"
+                                                    {% endif %}
+                                                    {% if field.reloadMod %}
+                                                    reload-mod="{{ field.reloadMod[field.points.index(point)]}}"
+                                                    {% endif %}
+                                                    {% if field.default== point %}
+                                                    selected
+                                                    {% endif %}>
+                                                {{point}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                <div class="col text-nowrap">
+                    <div class="card bg-dark sticky-top border">
+                        <table class="table table-sm table-borderless text-white w-50" align="right">
+                            <tr id="{{key}}-summary-row">
+                                <td>Total:</td>
+                                <td><p id="{{key}}-point-total" class="d-inline">0</p></td>
+                            </tr>
+                            <tr>
+                                <td>Damage Die:</td>
+                                <td><p id="{{key}}-damage-die" class="d-inline">{{ref_data.weights |
+                                    selectattr("points",
+                                    "equalto",
+                                    "default") |
+                                    map(attribute="die") | first }}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Cost:</td>
+                                <td><p id="{{key}}-cost-total" class="d-inline">{{ref_data.weights |
+                                    selectattr("points",
+                                    "equalto",
+                                    "default") |
+                                    map(attribute="cost") | first }}</p> cr
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Weight:</td>
+                                <td><p id="{{key}}-weight-total" class="d-inline">{{ref_data.weights |
+                                    selectattr("points",
+                                    "equalto",
+                                    "default")
+                                    | map(attribute="weight") | first }}</p> lbs
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Min/Max Range:</td>
+                                <td><p id="{{key}}-short-range" class="d-inline">{{ref_data.weights |
+                                    selectattr("points",
+                                    "equalto",
+                                    "default") |
+                                    map(attribute="short") | first }}</p> / <p id="{{key}}-long-range"
+                                                                               class="d-inline m-0 p-0">
+                                    {{ref_data.weights
+                                    | selectattr("points", "equalto", "default") | map(attribute="long") | first }}</p>
+                                    ft
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
+    {% endfor %}
 </div>
 
 <script nonce="{{ csp_nonce() }}">
     var reference = {{ data|tojson|safe }}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>

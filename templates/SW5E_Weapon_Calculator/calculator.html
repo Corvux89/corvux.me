@@ -135,8 +135,7 @@
 </div>
 
 <script nonce="{{ csp_nonce() }}">
-    var weights = {{ fields.weights|tojson|safe }}
-    var properties = {{ fields.fields|tojson|safe }}
+    var reference = {{ data|tojson|safe }}
 </script>
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>
 

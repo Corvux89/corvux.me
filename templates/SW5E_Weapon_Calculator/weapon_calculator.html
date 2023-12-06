@@ -21,17 +21,13 @@
     <div class="tab-pane fade {{'active show' if data|first == key else ''}}" id="{{key}}-calc" role="tabpanel"
          aria-labelledby="{{key}}-tab" tabindex="0">
         <div class="container m-2">
-            <div class="row  row-cols-auto m-2">
-                <div class="col-sm-1 m-2">
-                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{key}}-note-collapse"
+            <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#{{key}}-note-collapse"
                        role="button">Notes</a>
-                </div>
-                <div class="col-sm-3 m-2">
-                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{key}}-base-collapse"
+            <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#{{key}}-base-collapse"
                        role="button">Base
                         Values</a>
-                </div>
-            </div>
+            <button type="button" class="btn btn-primary m-2" id="{{key}}-export">Export (I don't work yet)</button>
+            <a class="btn btn-danger m-2" role="button" id="{{key}}-reset">Reset Weapon</a>
             <div class="row">
                 <div class="collapse" id="{{key}}-note-collapse">
                     <table class="table table-bordered text-white">
@@ -72,13 +68,13 @@
                 <div class="col">
                     <form id="{{key}}CalcForm">
                         <div class="table-responsive m-2">
-                            <table class="table table-bordered text-white text-nowrap ">
+                            <table class="table table-bordered text-white text-nowrap">
                                 <thead>
                                 <tr>
                                     <th class="align-text-top">
-                                        <h5>Weapon</h5>
-                                        <small><p class="m-0">Cost Adjustment</p></small>
-                                        <small><p class="m-0">Weight Adjustment</p></small>
+                                        <h5>Property</h5>
+                                        <small class="form-text text-muted text-wrap">Click property names for more
+                                            info</small>
                                     </th>
                                     <th class="align-text-top">
                                         <h5>Selection</h5>
@@ -88,24 +84,34 @@
                                 {% for field in ref_data.fields %}
                                 <tr>
                                     <td class="align-text-top">
+                                        {% if field.desc %}
+                                        <h5><a href="#/" class="popover-link text-white" data-bs-toggle="popover"
+                                               data-bs-trigger="focus" data-bs-content="{{field.desc}}"
+                                               data-placement="right">{{field.name}}</a></h5>
+                                        {% else %}
                                         <h5>{{field.name}}</h5>
+                                        {% endif %}
+                                        {% if field.pointValue %}
+                                        <small id="{{key}}-{{field.pointValue}}-help" class="form-text text-muted"><p
+                                                class="m-0">
+                                            Point Value: {{field.pointValue}}</p></small>
+                                        {% endif %}
                                         {% if field.cost %}
                                         <small id="{{key}}-{{field.cost}}-help" class="form-text text-muted"><p
                                                 class="m-0">
-                                            {{field.cost}} cr</p></small>
+                                            Cost Adjustment: {{field.cost}} cr</p></small>
                                         {% endif %}
                                         {% if field.weight %}
                                         <small id="{{key}}-{{field.weight}}-help" class="form-text text-muted"><p
                                                 class="m-0">
-                                            {{field.weight}} lbs
+                                            Weight Adjustment: {{field.weight}} lbs
                                             <p/></small>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <select class="form-select" id="{{key}}-{{field.name}}"
                                                 name="{{key}}-{{field.name}}"
-                                                aria-label="{{key}}-{{field.name}}"
-                                                title="{{field.desc if field.desc}}">
+                                                aria-label="{{key}}-{{field.name}}">
                                             {% for point in field.points %}
                                             <option
                                                     value="{{field.overrideValue[field.points.index(point)] if field.overrideValue else point}}"
@@ -121,7 +127,7 @@
                                                     {% if field.reloadMod %}
                                                     reload-mod="{{ field.reloadMod[field.points.index(point)]}}"
                                                     {% endif %}
-                                                    {% if field.default== point %}
+                                                    {% if field.defValue== point %}
                                                     selected
                                                     {% endif %}>
                                                 {{point}}
@@ -193,18 +199,8 @@
 <script nonce="{{ csp_nonce() }}">
     var reference = {{ data|tojson|safe }}
 
-
-
-
-
-
-
-
-
-
-
-
-
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 
 
 </script>

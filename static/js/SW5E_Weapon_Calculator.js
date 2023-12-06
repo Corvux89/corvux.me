@@ -1,16 +1,19 @@
-var weap_cal = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+function reset_form(key){
+    var form = document.getElementById(`${key}CalcForm`)
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    input_event = new Event("input")
 
-document.getElementById("blastersCalcForm").querySelectorAll('input, select').forEach(input =>{
-    input.addEventListener('input', function(){
-        calc_total('blasters')
-    })
-})
+    form.querySelectorAll('select').forEach(function(input, idx, ary){
+        var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
+        input.selectedIndex = "defValue" in property ? property.points.indexOf(property.defValue) : 0
 
-document.getElementById("lightweaponsCalcForm").querySelectorAll('input, select').forEach(input =>{
-    input.addEventListener('input', function(){
-        calc_total('lightweapons')
+        if (idx === ary.length - 1){
+            input.dispatchEvent(input_event)
+        }
     })
-})
+    weapons[key] = {}
+    localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
+}
 
 function calc_total(key){
     var form = document.getElementById(`${key}CalcForm`)
@@ -122,5 +125,84 @@ function calc_total(key){
     }
 }
 
-calc_total("blasters")
-calc_total("lightweapons")
+function saveToLocalStorage(key, input){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var inputName = input.name.replace(`${key}-`,"").replace(" ", "")
+    var inputValue = input.value
+
+    if (!weapons.hasOwnProperty(key)){
+        weapons[key] = {}
+    }
+
+
+    weapons[key][inputName] = inputValue
+
+    localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
+}
+
+function loadFromLocalStorage(key, input){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
+    var inputName = input.name.replace(`${key}-`,"").replace(" ", "")
+    input_event = new Event("input")
+    var value = weapons[key][inputName]
+
+    if (value){
+        console.log(value)
+        input.value = value
+//        input.selectedIndex = property.points.indexOf(value)
+        var here = 1
+        input.dispatchEvent(input_event)
+    }
+}
+
+function exportToURL(key){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var data = JSON.stringify(weapons[key])
+    var encodedData = encodeURIComponent(data)
+    var url = `?data=${encodedData}`
+
+    //window.history.replaceState({}, document.title, url)
+    navigator.clipboard.writeText(`${window.location.href}${url}`)
+    $('#exportSettings').tooltip({title: "Build copied to clipboard!", delay: {show: 500, hide: 1500}})
+    $('#exportSettings').tooltip('show')
+}
+
+function importFromURL(){
+    var urlParams = new URLSearchParams(window.location.search)
+    var encodedData = urlParams.get('data')
+
+    if (encodedData){
+        var data = decodeURIComponent(encodedData)
+
+        try {
+           var parsedData = JSON.parse(data)
+
+           for (var key in parsedData){
+            localStorage.setItem(key, parsedData[key])
+           }
+
+           window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error){
+            console.error('Error parsing data: ', error)
+        }
+    }
+}
+
+for (const [key, value] of Object.entries(reference)){
+    calc_total(key)
+
+    document.getElementById(`${key}CalcForm`).querySelectorAll('input, select').forEach(input =>{
+        input.addEventListener('input', function(){
+            calc_total(key)
+            saveToLocalStorage(key, input)
+        })
+
+        loadFromLocalStorage(key, input)
+    })
+
+    document.getElementById(`${key}-reset`).addEventListener('click', function(){
+        reset_form(key)
+    })
+
+}

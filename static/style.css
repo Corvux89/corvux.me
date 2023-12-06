@@ -5,7 +5,7 @@ h1{
     text-align: center;
 }
 
-h2, h3, h4, p{
+h2, h3, h4, p {
     font-family: verdana;
     margin-left: 15px;
     color: white;
@@ -26,7 +26,7 @@ body{
     color: #d5e0e7;
 }
 
-.nav-link.complanner{
+.nav-link.complanner, .nav-link.sw5ecalc{
     background-color: silver;
 }
 
@@ -42,7 +42,7 @@ body{
       mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
 }
 
-.icon-link{
+.icon-link, .popover-link{
     text-decoration: none;
 }
 
@@ -67,3 +67,5 @@ body{
     height: 8vw;
     object-fit: contain;
 }
+
+

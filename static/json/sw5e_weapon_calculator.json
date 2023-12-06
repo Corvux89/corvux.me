@@ -1,7 +1,14 @@
 {
   "blasters": {
     "title": "Blasters",
-    "weight_headers": {"points":  "Points", "die":  "Die Size", "cost":  "Cost", "weight":  "Weight", "range":  "Range", "reload":  "Reload"},
+    "weight_headers": {
+      "points": "Points",
+      "die": "Die Size",
+      "cost": "Cost",
+      "weight": "Weight",
+      "range": "Range",
+      "reload": "Reload"
+    },
     "weights": [
       {
         "points": "default",
@@ -130,6 +137,7 @@
     "fields": [
       {
         "name": "Simple/Martial",
+        "pointValue": "1/2",
         "points": [
           1,
           2
@@ -141,12 +149,14 @@
           0,
           1
         ],
+        "pointValue": "+1",
         "desc": "Automatic weapons can only fire in burst or rapid modes. If the weapon has both burst and rapid properties, you choose which mode to use. You can only use one mode at a time.",
         "cost": 100,
         "weight": ".5"
       },
       {
         "name": "Brutal 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -157,6 +167,7 @@
       },
       {
         "name": "Burst",
+        "pointValue": "-1",
         "points": [
           0,
           "-1",
@@ -171,6 +182,7 @@
       },
       {
         "name": "Dire 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -181,6 +193,7 @@
       },
       {
         "name": "Disguised",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -191,6 +204,7 @@
       },
       {
         "name": "Disintegrate",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -201,6 +215,7 @@
       },
       {
         "name": "Disruptive",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -211,6 +226,7 @@
       },
       {
         "name": "Fixed",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -221,6 +237,7 @@
       },
       {
         "name": "Hidden",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -231,6 +248,7 @@
       },
       {
         "name": "Keen 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -241,6 +259,7 @@
       },
       {
         "name": "Light",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -251,6 +270,7 @@
       },
       {
         "name": "Mighty",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -261,6 +281,7 @@
       },
       {
         "name": "Penetrating",
+        "pointValue": "-1",
         "points": [
           0,
           "-1",
@@ -275,6 +296,7 @@
       },
       {
         "name": "Piercing 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -285,6 +307,7 @@
       },
       {
         "name": "Range",
+        "pointValue": "0",
         "points": [
           "1.5",
           "1",
@@ -329,13 +352,14 @@
           "2",
           "2.25"
         ],
-        "default": 0,
+        "defValue": 0,
         "desc": "A weapon that can be used to make a ranged attack has a range shown in parentheses after the ammunition or thrown property. The range lists two numbers. The first is the weapon’s normal range in feet, and the second indicates the weapon’s maximum range. When attacking a target beyond normal range, you have disadvantage on the attack roll. You can’t attack a target beyond the weapon’s long range.",
         "cost": 50,
         "weight": ".5"
       },
       {
         "name": "Rapid",
+        "pointValue": "-1",
         "points": [
           0,
           "-1",
@@ -350,6 +374,7 @@
       },
       {
         "name": "Reload",
+        "pointValue": "0",
         "points": [
           "2.5",
           "2",
@@ -402,13 +427,14 @@
           "16",
           "20"
         ],
-        "default": 0,
+        "defValue": 0,
         "desc": "A limited number of shots can be made with a weapon that has the reload property. A character must then reload it using an action or a bonus action (the character’s choice). You must have one free hand to reload.",
         "cost": 50,
         "weight": ".5"
       },
       {
         "name": "Silent",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -419,6 +445,7 @@
       },
       {
         "name": "Strength",
+        "pointValue": "+1",
         "points": [
           0,
           1,
@@ -433,7 +460,8 @@
         "weight": ".5"
       },
       {
-        "name": "Smart (No points)",
+        "name": "Smart",
+        "pointValue": "0",
         "points": [
           0,
           "500"
@@ -447,7 +475,8 @@
         "weight": ".5"
       },
       {
-        "name": "Switch (No points)",
+        "name": "Switch",
+        "pointValue": "0",
         "points": [
           0,
           500,
@@ -462,13 +491,20 @@
           0,
           0
         ],
-        "reloadMod": [0, "-4", "-8", "-12", "-16"],
+        "reloadMod": [
+          0,
+          "-4",
+          "-8",
+          "-12",
+          "-16"
+        ],
         "desc": "A weapon with the switch property can deal an alternate type of damage. A damage value appears in parentheses appears with the property-the damage when the weapon uses its alternate damage type. On your turn, you can use your object interaction to change the weapon’s damage type.",
         "cost": 500,
         "weight": "2"
       },
       {
         "name": "Two-Handed",
+        "pointValue": "+1",
         "points": [
           0,
           1
@@ -479,6 +515,7 @@
       },
       {
         "name": "Vicious",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -491,7 +528,13 @@
   },
   "lightweapons": {
     "title": "Lightweapons",
-    "weight_headers": {"points":  "Points", "die":  "Die Size", "cost":  "Cost", "weight":  "Weight", "range":  "Thrown Range"},
+    "weight_headers": {
+      "points": "Points",
+      "die": "Die Size",
+      "cost": "Cost",
+      "weight": "Weight",
+      "range": "Thrown Range"
+    },
     "weights": [
       {
         "points": "default",
@@ -570,6 +613,7 @@
     "fields": [
       {
         "name": "Simple",
+        "pointValue": "2/3",
         "points": [
           0,
           2,
@@ -578,39 +622,60 @@
       },
       {
         "name": "Biting 13",
+        "pointValue": "-1",
         "desc": "This weapon's damage becomes acid. \n\nAdditionally, when you would make a melee weapon attack with a weapon with the biting property, you can instead force the target to make a Constitution saving throw (DC = 8 + your bonus to attacks with the weapon, or the biting number, whichever is lower). \n\nIf you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disadvantage on your attack roll, the creature instead has advantage on their saving throw. \n\nOn a failed save, the target takes normal weapon damage and is subjected to any additional effects that would occur on a hit, and the first attack it makes before the end of its next turn has disadvantage. \n\nIf damage dealt by this weapon reduces a creature to 0 hit points, it must make a DC 13 Constitution saving throw. On a failed save, it dies immediately without making death saving throws. A disintegrated creature and everything unenhanced it is wearing and carrying are reduced to a pile of fine gray dust. A creature destroyed in this way can not be revitalized.",
-        "points": [0, "-1"],
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 450,
         "weight": ".25"
       },
       {
         "name": "Bright 13",
+        "pointValue": "-1",
         "desc": "This weapon's damage becomes fire, and its luminous property sheds bright light in a 5-foot radius and dim light in a 5-foot radius while activated, instead of only dim light in a 5-foot radius. \n\nAdditionally, when you would make a melee weapon attack with a weapon with the bright property, you can instead force the target to make a Dexterity saving throw (DC = 8 + your bonus to attacks with the weapon, or the bright number, whichever is lower). \n\nIf you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disadvantage on your attack roll, the creature instead has advantage on their saving throw. \n\nOn a failed save, the target takes normal weapon damage and is subjected to any additional effects that would occur on a hit, and the creature takes additional damage of the same type at the start of its next turn equal to your governing ability modifier.",
-        "points": [0, "-1"],
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 450,
         "weight": ".25"
       },
       {
         "name": "Brutal 1",
-        "points": [0, "-1"],
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 300,
         "weight": ".25"
       },
       {
         "name": "Corruption 13",
+        "pointValue": "-1",
         "desc": "This weapon's damage becomes necrotic, and it loses its luminous property if it has it. \n\nAdditionally, when you would make a melee weapon attack with a weapon with the corruption property, you can instead force the target to make a Wisdom saving throw (DC = 8 + your bonus to attacks with the weapon, or the corruption number, whichever is lower). \n\nIf you would have advantage on your attack roll, the creature instead has disadvantage on their saving throw, and if you would have disadvantage on your attack roll, the creature instead has advantage on their saving throw. \n\nOn a failed save, the target takes normal weapon damage and is subjected to any additional effects that would occur on a hit, and the creature cannot regain hit points until the start of your next turn.",
-        "points": [0, "-1"],
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 450,
         "weight": ".25"
       },
       {
         "name": "Defensive 1",
-        "points": [0, "-1"],
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 300,
         "weight": ".25"
       },
       {
         "name": "Dexterity 11+",
+        "pointValue": "+1",
         "points": [
           0,
           1,
@@ -625,18 +690,27 @@
       },
       {
         "name": "Dire 1",
-        "points": [0, "-1"],
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 300,
         "weight": ".25"
       },
       {
         "name": "Disarming",
-        "points": [0, "-0.5"],
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
         "cost": 100,
         "weight": ".25"
       },
       {
         "name": "Disguised",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -647,6 +721,7 @@
       },
       {
         "name": "Disruptive",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -657,16 +732,21 @@
       },
       {
         "name": "Double",
+        "pointValue": "0",
         "points": [
           0,
           "300"
         ],
-        "overrideValue": [0, 0],
+        "overrideValue": [
+          0,
+          0
+        ],
         "cost": 300,
         "weight": "1"
       },
       {
         "name": "Finesse",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -676,6 +756,7 @@
       },
       {
         "name": "Fixed",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -686,12 +767,17 @@
       },
       {
         "name": "Heavy",
-        "points": [0, "-1"],
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 75,
         "weight": "0.5"
       },
       {
         "name": "Hidden",
+        "pointValue": "-0.5",
         "points": [
           0,
           "-.5"
@@ -702,6 +788,7 @@
       },
       {
         "name": "Keen 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -712,6 +799,7 @@
       },
       {
         "name": "Light",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -722,6 +810,7 @@
       },
       {
         "name": "Piercing 1",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -732,8 +821,9 @@
       },
       {
         "name": "Reach",
+        "pointValue": "-2",
         "points": [
-         0,
+          0,
           "-2"
         ],
         "cost": 450,
@@ -741,30 +831,47 @@
       },
       {
         "name": "Returning",
-        "points": [0, "-0.5"],
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
         "cost": 150,
         "weight": "0.5"
       },
       {
         "name": "Thrown",
-        "points": [0, "-0.5"],
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
         "cost": 50,
         "weight": "0"
       },
       {
         "name": "Two-Handed",
-        "points": [0, 2],
+        "pointValue": "+2",
+        "points": [
+          0,
+          2
+        ],
         "cost": 150,
         "weight": 1
       },
       {
         "name": "Versatile",
-        "points": [0, "-1"],
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
         "cost": 150,
         "weight": 1
       },
       {
         "name": "Vicious",
+        "pointValue": "-1",
         "points": [
           0,
           "-1"
@@ -774,13 +881,6 @@
         "weight": ".25"
       }
     ]
-  },
-  "vibroweapons": {
-    "title": "Vibroweapons",
-    "weight_headers": {},
-    "weights": [],
-    "notes": [],
-    "fields": []
   }
 }
 

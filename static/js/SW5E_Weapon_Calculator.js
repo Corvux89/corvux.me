@@ -2,6 +2,7 @@ function reset_form(key){
     var form = document.getElementById(`${key}CalcForm`)
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
     input_event = new Event("input")
+    document.getElementById(`${key}-name`).value = null
 
     form.querySelectorAll('select').forEach(function(input, idx, ary){
         var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
@@ -158,16 +159,22 @@ function loadFromLocalStorage(key, input){
     }
 }
 
+function encodeBuild(build){
+    return btoa(encodeURIComponent(JSON.stringify(build)))
+}
+
+function decodeBuild(build){
+    return decodeURIComponent(atob(build))
+}
+
 function exportToURL(key){
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
     var weapon = {}
     weapon[key]=weapons[key]
-    var data = JSON.stringify(weapon)
-    var encodedData = btoa(encodeURIComponent(data))
-    var url = `?data=${encodedData}`
+    var url = `?data=${encodeBuild(weapon)}`
 
     //window.history.replaceState({}, document.title, url)
-    navigator.clipboard.writeText(`${window.location.href}${url}`)
+    navigator.clipboard.writeText(`${window.location.href.replace("#/","")}${url}`)
     $(`#${key}-export`).tooltip({title: "Build copied to clipboard!", delay: {show: 500, hide: 1500}})
     $(`#${key}-export`).tooltip('show')
 }
@@ -178,7 +185,7 @@ function importFromURL(){
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
 
     if (encodedData){
-        var data = decodeURIComponent(atob(encodedData))
+        var data = decodeBuild(encodedData)
         try {
            var parsedData = JSON.parse(data)
 
@@ -193,10 +200,129 @@ function importFromURL(){
     }
 }
 
+function saveBuild(key){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var weap = {}
+    Object.assign(weap, weapons[key])
+    if (!weapons.hasOwnProperty("saved_weapons")){
+        weapons["saved_weapons"] = {}
+    }
+
+    var saved_weapons = weapons["saved_weapons"]
+    if (!saved_weapons.hasOwnProperty(key)){
+        saved_weapons[key] = {}
+    }
+
+    saved_weapons[key]
+
+    if (!weap.hasOwnProperty("name")){
+        alert("Must name the weapon first")
+    } else if (Object.keys(saved_weapons[key]).length >= 10) {
+        alert("Only allowed 10 weapons of each type at this time")
+    }else{
+        var name = weap.name
+        delete weap.name
+        var encodedData = encodeBuild(weap)
+
+        for (const [k, v] of Object.entries(saved_weapons[key])){
+
+            if (v==encodedData){
+                delete saved_weapons[key][k]
+            }
+        }
+
+        saved_weapons[key][name]=encodedData
+        weapons["saved_weapons"] = saved_weapons
+        localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
+        setupSaveList(key)
+    }
+}
+
+function deleteBuild(key){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var weap = {}
+    Object.assign(weap, weapons[key])
+    if (!weapons.hasOwnProperty("saved_weapons")){
+        weapons["saved_weapons"] = {}
+    }
+
+    var saved_weapons = weapons["saved_weapons"]
+    if (!saved_weapons.hasOwnProperty(key)){
+        saved_weapons[key] = {}
+    }
+
+    saved_weapons[key]
+
+    if (!weap.hasOwnProperty("name")){
+        name = ""
+    } else {
+        var name = weap.name
+        delete weap.name
+    }
+    var encodedData = encodeBuild(weap)
+
+    for (const [k, v] of Object.entries(saved_weapons[key])){
+        if (v==encodedData){
+            delete saved_weapons[key][k]
+            break
+        } else if (k == name){
+            delete saved_weapons[key][k]
+            break
+        }
+    }
+
+    weapons["saved_weapons"] = saved_weapons
+    localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
+    setupSaveList(key)
+    reset_form(key)
+}
+
+function setupSaveList(key){
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    if (weapons.hasOwnProperty("saved_weapons")){
+        saved_weapons = weapons["saved_weapons"]
+        if (saved_weapons.hasOwnProperty(key)){
+            var btn = document.getElementById(`${key}-load`)
+            var listObj = document.getElementById(`${key}-load-list`)
+            listObj.innerHTML = ""
+
+            for (const [k, v] of Object.entries(saved_weapons[key])){
+                data = decodeBuild(v)
+                try{
+                    var weap = JSON.parse(data)
+                    var data = {}
+                    weap.name = k
+                    data[key] = weap
+
+
+                    url = `${window.location.href.replace("#/","")}?data=${encodeBuild(data)}`
+                } catch(error){
+                    console.error('Error parsing data: ', error)
+                    continue
+                }
+                var adom = document.createElement("a")
+                adom.className = "dropdown-item"
+                adom.href = url
+                adom.innerHTML = k
+                var li = document.createElement("li")
+                li.appendChild(adom)
+                listObj.appendChild(li)
+            }
+
+            if (listObj.hasChildNodes()){
+                btn.hidden=false
+            } else{
+                btn.hidden=true
+            }
+        }
+    }
+}
+
 importFromURL()
 
 for (const [key, value] of Object.entries(reference)){
     calc_total(key)
+    setupSaveList(key)
 
     document.getElementById(`${key}CalcForm`).querySelectorAll('input, select').forEach(input =>{
         input.addEventListener('input', function(){
@@ -205,6 +331,13 @@ for (const [key, value] of Object.entries(reference)){
         })
 
         loadFromLocalStorage(key, input)
+    })
+
+    document.getElementById(`${key}-save`).addEventListener('click', function(){
+        saveBuild(key)
+    })
+    document.getElementById(`${key}-delete`).addEventListener('click', function(){
+        deleteBuild(key)
     })
 
     document.getElementById(`${key}-reset`).addEventListener('click', function(){

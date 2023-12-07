@@ -20,13 +20,20 @@
     {% set ref_data = data[key] %}
     <div class="tab-pane fade {{'active show' if data|first == key else ''}}" id="{{key}}-calc" role="tabpanel"
          aria-labelledby="{{key}}-tab" tabindex="0">
-        <div class="container m-2">
+        <div class="container m-2 test">
             <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#{{key}}-note-collapse"
-                       role="button">Notes</a>
+               role="button">Notes</a>
             <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#{{key}}-base-collapse"
-                       role="button">Base
-                        Values</a>
-            <button type="button" class="btn btn-primary m-2" id="{{key}}-export">Export (I don't work yet)</button>
+               role="button">Base
+                Values</a>
+            <a type="button" class="btn btn-primary m-2" id="{{key}}-export">Export</a>
+            <a type="button" class="btn btn-primary m-2" id="{{key}}-save">Save Build</a>
+            <div class="dropdown d-inline">
+                <a type="button" class="btn btn-info m-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="{{key}}-load" hidden>Load Build</a>
+                <ul class="dropdown-menu" aria-labelledby="{{key}}-load" id="{{key}}-load-list">
+                </ul>
+            </div>
+            <a class="btn btn-danger m-2" role="button" id="{{key}}-delete">Delete Weapon</a>
             <a class="btn btn-danger m-2" role="button" id="{{key}}-reset">Reset Weapon</a>
             <div class="row">
                 <div class="collapse" id="{{key}}-note-collapse">
@@ -64,9 +71,16 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-2">
                 <div class="col">
                     <form id="{{key}}CalcForm">
+                        <div class="row m-2">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="{{key}}-name" name="{{key}}-name"
+                                       placeholder="Weapon Name">
+                                <label for="{{key}}-name" class="ms-2">Weapon Name</label>
+                            </div>
+                        </div>
                         <div class="table-responsive m-2">
                             <table class="table table-bordered text-white text-nowrap">
                                 <thead>
@@ -141,7 +155,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="col text-nowrap">
+                <div class="col text-nowrap mt-2">
                     <div class="card bg-dark sticky-top border">
                         <table class="table table-sm table-borderless text-white w-50" align="right">
                             <tr id="{{key}}-summary-row">
@@ -202,8 +216,8 @@
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 
-
 </script>
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>
 
 {% endblock %}
+

@@ -609,7 +609,56 @@
         "weight": 2
       }
     ],
-    "notes": [],
+    "notes": [
+       {
+        "title": "Final value of .5",
+        "text": "If a weapon has a final value of .5, it will automatically be treated as if rounded up. If you instead wish to round down, you'll have to manually correct through the final Damage Die."
+      },
+      {
+        "title": "Dexterity",
+        "text": "Higher dexterity requirements can increase the damage die further. Dexterity 13 for 2 points, 15 for 3 points, 17 for 4 points, or 19 for 5 points."
+      },
+      {
+        "title": "Dexterity/Finesse",
+        "text": "Dexterity and finesse are mutually exclusive."
+      },
+      {
+        "title": "Double",
+        "text": "The double damage should be the same amount as the normal damage, but can switch types. The double property adds a fixed value to a weapon instead of points. (enter 300 in the cell)"
+      },
+      {
+        "title": "Double/Two-handed/Versatile",
+        "text": "Double, two-handed, and versatile are mutually exclusive."
+      },
+      {
+        "title": "Finesse/Two-handed/Versatile",
+        "text": "Finesse, two-handed, and versatile are mutually exclusive."
+      },
+      {
+        "title": "Heavy/Light",
+        "text": "Heavy and light are mutually exclusive."
+      },
+      {
+        "title": "Interlocking",
+        "text": "To create an interlocking weapon, remove the double property then double the weight and cost and add Double back on"
+      },
+      {
+        "title": "Special",
+        "text": "The special property is subjective and thus not given a particular weight or cost. A number entered in this column will affect the weapon's total value."
+      },
+      {
+        "title": "Thrown",
+        "text": "Thrown weapon ranges should align with the table in the overview."
+      },
+      {
+        "title": "Versatile",
+        "text": "Versatile weapons use the damage dice two steps up, when held in two hands."
+      },
+      {
+        "title": "Biting, Bright, Corruption",
+        "text": "Double the weapon's value by placing its ending value in the Special column."
+      }
+    ],
     "fields": [
       {
         "name": "Simple",
@@ -879,6 +928,407 @@
         "desc": "Whenever you deal damage with a weapon with the vicious property and roll the maximum on a weapon damage die, you gain a bonus to damage equal to the vicious number.",
         "cost": 300,
         "weight": ".25"
+      }
+    ]
+  },
+  "vibroweapons": {
+    "title": "Vibroweapons",
+    "weight_headers": {
+      "points": "Points",
+      "die": "Die Size",
+      "cost": "Cost",
+      "weight": "Weight",
+      "range": "Thrown Range"
+    },
+    "weights": [
+      {
+        "points": "default",
+        "die": "d4",
+        "cost": "-75",
+        "short": 20,
+        "long": 60,
+        "weight": 1
+      },
+      {
+        "points": 0,
+        "die": "d4",
+        "cost": "-75",
+        "short": 20,
+        "long": 60,
+        "weight": 1
+      },
+      {
+        "points": 1,
+        "die": "d6",
+        "cost": 0,
+        "short": 25,
+        "long": 75,
+        "weight": 2
+      },
+      {
+        "points": 2,
+        "die": "d8",
+        "cost": 100,
+        "short": 30,
+        "long": 90,
+        "weight": 3
+      },
+      {
+        "points": 3,
+        "die": "2d4",
+        "cost": 250,
+        "short": 30,
+        "long": 90,
+        "weight": 4
+      },
+      {
+        "points": 4,
+        "die": "d10",
+        "cost": 500,
+        "short": 30,
+        "long": 90,
+        "weight": 5
+      },
+      {
+        "points": 5,
+        "die": "d12",
+        "cost": 750,
+        "short": 30,
+        "long": 90,
+        "weight": 6
+      },
+      {
+        "points": 6,
+        "die": "2d6",
+        "cost": 1000,
+        "short": 25,
+        "long": 75,
+        "weight": 7
+      },
+      {
+        "points": 7,
+        "die": "3d4",
+        "cost": 1500,
+        "short": 20,
+        "long": 60,
+        "weight": 8
+      }
+    ],
+    "notes": [
+       {
+        "title": "Final value of .5",
+        "text": "If a weapon has a final value of .5, it will automatically be treated as if rounded up. If you instead wish to round down, you'll have to manually correct through the final Damage Die."
+      },
+      {
+        "title": "Dexterity",
+        "text": "Higher dexterity requirements can increase the damage die further. Dexterity 13 for 2 points, 15 for 3 points, 17 for 4 points, or 19 for 5 points."
+      },
+      {
+        "title": "Dexterity/Finesse",
+        "text": "Dexterity and finesse are mutually exclusive."
+      },
+      {
+        "title": "Double",
+        "text": "The double damage should be the same amount as the normal damage, but can switch types. The double property adds a fixed value to a weapon instead of points. (enter 300 in the cell)"
+      },
+      {
+        "title": "Double/Two-handed/Versatile",
+        "text": "Double, two-handed, and versatile are mutually exclusive."
+      },
+      {
+        "title": "Finesse/Two-handed/Versatile",
+        "text": "Finesse, two-handed, and versatile are mutually exclusive."
+      },
+      {
+        "title": "Heavy/Light",
+        "text": "Heavy and light are mutually exclusive."
+      },
+      {
+        "title": "Interlocking",
+        "text": "To create an interlocking weapon, remove the double property then double the weight and cost and add Double back on"
+      },
+      {
+        "title": "Special",
+        "text": "The special property is subjective and thus not given a particular weight or cost. A number entered in this column will affect the weapon's total value."
+      },
+      {
+        "title": "Thrown",
+        "text": "Thrown weapon ranges should align with the table in the overview."
+      },
+      {
+        "title": "Versatile",
+        "text": "Versatile weapons use the damage dice two steps up, when held in two hands."
+      }
+    ],
+    "fields": [
+      {
+        "name": "Simple",
+        "pointValue": "2/3",
+        "points": [
+          0,
+          2,
+          3
+        ]
+      },
+      {
+        "name": "Brutal 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 200,
+        "weight": ".25"
+      },
+      {
+        "name": "Defensive 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 200,
+        "weight": ".25"
+      },
+      {
+        "name": "Dexterity 11+",
+        "pointValue": "+1",
+        "points": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "cost": 50,
+        "weight": ".25"
+      },
+      {
+        "name": "Dire 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 200,
+        "weight": ".5"
+      },
+      {
+        "name": "Disarming",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
+        "cost": 75,
+        "weight": ".25"
+      },
+      {
+        "name": "Disguised",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-.5"
+        ],
+        "desc": "You have advantage on Charisma (Deception) checks made to hide the nature of a disguised weapon.",
+        "cost": 25,
+        "weight": ".25"
+      },
+      {
+        "name": "Disruptive",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When a creature is forced to make a Constitution saving throw to maintain concentration due to taking damage from a weapon with the disruptive property, the DC for the check equals 10 or the full damage taken, whichever number is higher, instead of only half.",
+        "cost": 200,
+        "weight": ".5"
+      },
+      {
+        "name": "Double",
+        "pointValue": "0",
+        "points": [
+          0,
+          "300"
+        ],
+        "overrideValue": [
+          0,
+          0
+        ],
+        "cost": 300,
+        "weight": "2"
+      },
+      {
+        "name": "Finesse",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 50,
+        "weight": "0.5"
+      },
+      {
+        "name": "Fixed",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-.5"
+        ],
+        "desc": "A weapon with the fixed property does not fill the hand, but you can’t use the weapon while the hand is full. Additionally, you have a +10 bonus to ability checks and saving throws to avoid being disarmed of this weapon.",
+        "cost": 25,
+        "weight": ".25"
+      },
+      {
+        "name": "Heavy",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 50,
+        "weight": "1"
+      },
+      {
+        "name": "Hidden",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-.5"
+        ],
+        "desc": "You have advantage on Dexterity (Sleight of Hand) checks made to conceal a hidden weapon.",
+        "cost": 25,
+        "weight": "0.25"
+      },
+      {
+        "name": "Keen 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+        "cost": 200,
+        "weight": ".5"
+      },
+      {
+        "name": "Light",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+        "cost": 50,
+        "weight": "-1"
+      },
+      {
+        "name": "Neuralizing 13",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+        "cost": 250,
+        "weight": "0.5"
+      },
+      {
+        "name": "Piercing 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "Before you make a weapon attack with a weapon with the piercing property, you can choose to gain a bonus to the attack roll up to the piercing number. If you do so and you hit with it, you suffer an equivalent penalty to the damage roll.",
+        "cost": 200,
+        "weight": ".5"
+      },
+      {
+        "name": "Reach",
+        "pointValue": "-2",
+        "points": [
+          0,
+          "-2"
+        ],
+        "cost": 300,
+        "weight": "2"
+      },
+      {
+        "name": "Returning",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
+        "cost": 100,
+        "weight": "0.5"
+      },
+      {
+        "name": "Shocking 13",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+        "cost": 250,
+        "weight": "0.5"
+      },
+      {
+        "name": "Sonorous 13",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "When you make a weapon attack with a weapon with the keen property, the critical hit range increases by an amount equal to the keen number.",
+        "cost": 250,
+        "weight": "0.5"
+      },
+      {
+        "name": "Thrown",
+        "pointValue": "-0.5",
+        "points": [
+          0,
+          "-0.5"
+        ],
+        "cost": 25,
+        "weight": "0"
+      },
+      {
+        "name": "Two-Handed",
+        "pointValue": "+2",
+        "points": [
+          0,
+          2
+        ],
+        "cost": 100,
+        "weight": 2
+      },
+      {
+        "name": "Versatile",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "cost": 100,
+        "weight": 2
+      },
+      {
+        "name": "Vicious 1",
+        "pointValue": "-1",
+        "points": [
+          0,
+          "-1"
+        ],
+        "desc": "Whenever you deal damage with a weapon with the vicious property and roll the maximum on a weapon damage die, you gain a bonus to damage equal to the vicious number.",
+        "cost": 200,
+        "weight": "0.5"
       }
     ]
   }

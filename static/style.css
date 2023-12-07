@@ -68,4 +68,6 @@ body{
     object-fit: contain;
 }
 
-
+.dropdown-menu{
+    z-index: 1050;
+}

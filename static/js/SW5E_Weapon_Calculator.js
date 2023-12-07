@@ -142,10 +142,15 @@ function saveToLocalStorage(key, input){
 
 function loadFromLocalStorage(key, input){
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
+    var data = weapons[key] || {}
     var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
     var inputName = input.name.replace(`${key}-`,"").replace(" ", "")
     input_event = new Event("input")
-    var value = weapons[key][inputName]
+
+    if (data.hasOwnProperty(inputName)){
+        var value = weapons[key][inputName]
+    }
+
 
     if (value){
         console.log(value)

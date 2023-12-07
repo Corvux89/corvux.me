@@ -153,46 +153,47 @@ function loadFromLocalStorage(key, input){
 
 
     if (value){
-        console.log(value)
         input.value = value
-//        input.selectedIndex = property.points.indexOf(value)
-        var here = 1
         input.dispatchEvent(input_event)
     }
 }
 
 function exportToURL(key){
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
-    var data = JSON.stringify(weapons[key])
-    var encodedData = encodeURIComponent(data)
+    var weapon = {}
+    weapon[key]=weapons[key]
+    var data = JSON.stringify(weapon)
+    var encodedData = btoa(encodeURIComponent(data))
     var url = `?data=${encodedData}`
 
     //window.history.replaceState({}, document.title, url)
     navigator.clipboard.writeText(`${window.location.href}${url}`)
-    $('#exportSettings').tooltip({title: "Build copied to clipboard!", delay: {show: 500, hide: 1500}})
-    $('#exportSettings').tooltip('show')
+    $(`#${key}-export`).tooltip({title: "Build copied to clipboard!", delay: {show: 500, hide: 1500}})
+    $(`#${key}-export`).tooltip('show')
 }
 
 function importFromURL(){
     var urlParams = new URLSearchParams(window.location.search)
     var encodedData = urlParams.get('data')
+    var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
 
     if (encodedData){
-        var data = decodeURIComponent(encodedData)
-
+        var data = decodeURIComponent(atob(encodedData))
         try {
            var parsedData = JSON.parse(data)
 
            for (var key in parsedData){
-            localStorage.setItem(key, parsedData[key])
+            weapons[key] = parsedData[key]
            }
-
+           localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
            window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error){
             console.error('Error parsing data: ', error)
         }
     }
 }
+
+importFromURL()
 
 for (const [key, value] of Object.entries(reference)){
     calc_total(key)
@@ -210,4 +211,7 @@ for (const [key, value] of Object.entries(reference)){
         reset_form(key)
     })
 
+    document.getElementById(`${key}-export`).addEventListener('click', function(){
+        exportToURL(key)
+    })
 }

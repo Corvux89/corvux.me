@@ -33,7 +33,7 @@
                 <ul class="dropdown-menu" aria-labelledby="{{key}}-load" id="{{key}}-load-list">
                 </ul>
             </div>
-            <a class="btn btn-danger m-2" role="button" id="{{key}}-delete">Delete Weapon</a>
+            <a class="btn btn-danger m-2" role="button" id="{{key}}-delete" hidden>Delete Weapon</a>
             <a class="btn btn-danger m-2" role="button" id="{{key}}-reset">Reset Weapon</a>
             <div class="row">
                 <div class="collapse" id="{{key}}-note-collapse">
@@ -212,11 +212,10 @@
 
 <script nonce="{{ csp_nonce() }}">
     var reference = {{ data|tojson|safe }}
-
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
-
 </script>
+
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>
 
 {% endblock %}

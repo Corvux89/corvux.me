@@ -282,7 +282,8 @@ function setupSaveList(key){
     if (weapons.hasOwnProperty("saved_weapons")){
         saved_weapons = weapons["saved_weapons"]
         if (saved_weapons.hasOwnProperty(key)){
-            var btn = document.getElementById(`${key}-load`)
+            var loadBtn = document.getElementById(`${key}-load`)
+            var delBtn = document.getElementById(`${key}-delete`)
             var listObj = document.getElementById(`${key}-load-list`)
             listObj.innerHTML = ""
 
@@ -310,9 +311,11 @@ function setupSaveList(key){
             }
 
             if (listObj.hasChildNodes()){
-                btn.hidden=false
+                loadBtn.hidden=false
+                delBtn.hidden=false
             } else{
-                btn.hidden=true
+                loadBtn.hidden=true
+                delBtn.hidden=true
             }
         }
     }

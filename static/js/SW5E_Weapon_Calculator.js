@@ -218,13 +218,23 @@ function importFromURL(){
     if (encodedData){
         var data = decodeBuild(encodedData)
         try {
-           var parsedData = JSON.parse(data)
+            var parsedData = JSON.parse(data)
+            var lastKey = ""
 
-           for (var key in parsedData){
-            weapons[key] = parsedData[key]
-           }
-           localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
-           window.history.replaceState({}, document.title, window.location.pathname);
+            for (var key in parsedData){
+                weapons[key] = parsedData[key]
+                lastKey = key
+            }
+
+            localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            if (lastKey != ""){
+                var tabElm = document.querySelector(`#${key}-tab`)
+                var tab = new bootstrap.Tab(tabElm)
+                tab.show()
+            }
+
         } catch (error){
             console.error('Error parsing data: ', error)
         }

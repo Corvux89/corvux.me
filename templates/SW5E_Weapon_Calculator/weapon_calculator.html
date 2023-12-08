@@ -195,6 +195,17 @@
                                     | map(attribute="weight") | first }}</p> lbs
                                 </td>
                             </tr>
+                            {% if 'reload' in ref_data.weight_headers %}
+                            <tr>
+                                <td>Reload:</td>
+                                <td><p id="{{key}}-reload" class="d-inline">{{ref_data.weights |
+                                    selectattr("points",
+                                    "equalto",
+                                    "default")
+                                    | map(attribute="reload") | first }}</p>
+                                </td>
+                            </tr>
+                            {% endif %}
                             <tr>
                                 <td>Min/Max {{'Thrown ' if 'Thrown' in ref_data.weight_headers.range else ''}}Range:</td>
                                 <td><p id="{{key}}-short-range" class="d-inline">{{ref_data.weights |

@@ -30,6 +30,8 @@ function calc_total(key){
     var point_mod = 1
     var range_mod = 1
     var reload_mod = 0
+    var costExpr = ""
+    var weightExpr = ""
 
     // Sum everything up
     form.querySelectorAll('select').forEach(input =>{
@@ -66,6 +68,15 @@ function calc_total(key){
             reload_mod = parseFloat(selection.getAttribute("reload-mod"))
         }
 
+        // Cost Calculation
+        if (selection.getAttribute("cost-calc")){
+            costExpr = selection.getAttribute("cost-calc")
+        }
+
+        // Weight Calculation
+        if (selection.getAttribute("weight-calc")){
+            weightExpr = selection.getAttribute("weight-calc")
+        }
     })
 
     // Adjust total
@@ -88,6 +99,17 @@ function calc_total(key){
         }
     }
 
+
+    // Check Expressions
+    if (costExpr != ""){
+        costExpr = costExpr.replace('x', cost)
+        cost = math.evaluate(costExpr)
+    }
+
+    if (weightExpr != ""){
+        weightExpr = weightExpr.replace('x', weight)
+        weight = math.evaluate(weightExpr)
+    }
 
     // Some error validation
     if (total > parseFloat(reference[key].weights[reference[key].weights.length-1].points) || adj_total <= -1){
@@ -130,13 +152,17 @@ function saveToLocalStorage(key, input){
     var weapons = JSON.parse(localStorage.getItem("SW5E_Weapons") || "{}")
     var inputName = input.name.replace(`${key}-`,"").replace(" ", "")
     var inputValue = input.value
+    var inputIndex = input.selectedIndex
 
     if (!weapons.hasOwnProperty(key)){
         weapons[key] = {}
     }
 
-
-    weapons[key][inputName] = inputValue
+    if (input.type == 'select-one'){
+        weapons[key][inputName] = inputIndex
+    } else (
+        weapons[key][inputName] = inputValue
+    )
 
     localStorage.setItem("SW5E_Weapons", JSON.stringify(weapons))
 }
@@ -154,7 +180,12 @@ function loadFromLocalStorage(key, input){
 
 
     if (value){
-        input.value = value
+        if (input.type == 'select-one'){
+            input.selectedIndex = value
+        } else {
+            input.value = value
+        }
+
         input.dispatchEvent(input_event)
     }
 }

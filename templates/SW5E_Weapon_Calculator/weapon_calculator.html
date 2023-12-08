@@ -88,7 +88,7 @@
                                     <th class="align-text-top">
                                         <h5>Property</h5>
                                         <small class="form-text text-muted text-wrap">Click property names for more
-                                            info</small>
+                                            info</small><br>
                                     </th>
                                     <th class="align-text-top">
                                         <h5>Selection</h5>
@@ -143,7 +143,14 @@
                                                     {% endif %}
                                                     {% if field.defValue== point %}
                                                     selected
-                                                    {% endif %}>
+                                                    {% endif %}
+                                                    {% if field.costCalc %}
+                                                    cost-calc="{{ field.costCalc[field.points.index(point)]}}"
+                                                    {% endif %}
+                                                    {% if field.weightCalc %}
+                                                    weight-calc="{{ field.weightCalc[field.points.index(point)]}}"
+                                                    {% endif %}
+                                            >
                                                 {{point}}
                                             </option>
                                             {% endfor %}
@@ -189,7 +196,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Min/Max Range:</td>
+                                <td>Min/Max {{'Thrown ' if 'Thrown' in ref_data.weight_headers.range else ''}}Range:</td>
                                 <td><p id="{{key}}-short-range" class="d-inline">{{ref_data.weights |
                                     selectattr("points",
                                     "equalto",
@@ -214,6 +221,9 @@
     var reference = {{ data|tojson|safe }}
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+</script>
+
+<script nonce="{{ csp_nonce() }}" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.1.0/math.js">
 </script>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/SW5E_Weapon_Calculator.js')}}"></script>

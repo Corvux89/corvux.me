@@ -640,7 +640,7 @@
       },
       {
         "title": "Interlocking",
-        "text": "To create an interlocking weapon, remove the double property then double the weight and cost and add Double back on"
+        "text": "Requires double be selected as well"
       },
       {
         "title": "Special",
@@ -661,7 +661,7 @@
     ],
     "fields": [
       {
-        "name": "Simple",
+        "name": "Simple/Martial",
         "pointValue": "2/3",
         "points": [
           0,
@@ -928,6 +928,18 @@
         "desc": "Whenever you deal damage with a weapon with the vicious property and roll the maximum on a weapon damage die, you gain a bonus to damage equal to the vicious number.",
         "cost": 300,
         "weight": ".25"
+      },
+      {
+        "name": "Interlocking",
+        "points": ["0", "Interlock"],
+        "overrideValue": [
+          0,
+          0
+        ],
+        "cost": "Calculated",
+        "weight": "Calculated",
+        "costCalc": ["", "2*x-300"],
+        "weightCalc": ["", "2*x-1"]
       }
     ]
   },
@@ -1062,7 +1074,7 @@
     ],
     "fields": [
       {
-        "name": "Simple",
+        "name": "Simple/Martial",
         "pointValue": "2/3",
         "points": [
           0,

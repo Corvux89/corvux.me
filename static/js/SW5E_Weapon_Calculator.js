@@ -60,12 +60,12 @@ function calc_total(key){
 
         // Range
         if (selection.getAttribute("range-mod")){
-            range_mod = parseFloat(selection.getAttribute("range-mod"))
+            range_mod += parseFloat(selection.getAttribute("range-mod"))
         }
 
         // Reload
         if (selection.getAttribute("reload-mod")){
-            reload_mod = parseFloat(selection.getAttribute("reload-mod"))
+            reload_mod += parseFloat(selection.getAttribute("reload-mod"))
         }
 
         // Cost Calculation

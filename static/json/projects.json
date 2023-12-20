@@ -19,13 +19,13 @@
     "name": "Avrae Combat Planner",
     "image": "images/AvraeLogo.svg",
     "desc": "GUI tool to help plan combat in Avrae and On the Fly Battlemaps (OTFBM)",
-    "weblink": "https://www.corvux.me/Avrae_Combat_Planner/",
+    "webLink": "https://www.corvux.me/Avrae_Combat_Planner/",
     "tags": ["py", "js"]
   },
   {
     "name": "SW5E Weapon Calculator",
     "desc": "Web bassed calculator to get away from a GSheet calculator. Allows for more flexibility, and sharing",
-    "weblink": "https://www.corvux.me/SW5E_Weapon_Calculator/",
+    "webLink": "https://www.corvux.me/SW5E_Weapon_Calculator/",
     "tags": ["py", "js"]
   },
   {

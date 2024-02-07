@@ -37,7 +37,12 @@ function calc_total(key){
     form.querySelectorAll('select').forEach(input =>{
         var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
 
-        total += (parseFloat(property.points[input.selectedIndex] * point_mod)) || 0
+        if ('overrideValue' in property){
+            total += (parseFloat(property.overrideValue[input.selectedIndex] * point_mod)) || 0
+        } else{
+            total += (parseFloat(property.points[input.selectedIndex] * point_mod)) || 0
+        }
+
 
         // Cost
         if ('costs' in property){

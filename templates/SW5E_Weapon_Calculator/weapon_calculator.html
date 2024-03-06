@@ -128,28 +128,6 @@
                                                 aria-label="{{key}}-{{field.name}}">
                                             {% for point in field.points %}
                                             <option
-                                                    value="{{field.overrideValue[field.points.index(point)] if field.overrideValue else point}}"
-                                                    {% if field.weights %}
-                                                    weight-override="{{field.weights[field.points.index(point)]}}"
-                                                    {% endif %}
-                                                    {% if field.costs %}
-                                                    cost-override="{{field.costs[field.points.index(point)]}}"
-                                                    {% endif %}
-                                                    {% if field.rangeMod %}
-                                                    range-mod="{{ field.rangeMod[field.points.index(point)]}}"
-                                                    {% endif %}
-                                                    {% if field.reloadMod %}
-                                                    reload-mod="{{ field.reloadMod[field.points.index(point)]}}"
-                                                    {% endif %}
-                                                    {% if field.defValue== point %}
-                                                    selected
-                                                    {% endif %}
-                                                    {% if field.costCalc %}
-                                                    cost-calc="{{ field.costCalc[field.points.index(point)]}}"
-                                                    {% endif %}
-                                                    {% if field.weightCalc %}
-                                                    weight-calc="{{ field.weightCalc[field.points.index(point)]}}"
-                                                    {% endif %}
                                             >
                                                 {{point}}
                                             </option>

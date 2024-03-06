@@ -35,47 +35,47 @@ function calc_total(key){
 
     // Sum everything up
     form.querySelectorAll('select').forEach(input =>{
-        var selection = input.options[input.selectedIndex]
         var property = reference[key].fields.filter(obj => {return obj.name == input.id.replace(`${key}-`,'')})[0]
 
-        if (selection.getAttribute("point-mod")){
-            point_mod = parseFloat(selection.getAttribute("point-mod"))
+        if ('overrideValue' in property){
+            total += (parseFloat(property.overrideValue[input.selectedIndex] * point_mod)) || 0
+        } else{
+            total += (parseFloat(property.points[input.selectedIndex] * point_mod)) || 0
         }
 
-        total += (parseFloat(input.value) * point_mod) || 0
 
         // Cost
-        if (selection.getAttribute("cost-override")){
-            cost += parseFloat(selection.getAttribute("cost-override")) || 0
+        if ('costs' in property){
+            cost += parseFloat(property.costs[input.selectedIndex]) || 0
         } else {
             cost += parseFloat(input.selectedIndex) * parseFloat(property.cost) || 0
         }
 
         // Weight
-        if (selection.getAttribute("weight-override")){
-            weight += parseFloat(selection.getAttribute("weight-override")) || 0
+        if ('weights' in property){
+            weight += parseFloat(property.weights[input.selectedIndex]) || 0
         } else {
             weight += parseFloat(input.selectedIndex) * parseFloat(property.weight) || 0
         }
 
         // Range
-        if (selection.getAttribute("range-mod")){
-            range_mod += parseFloat(selection.getAttribute("range-mod"))
+        if ('rangeMod' in property){
+            range_mod += parseFloat(property.rangeMod[input.selectedIndex])
         }
 
         // Reload
-        if (selection.getAttribute("reload-mod")){
-            reload_mod += parseFloat(selection.getAttribute("reload-mod"))
+        if ('reloadMod' in property){
+            reload_mod += parseFloat(property.reloadMod[input.selectedIndex])
         }
 
         // Cost Calculation
-        if (selection.getAttribute("cost-calc")){
-            costExpr = selection.getAttribute("cost-calc")
+        if ('costCalc' in property){
+            costExpr = property.costCalc[input.selectedIndex]
         }
 
         // Weight Calculation
-        if (selection.getAttribute("weight-calc")){
-            weightExpr = selection.getAttribute("weight-calc")
+        if ('weightCalc' in property){
+            weightExpr = property.weightCalc[input.selectedIndex]
         }
     })
 
@@ -98,7 +98,6 @@ function calc_total(key){
             break;
         }
     }
-
 
     // Check Expressions
     if (costExpr != ""){

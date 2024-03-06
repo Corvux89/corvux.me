@@ -323,6 +323,7 @@ function buildMapCommand(){
         var positions = $(`#map${i+1} div.monPos`).length
         var size = document.getElementById(`monSize${i+1}`).value
         var token = document.getElementById(`monToken${i+1}`).value
+        var tokenColor = document.getElementById(`monColor${i+1}`).value
 
         for (var j = 0; j < positions; j++){
             var str = ""
@@ -331,7 +332,7 @@ function buildMapCommand(){
             var monCoord = monElement.value
 
             if (monCoord){
-                str = `-t "${monName}"|${monCoord}|${size}|r` + (token ? `|\$${token}`:"")
+                str = `-t "${monName}"|${monCoord}|${size}|${tokenColor}` + (token ? `|\$${token}`:"")
                 coords.push(str)
             }
         }
@@ -646,7 +647,7 @@ function buildMapPreview(){
             if (monster.monCoord){
                 for (var i =0; i < monster.monCoord.length; i++){
                     if (monster.monCoord[i] != null){
-                        var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + "r-"
+                        var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + (monster.monColor ? monster.monColor:"r") + "-"
 
                         if (monster.monCoord.length > 1 || (monster.monLabel && monster.monLabel.includes("#"))){
                             monStr += `${prefix}${i+1}`

@@ -4,7 +4,7 @@
     "image": "/images/mainlogo.png",
     "desc": "This website! This is a big testing ground as I learn more about python, and various aspects of programming that I don't get to explore in my normal job. Corvux has been my username for years, so this domain made sense.",
     "github": "https://github.com/Corvux89/corvux.me",
-    "tags": ["py", "js"]
+    "tags": ["py", "js", "html"]
   },
   {
     "name": "TheBrokenProphecy.com",
@@ -13,20 +13,20 @@
     "webLink": "https://www.thebrokenprophecy.com/",
     "github": "https://github.com/Corvux89/thebrokenprophecy.com",
     "discord": "https://disboard.org/server/679749063414906985",
-    "tags": ["py", "js"]
+    "tags": ["py", "js", "html"]
   },
   {
     "name": "Avrae Combat Planner",
     "image": "images/AvraeLogo.svg",
     "desc": "GUI tool to help plan combat in Avrae and On the Fly Battlemaps (OTFBM)",
     "webLink": "https://www.corvux.me/Avrae_Combat_Planner/",
-    "tags": ["py", "js"]
+    "tags": ["py", "js", "html"]
   },
   {
     "name": "SW5E Weapon Calculator",
     "desc": "Web bassed calculator to get away from a GSheet calculator. Allows for more flexibility, and sharing",
     "webLink": "https://www.corvux.me/SW5E_Weapon_Calculator/",
-    "tags": ["py", "js"]
+    "tags": ["py", "js", "html"]
   },
   {
     "name": "ProphetBot",

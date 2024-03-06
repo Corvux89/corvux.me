@@ -49,5 +49,12 @@
     "github": "https://github.com/Corvux89/Corvux-Avrae-Aliases/tree/master/Collections/SW5E%20Things",
     "webLink": "https://avrae.io/dashboard/workshop/63e066ecd6596a5e18f1604f",
     "tags": ["py"]
+  },
+  {
+    "name": "Avrae-Pycharm",
+    "image": "images/AvraeLogo.svg",
+    "desc": "Small python utility to help with Avrae management in Pycarm",
+    "github": "https://github.com/Corvux89/Avrae-Pycharm",
+    "tags": ["py"]
   }
 ]

@@ -247,7 +247,10 @@ function validateToken(e){
 }
 
 function exportToURL(){
-    var data = JSON.stringify(localStorage)
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var raw_data = {"combat_plan": combat_plan, "combat_map": combat_plan_map}
+    var data = JSON.stringify({"combat_plan": combat_plan, "combat_map": combat_plan_map})
     var encodedData = encodeURIComponent(data)
     var url = `?data=${encodedData}`
 
@@ -266,10 +269,11 @@ function importFromURL(){
 
         try {
            var parsedData = JSON.parse(data)
+           console.log(parsedData.combat_plan)
 
-           for (var key in parsedData){
-            localStorage.setItem(key, parsedData[key])
-           }
+           localStorage.setItem("combat_plan", JSON.stringify(parsedData.combat_plan))
+           localStorage.setItem("combat_map", JSON.stringify(parsedData.combat_map))
+
 
            window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error){

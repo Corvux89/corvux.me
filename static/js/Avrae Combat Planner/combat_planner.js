@@ -210,7 +210,7 @@ function buildMaddTable(num, monster){
     }
 
     var monster_row = document.createElement("div")
-    var prefix = (monster.monLabel ? monster.monLabel.replace("#","") : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+    var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
     var quantity = monster.monQty ? parseInt(monster.monQty): 1
     monster_row.id=`map${num}`
     monster_row.className = "row m-2 border rounded monGroup bg-secondary"
@@ -237,7 +237,7 @@ function buildMaddTable(num, monster){
         coord.id = `mapMon${num}-${i+1}`
         coord.name = "monCoord"
         if (quantity>1 || (monster.monLabel && monster.monLabel.includes("#"))){
-            coord.placeholder = `${prefix}${i+1}`
+            coord.placeholder = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
         } else {
             coord.placeholder = `${prefix}`
         }
@@ -646,7 +646,6 @@ function buildMapPreview(){
         var imgUrl = 'https://otfbm.io/' + (combat_plan_map["map-size"] ? combat_plan_map["map-size"]:"10x10") + (combat_plan_map["map-csettings"] ? `/@c${combat_plan_map["map-csettings"]}`:"")
 
         // Overlay
-        // https://otfbm.io/20x28/@c60/H3Mb-DEV_Ori~5b83g/*s30bb4/?a=2&bg=https://i.imgur.com/qItSZqb.jpg
         if (combat_plan_map["map-overlay-type"]){
             if (combat_plan_map["map-overlay-type"] == "circle" && combat_plan_map["map-overlay-radius"] && combat_plan_map["map-overlay-color"] && combat_plan_map["map-overlay-center"]){
                 imgUrl += '/*c' + combat_plan_map["map-overlay-radius"] + combat_plan_map["map-overlay-color"] + combat_plan_map["map-overlay-center"]
@@ -661,14 +660,14 @@ function buildMapPreview(){
 
         // Token Placement here
         combat_plan.forEach(monster => {
-            var prefix = (monster.monLabel ? monster.monLabel.replace("#","") : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+            var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
             if (monster.monCoord){
                 for (var i =0; i < monster.monCoord.length; i++){
                     if (monster.monCoord[i] != null){
                         var monStr = "/" + monster.monCoord[i] + (monster.monSize ? monster.monSize:"M") + (monster.monColor ? monster.monColor:"r") + "-"
 
                         if (monster.monCoord.length > 1 || (monster.monLabel && monster.monLabel.includes("#"))){
-                            monStr += `${prefix}${i+1}`
+                            monStr += (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
                         } else {
                             monStr += prefix
                         }
@@ -720,16 +719,17 @@ function buildBplan(){
         var coords = []
 
         if (name){
-            var prefix = (label ? label.replace("#","") : name.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
 
             for (var j=0; j < qt; j++){
                 coords[j] = document.getElementById(`mapMon${i}-${j+1}`).value
             }
 
             if (coords.filter(x => x != "").length>0){
+                var prefix = (label ? label : name.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
                 for (var j=0; j<qt; j++){
+                    var tid = (prefix.includes("#") ? prefix.replace("#", `${j+1}`):`${prefix}${j+1}`)
                     var note = (token ? `Token: ${token}`:'') + (coords[j] && token ? ` | `:'') + (coords[j] ? `Location: ${coords[j]}`:'')
-                    var str = `!i madd "${name}"` + (label ? ` -name "${label}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
+                    var str = `!i madd "${name}"` + (label ? ` -name "${tid}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
                     commands.push(str.replace(/"/g,'\\"'))
                 }
             } else{

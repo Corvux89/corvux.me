@@ -48,18 +48,21 @@ function onLoad(){
     document.getElementById("monInventory").addEventListener('change', function(event){
         buildMaddCommand()
         updateMaddTable()
+        buildBplan()
     })
 
      // Monster position table
     document.getElementById("mapPlanner").addEventListener('change', function(event){
         buildMapCommand()
         buildMapPreview()
+        buildBplan()
     })
 
     // Map settings
     document.getElementById("map-setup").addEventListener('change', function(event){
         buildMapPlannerCommand()
         buildMapPreview()
+        buildBplan()
     })
 
     // Map Overlay
@@ -72,6 +75,11 @@ function onLoad(){
     // Map overlay type
     document.getElementById("map-overlay-type").addEventListener('change', function(event){
         handleOverlay()
+    })
+
+    // BPlan
+    document.getElementById("bplan-name").addEventListener('input', function(event){
+        buildBplan()
     })
 
     // Copy Buttons
@@ -107,6 +115,16 @@ function onLoad(){
     // Copy overlay command
     document.getElementById("overlayCopy").addEventListener('click', function(event){
         var copyText = document.getElementById("overlay-command").innerHTML
+        copyText = copyText.replace(/<br>/g, '\n')
+
+        if (copyText){
+            navigator.clipboard.writeText(copyText)
+        }
+    })
+
+    // Copy bplan command
+    document.getElementById("bplan-command-copy").addEventListener('click', function(event){
+        var copyText = document.getElementById("bplan-command").innerHTML
         copyText = copyText.replace(/<br>/g, '\n')
 
         if (copyText){
@@ -680,6 +698,71 @@ function buildMapPreview(){
     } else{
         document.getElementById("mapPreview").hidden=true
     }
+}
+
+function buildBplan(){
+    var bplan_header = document.getElementById('bplan-header')
+    var bplan_name = document.getElementById('bplan-name').value || "Battle Name"
+    var out = ""
+    var commands = []
+
+    // Monsters
+    var rows = $('#monInventory div.monster').length
+    for (i = 1; i < rows; i++){
+        var str = ""
+        var name = document.getElementById(`monName${i}`).value
+        var label = document.getElementById(`monLabel${i}`).value
+        var qt = document.getElementById(`monQty${i}`).value
+        var args = document.getElementById(`monArgs${i}`).value
+        var size = document.getElementById(`monSize${i}`).value
+        var token = document.getElementById(`monToken${i}`).value
+        var args = document.getElementById(`monArgs${i}`).value
+        var coords = []
+
+        if (name){
+            var prefix = (label ? label.replace("#","") : name.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+
+            for (var j=0; j < qt; j++){
+                coords[j] = document.getElementById(`mapMon${i}-${j+1}`).value
+            }
+
+            if (coords.filter(x => x != "").length>0){
+                for (var j=0; j<qt; j++){
+                    var note = (token ? `Token: ${token}`:'') + (coords[j] && token ? ` | `:'') + (coords[j] ? `Location: ${coords[j]}`:'')
+                    var str = `!i madd "${name}"` + (label ? ` -name "${label}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
+                    commands.push(str.replace(/"/g,'\\"'))
+                }
+            } else{
+                var note = (token ? `Token: ${token}`:'')
+                var str = `!i madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
+                commands.push(str.replace(/"/g,'\\"'))
+            }
+        }
+    }
+
+    if (commands.length>0){
+        commands.unshift('!i add 20 DM -p')
+    }
+
+    // Map
+    var maps_header = document.getElementById('maps-header')
+    var url = document.getElementById("map-url").value
+    var size = document.getElementById('map-size').value
+    var csettings = document.getElementById('map-csettings').value
+
+    if (url || size){
+        var str = `!i effect DM map -attack "||Size: ` + (size ? size:'10x10') + (url ? ` ~ Background: ${url}`:'') + (csettings ? ` ~ Options c${csettings}`:"") + `"`
+        commands.push(str.replace(/"/g,'\\"'))
+    }
+
+    out = `!uvar Battles {"${bplan_name}": ["${commands.join("\", \"")}"]}`
+
+    if (out){
+        bplan_header.hidden=false
+    } else{
+        bplan_header.hidden=true
+    }
+    document.getElementById('bplan-command').innerHTML = out
 }
 
 importFromURL()

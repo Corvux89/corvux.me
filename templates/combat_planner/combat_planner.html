@@ -6,6 +6,7 @@
     <button type="button" class="btn btn-primary m-2" id="comMonReset">Reset Monsters Only</button>
     <button type="button" class="btn btn-primary m-2" id="comMapReset">Reset Map Only</button>
     <button type="button" class="btn btn-primary m-2" id="exportSettings">Export</button>
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#bplanModal">Generate BPlan</button>
 </div>
 
 <nav>
@@ -149,6 +150,7 @@
 </div>
 
 <! -- Modal -->
+<!--    Monster Map Placement    -->
 <div class="modal fade" id="monsterMapModal" tabindex="-1" role="dialog" aria-labelledby="monsterMapModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -182,6 +184,7 @@
     </div>
 </div>
 
+<!--    Map Settings    -->
 <div class="modal fade" id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -237,6 +240,7 @@
     </div>
 </div>
 
+<!--    Map Overlay    -->
 <div class="modal fade" id="mapOverlayModal" tabindex="-1" role="dialog" aria-labelledby="mapOverlayModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -297,7 +301,49 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_helpers.js')}}"></script>
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/combat_planner.js')}}"></script>
+<!-- BPLan Exporter -->
+<div class="modal fade" id="bplanModal" tabindex="-1" role="dialog" aria-labelledby="bplanModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="bplanModalLabel">BPlan</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="bplan-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="bplan-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn" id="bplan-command-copy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <form method="post" id="bplan-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="bplan-name" name="bplan-name"
+                                               placeholder="Battle Name">
+                                        <label for="map-url">Battle Name</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_helpers.js')}}"></script>
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_planner.js')}}"></script>
 
 {% endblock %}

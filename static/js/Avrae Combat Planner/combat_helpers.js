@@ -16,7 +16,10 @@ function saveToLocalStorage(){
         combat_plan_map[inputName] = inputValue
     } else {
         // Monster storage
-        var node =parseInt(this.id.match(/\d+/)[0])-1
+        try{
+            var node =parseInt(this.id.match(/\d+/)[0])-1
+        } catch(error){
+        }
         var monster = combat_plan[node] || {}
 
         if (this.type == 'checkbox' && this.checked == false){
@@ -56,7 +59,11 @@ function loadFromLocalStorage(input){
             input.value = value
         }
     } else{
-        var node =parseInt(input.id.match(/\d+/)[0])-1
+        try{
+            var node =parseInt(input.id.match(/\d+/)[0])-1
+        } catch(error){
+        }
+
         var monster = combat_plan[node] || {}
         var value = monster[inputName]
 

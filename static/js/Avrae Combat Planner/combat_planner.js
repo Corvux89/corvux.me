@@ -70,6 +70,7 @@ function onLoad(){
         handleOverlay()
         buildMapPreview()
         buildOverlayCommand()
+        buildBplan()
     })
 
     // Map overlay type
@@ -167,6 +168,7 @@ function onLoad(){
     buildOverlayCommand()
     buildMapPlannerCommand()
     buildMapPreview()
+    buildBplan()
 }
 
 function buildMaddCommand(){
@@ -700,60 +702,70 @@ function buildMapPreview(){
 }
 
 function buildBplan(){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+
     var bplan_header = document.getElementById('bplan-header')
     var bplan_name = document.getElementById('bplan-name').value || "Battle Name"
     var out = ""
     var commands = []
 
     // Monsters
-    var rows = $('#monInventory div.monster').length
-    for (i = 1; i < rows; i++){
+    var rows = combat_plan.length
+    combat_plan.forEach(monster => {
         var str = ""
-        var name = document.getElementById(`monName${i}`).value
-        var label = document.getElementById(`monLabel${i}`).value
-        var qt = document.getElementById(`monQty${i}`).value
-        var args = document.getElementById(`monArgs${i}`).value
-        var size = document.getElementById(`monSize${i}`).value
-        var token = document.getElementById(`monToken${i}`).value
-        var args = document.getElementById(`monArgs${i}`).value
         var coords = []
+        var qty = (monster.monQty ? monster.monQty:1)
 
-        if (name){
-
-            for (var j=0; j < qt; j++){
-                coords[j] = document.getElementById(`mapMon${i}-${j+1}`).value
-            }
-
-            if (coords.filter(x => x != "").length>0){
-                var prefix = (label ? label : name.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
-                for (var j=0; j<qt; j++){
-                    var tid = (prefix.includes("#") ? prefix.replace("#", `${j+1}`):`${prefix}${j+1}`)
-                    var note = (token ? `Token: ${token}`:'') + (coords[j] && token ? ` | `:'') + (coords[j] ? `Location: ${coords[j]}`:'')
-                    var str = `!i madd "${name}"` + (label ? ` -name "${tid}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
-                    commands.push(str.replace(/"/g,'\\"'))
-                }
-            } else{
-                var note = (token ? `Token: ${token}`:'')
-                var str = `!i madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (note ? ` -note "${note}"`:'') + (args ? ` ${args}`:'')
+        if (monster.monCoord.filter(x => x != null).length > 0){
+            var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+            for (var i=0; i<qty; i++){
+                var tid = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
+                var note = (monster.monToken ? `Token: ${monster.monToken}`:'') + (monster.monCoord[i] && monster.monToken ? ` | `:'') + (monster.monCoord[i] ? `Location: ${monster.monCoord[i]}`:'')
+                var str = `!i madd "${monster.monName}"` + (monster.monLabel ? ` -name "${tid}"`:'') + (note ? ` -note "${note}"`:'') + (monster.monArgs ? ` ${monster.monArgs}`:'')
                 commands.push(str.replace(/"/g,'\\"'))
             }
+        } else{
+            var note = (monster.monToken ? `Token: ${monster.monToken}`:'')
+            var str = `!i madd "${monster.monName}"` + (qty ? ` -n ${qty}`: '') + (monster.monLabel ? ` -name "${monster.monLabel}"`:'') + (note ? ` -note "${note}"`:'') + (monster.monArgs ? ` ${monster.monArgs}`:'')
+            commands.push(str.replace(/"/g,'\\"'))
         }
-    }
+    })
 
     if (commands.length>0){
         commands.unshift('!i add 20 DM -p')
     }
 
     // Map
-    var maps_header = document.getElementById('maps-header')
-    var url = document.getElementById("map-url").value
-    var size = document.getElementById('map-size').value
-    var csettings = document.getElementById('map-csettings').value
+    if (Object.keys(combat_map).length > 0){
+        var url = (combat_map["map-url"] ? combat_map["map-url"] : "")
+        var size = (combat_map["map-size"] ? combat_map["map-size"] : "")
+        var csettings = (combat_map["map-csettings"] ? combat_map["map-csettings"] : "")
 
-    if (url || size){
-        var str = `!i effect DM map -attack "||Size: ` + (size ? size:'10x10') + (url ? ` ~ Background: ${url}`:'') + (csettings ? ` ~ Options c${csettings}`:"") + `"`
-        commands.push(str.replace(/"/g,'\\"'))
+        if (url || size){
+            var str = `!i effect DM map -attack "||Size: ` + (size ? size:'10x10') + (url ? ` ~ Background: ${url}`:'') + (csettings ? ` ~ Options c${csettings}`:"") + `"`
+            commands.push(str.replace(/"/g,'\\"'))
+        }
     }
+
+    // Overlay
+    if (combat_map["map-overlay-type"] && combat_map["map-overlay-type"] != null && combat_map["map-overlay-color"]){
+        var str = ""
+        if (combat_map["map-overlay-type"] == "circle" && combat_map["map-overlay-radius"] && combat_map["map-overlay-center"]){
+            str += `Overlay: c` + combat_map["map-overlay-radius"] + combat_map["map-overlay-color"] + combat_map["map-overlay-center"]
+        } else if (combat_map["map-overlay-type"] == "cone" && combat_map["map-overlay-size"] && combat_map["map-overlay-start"] && combat_map["map-overlay-end"]){
+            str += `Overlay: t` + combat_map["map-overlay-size"] + combat_map["map-overlay-color"] + combat_map["map-overlay-start"] + combat_map["map-overlay-end"]
+        } else if (combat_map["map-overlay-type"] == "line" && combat_map["map-overlay-start"] && combat_map["map-overlay-end"] && combat_map["map-overlay-len"] && combat_map["map-overlay-width"]){
+            str += `Overlay: l` + combat_map["map-overlay-len"] + "," + combat_map["map-overlay-width"] + combat_map["map-overlay-color"] + combat_map["map-overlay-start"] + combat_map["map-overlay-end"]
+        } else if (combat_map["map-overlay-type"] == "square" && combat_map["map-overlay-size"] && combat_map["map-overlay-top-left"]){
+            str += `Overlay: s` + combat_map["map-overlay-size"] + combat_map["map-overlay-color"]+ combat_map["map-overlay-top-left"]
+        }
+
+        if (str.length > 1){
+            commands.push(`!i note ${(combat_map["map-overlay-target"] ? combat_map["map-overlay-target"] : "DM")} ${str}`)
+        }
+    }
+
 
     out = `!uvar Battles {"${bplan_name}": ["${commands.join("\", \"")}"]}`
 

@@ -46,41 +46,44 @@ function onLoad(){
 
     // Monster Inventory
     document.getElementById("monInventory").addEventListener('change', function(event){
-        buildMaddCommand()
+        buildCommandString()
         updateMaddTable()
-        buildBplan()
     })
 
-     // Monster position table
+    // Monster position table
     document.getElementById("mapPlanner").addEventListener('change', function(event){
+        buildCommandString()
         buildMapCommand()
         buildMapPreview()
-        buildBplan()
     })
 
     // Map settings
     document.getElementById("map-setup").addEventListener('change', function(event){
+        buildCommandString()
         buildMapPlannerCommand()
         buildMapPreview()
-        buildBplan()
     })
 
     // Map Overlay
     document.getElementById("overlay-setup").addEventListener('change', function(event){
+        buildCommandString()
         handleOverlay()
         buildMapPreview()
         buildOverlayCommand()
-        buildBplan()
     })
 
     // Map overlay type
     document.getElementById("map-overlay-type").addEventListener('change', function(event){
+        buildCommandString()
         handleOverlay()
     })
 
-    // BPlan
-    document.getElementById("bplan-name").addEventListener('input', function(event){
-        buildBplan()
+    // Settings
+    document.getElementById("appSettings-setup").addEventListener('change', function(event){
+        buildCommandString()
+        buildMapCommand()
+        buildOverlayCommand()
+        buildMapPlannerCommand()
     })
 
     // Copy Buttons
@@ -123,16 +126,6 @@ function onLoad(){
         }
     })
 
-    // Copy bplan command
-    document.getElementById("bplan-command-copy").addEventListener('click', function(event){
-        var copyText = document.getElementById("bplan-command").innerHTML
-        copyText = copyText.replace(/<br>/g, '\n')
-
-        if (copyText){
-            navigator.clipboard.writeText(copyText)
-        }
-    })
-
     // Setup input listener and load initial row
     var fields = document.querySelectorAll('input, select')
     fields.forEach(input => {
@@ -163,47 +156,290 @@ function onLoad(){
         handle: ".modal-header"
     })
 
-    buildMaddCommand()
     buildMapCommand()
     buildOverlayCommand()
     buildMapPlannerCommand()
     buildMapPreview()
-    buildBplan()
+
+    // Toggle Boxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox){
+        checkbox.addEventListener('input', function(event){
+            buildCommandString()
+        })
+    })
 }
 
-function buildMaddCommand(){
-    var rows = $('#monInventory div.monster').length
+function buildCommandString(){
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
+    var combat_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var avrae_prefix = (combat_settings["avrae-prefix"] ? combat_settings["avrae-prefix"]:"!")
+    var attach_map = (combat_map["map-attach"] ? combat_map["map-attach"]:"DM")
     var inventory_header = document.getElementById('inventory-header')
-    var madd = []
+    var commandStr = document.getElementById('commandStr')
+    var multiColumn = document.getElementById("multiColumn")
+    var errorButton = multiColumn.querySelector('.error-button')
+    var includeNotes = (combat_settings["includeNotes"] ? true:false)
+    var includeMulti = (combat_settings["includeMulti"] || document.getElementById("includeMulti").checked ? true:false)
+    var includeMonsters = (combat_settings["monsters"] || document.getElementById("monsters").checked ? true:false)
+    var commands = []
     var out = ""
 
-    // Build the MADD String
-    for (i = 1; i < rows; i++){
-        var str = ""
-        var name = document.getElementById(`monName${i}`).value
-        var label = document.getElementById(`monLabel${i}`).value
-        var qt = document.getElementById(`monQty${i}`).value
-        var args = document.getElementById(`monArgs${i}`).value
-        var size = document.getElementById(`monSize${i}`).value
-        var token = document.getElementById(`monToken${i}`).value
-
-        if (name){
-           str = `!i madd "${name}"` + (qt ? ` -n ${qt}`: '') + (label ? ` -name "${label}"`:'') + (args ? ` ${args}`:'')
-        }
-        madd.push(str)
+    if (combat_settings["includeTarg"] == 'on'){
+        commands.unshift(`${avrae_prefix}i add 20 ${attach_map} -p`)
     }
 
-    if (madd.length > 1){
-        out += "!multiline<br>"
+    if (includeMulti){
+        commands.unshift(`${avrae_prefix}multiline`)
     }
-    out += madd.join("<br>")
+
+    if (includeMonsters){
+        commands = commands.concat(getMaddCommand(includeNotes))
+    }
+
+    if (combat_settings["battlemap"] == 'on'){
+        commands = commands.concat(getMapCommand(includeNotes, (includeMonsters && !includeNotes ? true:false)))
+    }
+
+    if (combat_settings["overlay"] == 'on'){
+        commands.push(getOverlayCommand(includeNotes))
+    }
+
+    out = commands.join("<br>")
+
     if (out.length > 1){
-        inventory_header.hidden = false
+        commandStr.hidden = false
     } else {
-        inventory_header.hidden = true
+        commandStr.hidden = true
     }
 
     document.getElementById('madd').innerHTML = out
+
+
+
+    if (includeMulti && (!includeNotes && (combat_settings["battlemap"] == 'on' || combat_settings["overlay"] == 'on'))){
+        if (!errorButton){
+            errorButton = document.createElement('button')
+            errorButton.setAttribute("type", "button");
+            errorButton.classList.add("btn", "btn-link", "m-0", "p-0", "error-button");
+            errorButton.setAttribute("data-toggle", "tooltip");
+            errorButton.setAttribute("data-placement", "right");
+            errorButton.setAttribute("title", "Multiline won't work with alias (ie. map) commands.\nInclude notes to use with multiline");
+
+            var icon = document.createElement("i");
+            icon.classList.add("fa-solid", "fa-triangle-exclamation");
+
+            errorButton.appendChild(icon);
+
+            multiColumn.appendChild(errorButton)
+        }
+    } else if (errorButton){
+        multiColumn.removeChild(errorButton)
+    }
+}
+
+function getMaddCommand(includeNotes = false){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
+    var commands = []
+    var avrae_prefix = (combat_settings["avrae-prefix"] ? combat_settings["avrae-prefix"]:"!")
+
+    combat_plan.forEach(monster => {
+        var coords = []
+        var qty = (monster.monQty ? monster.monQty:1)
+
+        if (includeNotes == true){
+            var note = ""
+
+            if (monster.monCoord.filter(x => x != null && x != "").length > 0){
+                var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+
+                for (var i=0; i<qty; i++){
+                    var monID = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
+                    note = (monster.monToken ? `Token: ${monster.monToken}`:'')
+                    note += (monster.monCoord[i] && monster.monToken ? ` | `:'')
+                    note += (monster.monCoord[i] ? `Location: ${monster.monCoord[i]}`:'')
+
+                    var str = `${avrae_prefix}i madd "${monster.monName}"`
+                    str += (monster.monLabel ? ` -name "${monID}"`:"")
+                    str += (note ? ` -note "${note}"`:"")
+                    str += (monster.monArgs ? ` ${monster.monArgs}`:'')
+
+                    commands.push(str)
+                }
+            } else {
+                note = (monster.monToken ? `Token: ${monster.monToken}`:'')
+
+                var str = `${avrae_prefix}i madd "${monster.monName}"`
+                str += (monster.monLabel ? ` -name "${monster.monName}"`:"")
+                str += (note ? ` -note "${note}"`:"")
+                str += (monster.monArgs ? ` ${monster.monArgs}`:'')
+
+                commands.push(str)
+            }
+        } else {
+            var str = `${avrae_prefix}i madd "${monster.monName}"`
+            str += (monster.monQty ? ` -n ${monster.monQty}`:"")
+            str += (monster.monLabel ? ` -name "${monster.monLabel}${(monster.monLabel.includes("#") ? "":"#")}"`:"")
+            str += (monster.monArgs ? ` ${monster.monArgs}`:'')
+
+            commands.push(str)
+        }
+    })
+
+    return commands
+}
+
+function getMonsterMapCommand(){
+    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
+    var coords = []
+    var avrae_prefix = (combat_settings["avrae-prefix"] ? combat_settings["avrae-prefix"]:"!")
+
+    combat_plan.forEach(monster => {
+        var str = ""
+        var qty = (monster.monQty ? monster.monQty:1)
+        var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+
+        for (var i=0; i<qty; i++){
+            var monID = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
+            if (monster.monCoord[i] != null && monster.monCoord[i] != ""){
+                str = `-t "${monID}|`
+                str += monster.monCoord[i] + "|"
+                str += (monster.monSize ? monster.monSize:"M") + "|"
+                str += (monster.monColor ? monster.monColor:"r")
+                str += (monster.monToken ? `|\$${monster.monToken}`:"") + `"`
+                coords.push(str)
+            }
+        }
+    })
+
+    if (coords.length > 0){
+        return `${avrae_prefix}map ${coords.join(" ")}`
+    }
+    return ""
+}
+
+function getMapCommand(includeNotes = false, includeMonsters = false){
+    var combat_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
+    var str = ""
+    var attach_map = (combat_map["map-attach"] ? combat_map["map-attach"]:"DM")
+    var avrae_prefix = (combat_settings["avrae-prefix"] ? combat_settings["avrae-prefix"]:"!")
+    commands = []
+
+    if (Object.keys(combat_map).length > 0){
+        var url = (combat_map["map-url"] ? combat_map["map-url"] : "")
+        var size = (combat_map["map-size"] ? combat_map["map-size"] : "")
+        var csettings = (combat_map["map-csettings"] ? combat_map["map-csettings"] : "")
+
+        if (url || size){
+            if (includeNotes==true){
+                str = `${avrae_prefix}i effect ${attach_map} map -attack "||Size: `
+                str += (size ? size:'10x10')
+                str += (url ? ` ~ Background: ${url}`:'')
+                str += (csettings ? ` ~ Options: c${csettings}`:"")
+                str += `"`
+            } else{
+                str = `${avrae_prefix}map`
+                str += (url ?` -bg "${url}"`:"")
+                str += (size ? ` -mapsize ${size}`:"")
+                str += (csettings ? ` -options c${csettings}`:"")
+            }
+        }
+    }
+
+    if (includeMonsters){
+        commands.push(getMonsterMapCommand())
+    }
+    commands.push(str)
+
+    return commands
+}
+
+function getOverlayCommand(includeNotes = false){
+    var combat_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
+    var attach_map = (combat_map["map-attach"] ? combat_map["map-attach"]:"DM")
+    var avrae_prefix = (combat_settings["avrae-prefix"] ? combat_settings["avrae-prefix"]:"!")
+    var str = ""
+
+    if (combat_map["map-overlay-type"] && combat_map["map-overlay-type"] != null && combat_map["map-overlay-color"]){
+        if (includeNotes == true){
+            str = `Overlay: c`
+            str += combat_map["map-overlay-radius"]
+            str += combat_map["map-overlay-color"]
+            str += combat_map["map-overlay-center"]
+        } else {
+            str = `${avrae_prefix}map -over circle,`
+            str += combat_map["map-overlay-radius"]
+            str += ","
+            str += combat_map["map-overlay-color"]
+            str += ","
+            str += combat_map["map-overlay-center"]
+        }
+    } else if (combat_map["map-overlay-type"] == "cone" && combat_map["map-overlay-size"] && combat_map["map-overlay-start"] && combat_map["map-overlay-end"]){
+        if (includeNotes == true){
+            str = `Overlay: t`
+            str += combat_map["map-overlay-size"]
+            str += combat_map["map-overlay-color"]
+            str += combat_map["map-overlay-start"]
+            str += combat_map["map-overlay-end"]
+        } else {
+            str = `${avrae_prefix}map -over cone,`
+            str += combat_map["map-overlay-size"]
+            str += ","
+            str += combat_map["map-overlay-color"]
+            str += ","
+            str += combat_map["map-overlay-start"]
+            str += ","
+            str += combat_map["map-overlay-end"]
+        }
+    } else if (combat_map["map-overlay-type"] == "line" && combat_map["map-overlay-start"] && combat_map["map-overlay-end"] && combat_map["map-overlay-len"] && combat_map["map-overlay-width"]){
+        if (includeNotes == true){
+            str = `Overlay: l`
+            str += combat_map["map-overlay-len"]
+            str += ","
+            str += combat_map["map-overlay-width"]
+            str += combat_map["map-overlay-color"]
+            str += combat_map["map-overlay-start"]
+            str += combat_map["map-overlay-end"]
+        } else {
+            str = `${avrae_prefix}map -over line,`
+            str += combat_map["map-overlay-len"]
+            str += ","
+            str += combat_map["map-overlay-width"]
+            str += ","
+            str += combat_map["map-overlay-color"]
+            str += ","
+            str += combat_map["map-overlay-start"]
+            str += ","
+            str += combat_map["map-overlay-end"]
+        }
+    } else if (combat_map["map-overlay-type"] == "square" && combat_map["map-overlay-size"] && combat_map["map-overlay-top-left"]){
+        if (includeNotes == true){
+            str = `Overlay: s`
+            str += combat_map["map-overlay-size"]
+            str += combat_map["map-overlay-color"]
+            str += combat_map["map-overlay-top-left"]
+        } else {
+            str = `${avrae_prefix}map -over square,`
+            str += combat_map["map-overlay-size"]
+            str += ","
+            str += combat_map["map-overlay-color"]
+            str += ","
+            str += combat_map["map-overlay-top-left"]
+        }
+    }
+
+    if (str.length > 0){
+        if (includeNotes == true){
+            str = `${avrae_prefix}i note ${(combat_map["map-overlay-target"] ? combat_map["map-overlay-target"] : `${attach_map}`)} ${str}`
+        } else{
+            str += (combat_map["map-overlay-target"] && combat_map["map-overlay-target"] != null ? ` -t ${combat_map["map-overlay-target"]}`:"")
+        }
+    }
+
+    return str
 }
 
 function buildMaddTable(num, monster){
@@ -317,51 +553,25 @@ function updateMaddTable(){
 
 function buildMapPlannerCommand(){
     var maps_header = document.getElementById('maps-header')
-    var url = document.getElementById("map-url").value
-    var size = document.getElementById('map-size').value
-    var csettings = document.getElementById('map-csettings').value
+    var out = getMapCommand()
 
-    var out = ""
-
-    if (url || size || csettings){
-        out = `!map` +  (url ?` -bg "${url}"`:"") + (size ? ` -mapsize ${size}`:"") + (csettings ? ` -options c${csettings}`:"")
+    if (out){
         maps_header.hidden=false
     } else{
         maps_header.hidden=true
     }
 
-    document.getElementById("map-command").innerHTML = out
+    document.getElementById("map-command").innerHTML =out.join("")
 }
 
 function buildMapCommand(){
-    var rows = $('#mapPlanner div.monGroup').length
     var map_header = document.getElementById('map-header')
-    var coords = []
-    var out = ""
 
-    for (var i = 0; i < rows; i++){
-        var positions = $(`#map${i+1} div.monPos`).length
-        var size = document.getElementById(`monSize${i+1}`).value
-        var token = document.getElementById(`monToken${i+1}`).value
-        var tokenColor = document.getElementById(`monColor${i+1}`).value
+    var out = getMonsterMapCommand()
 
-        for (var j = 0; j < positions; j++){
-            var str = ""
-            var monElement = document.getElementById(`mapMon${i+1}-${j+1}`)
-            var monName = monElement.placeholder
-            var monCoord = monElement.value
-
-            if (monCoord){
-                str = `-t "${monName}"|${monCoord}|${size}|${tokenColor}` + (token ? `|\$${token}`:"")
-                coords.push(str)
-            }
-        }
-    }
-
-    if (coords.length > 0){
-        out = "!map " + coords.join(" ")
+    if (out){
         map_header.hidden=false
-    } else{
+    } else {
         map_header.hidden=true
     }
 
@@ -370,29 +580,12 @@ function buildMapCommand(){
 
 function buildOverlayCommand(){
     var overlay_header = document.getElementById('overlay-header')
-    var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
-    var out = ""
+    var out = getOverlayCommand(true)
 
-    if (combat_plan_map["map-overlay-type"] && combat_plan_map["map-overlay-type"] != null && combat_plan_map["map-overlay-color"]){
-        overlay_header.hidden=false
-        if (combat_plan_map["map-overlay-type"] == "circle" && combat_plan_map["map-overlay-radius"] && combat_plan_map["map-overlay-center"]){
-            out += "!map -over circle," + combat_plan_map["map-overlay-radius"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-center"]
-        } else if (combat_plan_map["map-overlay-type"] == "cone" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"]){
-            out += "!map -over cone," + combat_plan_map["map-overlay-size"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-start"] + "," + combat_plan_map["map-overlay-end"]
-        } else if (combat_plan_map["map-overlay-type"] == "line" && combat_plan_map["map-overlay-start"] && combat_plan_map["map-overlay-end"] && combat_plan_map["map-overlay-len"] && combat_plan_map["map-overlay-width"]){
-            out += "!map -over line," + combat_plan_map["map-overlay-len"] + "," + combat_plan_map["map-overlay-width"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-start"] + "," + combat_plan_map["map-overlay-end"]
-        } else if (combat_plan_map["map-overlay-type"] == "square" && combat_plan_map["map-overlay-size"] && combat_plan_map["map-overlay-top-left"]){
-            out += "!map -over square," + combat_plan_map["map-overlay-size"] + "," + combat_plan_map["map-overlay-color"] + "," + combat_plan_map["map-overlay-top-left"]
-        } else {
-            overlay_header.hidden=true
-        }
-
-    } else{
-        overlay_header.hidden=true
-    }
-
-    if (out.length > 1 && combat_plan_map["map-overlay-target"] && combat_plan_map["map-overlay-target"] != null){
-        out += " -t " + combat_plan_map["map-overlay-target"]
+    if (out.length > 0){
+        overlay_header.hidden = false
+    } else {
+        overlay_header.hidden = true
     }
 
     document.getElementById('overlay-command').innerHTML = out
@@ -699,82 +892,6 @@ function buildMapPreview(){
     } else{
         document.getElementById("mapPreview").hidden=true
     }
-}
-
-function buildBplan(){
-    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
-    var combat_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
-
-    var bplan_header = document.getElementById('bplan-header')
-    var bplan_name = document.getElementById('bplan-name').value || "Battle Name"
-    var out = ""
-    var commands = []
-
-    // Monsters
-    var rows = combat_plan.length
-    combat_plan.forEach(monster => {
-        var str = ""
-        var coords = []
-        var qty = (monster.monQty ? monster.monQty:1)
-
-        if (monster.monCoord.filter(x => x != null).length > 0){
-            var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
-            for (var i=0; i<qty; i++){
-                var tid = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
-                var note = (monster.monToken ? `Token: ${monster.monToken}`:'') + (monster.monCoord[i] && monster.monToken ? ` | `:'') + (monster.monCoord[i] ? `Location: ${monster.monCoord[i]}`:'')
-                var str = `!i madd "${monster.monName}"` + (monster.monLabel ? ` -name "${tid}"`:'') + (note ? ` -note "${note}"`:'') + (monster.monArgs ? ` ${monster.monArgs}`:'')
-                commands.push(str.replace(/"/g,'\\"'))
-            }
-        } else{
-            var note = (monster.monToken ? `Token: ${monster.monToken}`:'')
-            var str = `!i madd "${monster.monName}"` + (qty ? ` -n ${qty}`: '') + (monster.monLabel ? ` -name "${monster.monLabel}"`:'') + (note ? ` -note "${note}"`:'') + (monster.monArgs ? ` ${monster.monArgs}`:'')
-            commands.push(str.replace(/"/g,'\\"'))
-        }
-    })
-
-    if (commands.length>0){
-        commands.unshift('!i add 20 DM -p')
-    }
-
-    // Map
-    if (Object.keys(combat_map).length > 0){
-        var url = (combat_map["map-url"] ? combat_map["map-url"] : "")
-        var size = (combat_map["map-size"] ? combat_map["map-size"] : "")
-        var csettings = (combat_map["map-csettings"] ? combat_map["map-csettings"] : "")
-
-        if (url || size){
-            var str = `!i effect DM map -attack "||Size: ` + (size ? size:'10x10') + (url ? ` ~ Background: ${url}`:'') + (csettings ? ` ~ Options c${csettings}`:"") + `"`
-            commands.push(str.replace(/"/g,'\\"'))
-        }
-    }
-
-    // Overlay
-    if (combat_map["map-overlay-type"] && combat_map["map-overlay-type"] != null && combat_map["map-overlay-color"]){
-        var str = ""
-        if (combat_map["map-overlay-type"] == "circle" && combat_map["map-overlay-radius"] && combat_map["map-overlay-center"]){
-            str += `Overlay: c` + combat_map["map-overlay-radius"] + combat_map["map-overlay-color"] + combat_map["map-overlay-center"]
-        } else if (combat_map["map-overlay-type"] == "cone" && combat_map["map-overlay-size"] && combat_map["map-overlay-start"] && combat_map["map-overlay-end"]){
-            str += `Overlay: t` + combat_map["map-overlay-size"] + combat_map["map-overlay-color"] + combat_map["map-overlay-start"] + combat_map["map-overlay-end"]
-        } else if (combat_map["map-overlay-type"] == "line" && combat_map["map-overlay-start"] && combat_map["map-overlay-end"] && combat_map["map-overlay-len"] && combat_map["map-overlay-width"]){
-            str += `Overlay: l` + combat_map["map-overlay-len"] + "," + combat_map["map-overlay-width"] + combat_map["map-overlay-color"] + combat_map["map-overlay-start"] + combat_map["map-overlay-end"]
-        } else if (combat_map["map-overlay-type"] == "square" && combat_map["map-overlay-size"] && combat_map["map-overlay-top-left"]){
-            str += `Overlay: s` + combat_map["map-overlay-size"] + combat_map["map-overlay-color"]+ combat_map["map-overlay-top-left"]
-        }
-
-        if (str.length > 1){
-            commands.push(`!i note ${(combat_map["map-overlay-target"] ? combat_map["map-overlay-target"] : "DM")} ${str}`)
-        }
-    }
-
-
-    out = `!uvar Battles {"${bplan_name}": ["${commands.join("\", \"")}"]}`
-
-    if (out){
-        bplan_header.hidden=false
-    } else{
-        bplan_header.hidden=true
-    }
-    document.getElementById('bplan-command').innerHTML = out
 }
 
 importFromURL()

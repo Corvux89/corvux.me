@@ -6,7 +6,9 @@
     <button type="button" class="btn btn-primary m-2" id="comMonReset">Reset Monsters Only</button>
     <button type="button" class="btn btn-primary m-2" id="comMapReset">Reset Map Only</button>
     <button type="button" class="btn btn-primary m-2" id="exportSettings">Export</button>
-    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#bplanModal">Generate BPlan</button>
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal">
+        General Settings
+    </button>
 </div>
 
 <nav>
@@ -28,13 +30,48 @@
     <div class="tab-pane fade show active" id="monster-inventory" role="tabpanel" aria-labelledby="inventory-tab"
          tabindex="0">
         <div class="container m-2">
-            <div class="row border rounded border-success bg-light" id="inventory-header" hidden>
-                <div class="col-sm">
-                    <p class="text-black">Avrae Command String</p>
-                    <div id="madd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
-                </div>
-                <div class="col-1 m-0 p-0">
-                    <button class="btn" id="maddCopy"><i class="fa-solid fa-copy"></i></button>
+            <div class="row border rounded border-success bg-light" id="inventory-header">
+                <div class="col">
+                    <div class="row border rounded border-success bg-light">
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="commandStr" hidden>
+                                <button class="btn float-end pe-2 me-2" id="maddCopy"><i
+                                        class="fa-solid fa-copy pe-2"></i></button>
+                                <div id="madd" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-auto mt-5 mb-4">
+                            <div class="form-check form-switch" id="multiColumn">
+                                <input class="form-check-input" type="checkbox" checked id="includeMulti"
+                                       name="includeMulti">
+                                <label class="form-check-label" for="includeMulti">Include Multiline</label>
+<!--                                <button type="button" class="btn btn-link m-0 p-0 error-button" data-toggle="tooltip" data-placement="right" title="Multiline won't work with alias (ie. map) commands.&#10;Include notes to use with multiline"><i class="fa-solid fa-triangle-exclamation" tooltip="here"></i></button>-->
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="includeTarg" name="includeTarg">
+                                <label class="form-check-label" for="includeTarg">Include Map Target</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="includeNotes" name="includeNotes">
+                                <label class="form-check-label" for="includeNotes">Include Notes</label>
+                            </div>
+                        </div>
+                        <div class="col-auto mt-5 mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" checked id="monsters" name="monsters">
+                                <label class="form-check-label" for="monsters">Monsters</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="battlemap" name="battlemap">
+                                <label class="form-check-label" for="battlemap">Map</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="overlay" name="overlay">
+                                <label class="form-check-label" for="overlay">Overlay</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <form method="post" id="monInventory">
@@ -290,7 +327,9 @@
                             </div>
                             <div class="row m-2">
                                 <div class="col mb-3">
-                                    <button type="button" class="btn btn-light float-end" id="overlay-clear-button">Clear</button>
+                                    <button type="button" class="btn btn-light float-end" id="overlay-clear-button">
+                                        Clear
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -301,35 +340,34 @@
     </div>
 </div>
 
-<!-- BPLan Exporter -->
-<div class="modal fade" id="bplanModal" tabindex="-1" role="dialog" aria-labelledby="bplanModalTitle"
+<!-- General Settings -->
+<div class="modal fade" id="appSettingsModal" tabindex="-1" role="dialog" aria-labelledby="appSettingsModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black" id="bplanModalLabel">BPlan</h4>
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="appSettingsLabel">General Settings</h4>
                 <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="container m-2">
-                    <div class="row border rounded border-success bg-light" id="bplan-header" hidden>
-                        <div class="col-sm">
-                            <p class="text-black">Avrae Command String</p>
-                            <div id="bplan-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
-                        </div>
-                        <div class="col-1 m-0 p-0">
-                            <button class="btn" id="bplan-command-copy"><i class="fa-solid fa-copy"></i></button>
-                        </div>
-                    </div>
-                    <form method="post" id="bplan-setup">
+                    <form method="post" id="appSettings-setup">
                         <div class="row border rounded bg-secondary m-2">
                             <div class="row m-2">
                                 <div class="col-sm mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="bplan-name" name="bplan-name"
-                                               placeholder="Battle Name">
-                                        <label for="map-url">Battle Name</label>
+                                        <input type="text" class="form-control" id="avrae-prefix" value="!"
+                                               name="avrae-prefix"
+                                               placeholder="!">
+                                        <label for="avrae-prefix">Avrae Prefix</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-attach" name="map-attach"
+                                               placeholder="DM" value="DM">
+                                        <label for="map-attach">Map Attached to</label>
                                     </div>
                                 </div>
                             </div>
@@ -342,8 +380,9 @@
 </div>
 
 
-
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_helpers.js')}}"></script>
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_planner.js')}}"></script>
+<script nonce="{{ csp_nonce() }}"
+        src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_helpers.js')}}"></script>
+<script nonce="{{ csp_nonce() }}"
+        src="{{ url_for('static', filename='/js/Avrae Combat Planner/combat_planner.js')}}"></script>
 
 {% endblock %}

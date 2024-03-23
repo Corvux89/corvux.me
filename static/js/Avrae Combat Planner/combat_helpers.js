@@ -1,6 +1,7 @@
 function saveToLocalStorage(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
     var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
     var inputName = this.name
     var inputValue = this.value
 
@@ -19,6 +20,12 @@ function saveToLocalStorage(){
         try{
             var node =parseInt(this.id.match(/\d+/)[0])-1
         } catch(error){
+            // Settings
+            if (this.type == 'checkbox' && this.checked == false){
+                combat_settings[inputName] = false
+            } else {
+                combat_settings[inputName] = inputValue
+            }
         }
         var monster = combat_plan[node] || {}
 
@@ -37,11 +44,13 @@ function saveToLocalStorage(){
     combat_plan[node] = monster
     localStorage.setItem("combat_plan", JSON.stringify(combat_plan))
     localStorage.setItem("combat_map", JSON.stringify(combat_plan_map))
+    localStorage.setItem("combat_settings", JSON.stringify(combat_settings))
 }
 
 function loadFromLocalStorage(input){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
     var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
+    var combat_settings = JSON.parse(localStorage.getItem("combat_settings") || "{}")
     var inputName = input.name
     var change_event = new Event("change")
 
@@ -62,6 +71,22 @@ function loadFromLocalStorage(input){
         try{
             var node =parseInt(input.id.match(/\d+/)[0])-1
         } catch(error){
+            var value = combat_settings[inputName]
+            if (value !== null && value){
+                if (input.type == 'radio' || input.type == 'checkbox'){
+                    if (input.value == value){
+                        input.checked = true
+                    } else {
+                        input.checked = false
+                    }
+                } else {
+                   input.value = value
+                }
+            } else{
+                if ((input.type == 'radio' || input.type == 'checkbox') && value == false){
+                    input.checked = false
+                }
+            }
         }
 
         var monster = combat_plan[node] || {}
@@ -257,7 +282,7 @@ function exportToURL(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
     var combat_plan_map = JSON.parse(localStorage.getItem("combat_map") || "{}")
     var raw_data = {"combat_plan": combat_plan, "combat_map": combat_plan_map}
-    var data = JSON.stringify({"combat_plan": combat_plan, "combat_map": combat_plan_map})
+    var data = JSON.stringify(raw_data)
     var encodedData = encodeURIComponent(data)
     var url = `?data=${encodedData}`
 
@@ -275,14 +300,11 @@ function importFromURL(){
         var data = decodeURIComponent(encodedData)
 
         try {
-           var parsedData = JSON.parse(data)
-           console.log(parsedData.combat_plan)
+            var parsedData = JSON.parse(data)
+            localStorage.setItem("combat_plan", JSON.stringify(parsedData.combat_plan))
+            localStorage.setItem("combat_map", JSON.stringify(parsedData.combat_map))
 
-           localStorage.setItem("combat_plan", JSON.stringify(parsedData.combat_plan))
-           localStorage.setItem("combat_map", JSON.stringify(parsedData.combat_map))
-
-
-           window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error){
             console.error('Error parsing data: ', error)
         }

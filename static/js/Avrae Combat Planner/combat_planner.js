@@ -1,3 +1,22 @@
+class Monster{
+    constructor(name, label, quantity, size, color, token, args, coords){
+        this.name = name || ""
+        this.label = label ||""
+        this.quantity = quantity || 1
+        this.size = size || "M"
+        this.color = color || "r"
+        this.token = token || ""
+        this.args = args || ""
+        this.coords= coords || []
+
+        this.addEventListeners()
+    }
+
+    addEventListeners(){
+
+    }
+}
+
 function onLoad(){
     var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
 

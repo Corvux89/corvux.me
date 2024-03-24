@@ -219,16 +219,19 @@ function buildCommandString(){
     if (includeMulti && (!includeNotes && (combat_settings["battlemap"] == 'on' || combat_settings["overlay"] == 'on'))){
         if (!errorButton){
             errorButton = document.createElement('button')
-            errorButton.setAttribute("type", "button");
-            errorButton.classList.add("btn", "btn-link", "m-0", "p-0", "error-button");
-            errorButton.setAttribute("data-toggle", "tooltip");
-            errorButton.setAttribute("data-placement", "right");
-            errorButton.setAttribute("title", "Multiline won't work with alias (ie. map) commands.\nInclude notes to use with multiline");
+            errorButton.setAttribute("type", "button")
+            errorButton.classList.add("btn", "btn-light", "m-0", "p-0", "error-button")
+            errorButton.setAttribute("data-bs-toggle", "tooltip")
+            errorButton.setAttribute("data-bs-trigger", "hover")
+            errorButton.setAttribute("data-bs-placement", "right")
+            errorButton.setAttribute("title", "Multiline won't work with alias (ie. map) commands.\nInclude Notes to use with multiline")
 
-            var icon = document.createElement("i");
-            icon.classList.add("fa-solid", "fa-triangle-exclamation");
+            var icon = document.createElement("i")
+            icon.classList.add("fa-solid", "fa-triangle-exclamation")
 
-            errorButton.appendChild(icon);
+            errorButton.appendChild(icon)
+
+            var tooltip = new bootstrap.Tooltip(errorButton)
 
             multiColumn.appendChild(errorButton)
         }

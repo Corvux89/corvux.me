@@ -71,3 +71,7 @@ body{
 .dropdown-menu{
     z-index: 1050;
 }
+
+.fa-triangle-exclamation{
+    color: #ff0000;
+}

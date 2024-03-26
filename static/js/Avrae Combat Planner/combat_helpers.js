@@ -35,7 +35,7 @@ function saveToLocalStorage(){
             monster[inputName] = inputValue
 
             if (inputName == "monQty"){
-                // Setup the coordinate array to the same size as the number of monsters
+                // Setup the coordinate array to the b same size as the number of monsters
                 monster["monCoord"] = monster["monCoord"] || []
                 monster["monCoord"].length = inputValue
             }
@@ -230,6 +230,7 @@ function validateToken(e){
     var val = document.getElementById(e.srcElement.id).value
     var row = $('#monInventory div.monster').length
     var parent = e.srcElement.parentElement
+    console.log(parent)
     helpDom = document.getElementById(`mTokenHelp${row}`)
 
     if (isValidHttpUrl(val)){
@@ -248,9 +249,9 @@ function validateToken(e){
             if (request.readyState === 4 && request.status === 200){
                 var response = JSON.parse(request.responseText)
                 if (response.token != ""){
-                    input_event = new Event("input")
+                    change_event = new Event("change")
                     tokenDom.value = response.token
-                    tokenDom.dispatchEvent(input_event)
+                    tokenDom.dispatchEvent(change_event)
 
                     if (helpDom){
                         helpDom.remove()

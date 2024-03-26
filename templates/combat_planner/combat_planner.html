@@ -2,8 +2,8 @@
 
 <div class="container m-2">
     <h1>Avrae/OTFBM Combat Planner</h1>
-    <button type="button" class="btn btn-danger m-2" id="comReset">Reset All</button>
-    <button type="button" class="btn btn-primary m-2" id="comMonReset">Reset Monsters Only</button>
+    <button type="button" class="btn btn-danger m-2" id="reset-all">Reset All</button>
+    <button type="button" class="btn btn-primary m-2" id="reset-monsters">Reset Monsters Only</button>
     <button type="button" class="btn btn-primary m-2" id="comMapReset">Reset Map Only</button>
     <button type="button" class="btn btn-primary m-2" id="exportSettings">Export</button>
     <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal">
@@ -14,8 +14,8 @@
 <nav>
     <div class="nav nav-tabs complanner-tabs m-2" id="complannerTab" role="tablist">
         <button class="nav-link active complanner" id="inventory-tab" data-bs-toggle="tab"
-                data-bs-target="#monster-inventory"
-                type="button" role="tab" aria-selected="true" aria-controls="monster-inventory">Monster Inventory
+                data-bs-target="#main-tab"
+                type="button" role="tab" aria-selected="true" aria-controls="main-tab">Monster Inventory
         </button>
 
         <button class="nav-link complanner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
@@ -26,8 +26,8 @@
 </nav>
 
 <div class="tab-content" id="complannerTabContent">
-    <!--    Monster Inventory   -->
-    <div class="tab-pane fade show active" id="monster-inventory" role="tabpanel" aria-labelledby="inventory-tab"
+    <!--    Main  Tab   -->
+    <div class="tab-pane fade show active" id="main-tab" role="tabpanel" aria-labelledby="inventory-tab"
          tabindex="0">
         <div class="container m-2">
             <div class="row border rounded border-success bg-light" id="inventory-header">
@@ -74,86 +74,7 @@
                     </div>
                 </div>
             </div>
-            <form method="post" id="monInventory">
-                <div class="row monster border rounded bg-secondary m-2" id="monster1">
-                    <div class="row mt-2">
-                        <div class="col-md-12 d-flex monHeader">
-                            <h3>Monster 1</h3>
-                            <!--                            <button type="button" id="monRemove1" class="btn-close ms-auto"></button>-->
-                        </div>
-                    </div>
-                    <div class="row m-2">
-                        <div class="col-sm mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="monName1" name="monName"
-                                       placeholder="Monster Name">
-                                <label for="monName1">Monster Name</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="monLabel1" name="monLabel"
-                                       placeholder="Label">
-                                <label for="monLabel1">Label</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 mb-3">
-                            <div class="form-floating">
-                                <input type="number" class="form-control" id="monQty1" name="monQty" max="20"
-                                       value="1">
-                                <label for="monQty1">Quantity</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3 mb-3">
-                            <div class="form-floating">
-                                <select class="form-select" aria-label="Monster Size" id="monSize1" name="monSize">
-                                    <option value="T">Tiny</option>
-                                    <option value="S">Small</option>
-                                    <option value="M" selected>Medium</option>
-                                    <option value="L">Large</option>
-                                    <option value="H">Huge</option>
-                                    <option value="G">Gargantuan</option>
-                                </select>
-                                <label for="monSize1">Size</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 mb-3">
-                            <div class="form-floating">
-                                <select class="form-select" aria-label="Token Color" id="monColor1" name="monColor">
-                                    <option value="r" selected>Red</option>
-                                    <option value="w">White</option>
-                                    <option value="gy">Grey</option>
-                                    <option value="g">Green</option>
-                                    <option value="y">Yellow</option>
-                                    <option value="pk">Pink</option>
-                                    <option value="bn">Brown</option>
-                                    <option value="bk">Black</option>
-                                    <option value="b">Blue</option>
-                                    <option value="p">Purple</option>
-                                    <option value="c">Cyan</option>
-                                    <option value="o">Orange</option>
-                                </select>
-                                <label for="monColor1">Token Color</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row m-2">
-                        <div class="col-sm-4 mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="monToken1" name="monToken"
-                                       placeholder="Token Shortcode/URL">
-                                <label for="monToken1">Token Shortcode/URL</label>
-                            </div>
-                        </div>
-                        <div class="col-sm mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="monArgs1" name="monArgs"
-                                       placeholder="Additional Arguments">
-                                <label for="monArgs1">Additional Arguments</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <form method="post" id="monster-inventory">
             </form>
         </div>
     </div>
@@ -211,7 +132,7 @@
                     </div>
                     <div class="row m-2">
                         <div class="col-md">
-                            <form method="post" id="mapPlanner">
+                            <form method="post" id="madd-table">
                             </form>
                         </div>
                     </div>
@@ -222,7 +143,7 @@
 </div>
 
 <!--    Map Settings    -->
-<div class="modal fade" id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
+<div class="modal fade"id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -304,7 +225,7 @@
                             <div class="row m-2">
                                 <div class="col-sm-5 mb-3">
                                     <div class="form-floating">
-                                        <select class="form-select" arial-label="Overlay Type" id="map-overlay-type"
+                                        <select class="form-select" arial-label="Overlay Type" id="map-overlayType"
                                                 name="map-overlay-type">
                                             <option value="" selected></option>
                                             <option value="circle">Circle</option>
@@ -312,14 +233,14 @@
                                             <option value="line">Line</option>
                                             <option value="square">Square</option>
                                         </select>
-                                        <label for="map-overlay-type">Overlay</label>
+                                        <label for="map-overlayType">Overlay</label>
                                     </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="map-overlay-target"
+                                        <input type="text" class="form-control" id="map-overlayTarget"
                                                name="map-overlay-target" placeholder="Target">
-                                        <label for="map-overlay-target">Target</label>
+                                        <label for="map-overlayTarget">Target</label>
                                     </div>
                                 </div>
                             </div>

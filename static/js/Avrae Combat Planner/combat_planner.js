@@ -1,5 +1,10 @@
+const inventoryContainer = document.getElementById("monster-inventory")
+
 class Monster{
-    constructor(name, label, quantity, size, color, token, args, coords){
+    static node = "monsters"
+    static maddTable = document.getElementById("madd-table")
+
+    constructor(index, name, label, quantity, size, color, token, args, coords){
         this.name = name || ""
         this.label = label ||""
         this.quantity = quantity || 1
@@ -7,14 +12,457 @@ class Monster{
         this.color = color || "r"
         this.token = token || ""
         this.args = args || ""
-        this.coords= coords || []
-
-        this.addEventListeners()
+        this.coords = coords || []
+        this.index = index || 1
     }
 
-    addEventListeners(){
+    static loadFromLocalStorage(){
+        var monsterData = JSON.parse(localStorage.getItem(Monster.node) || "[]")
 
+        var monsters = monsterData.map((data, index) => new Monster(
+            index+1,
+            data.name,
+            data.label,
+            data.quantity,
+            data.size,
+            data.color,
+            data.token,
+            data.args,
+            data.coords
+        ))
+
+        if (monsters.length == 0){
+            monsters.push(new Monster(1))
+        }
+
+        return monsters
     }
+
+    static clearLocalStorage(){
+        localStorage.removeItem(Monster.node)
+    }
+
+    static initialize(){
+        var monsters = Monster.loadFromLocalStorage()
+
+        monsters.forEach(function(monster){
+            var maddRow = monster.addMaddRow()
+
+            inventoryContainer.appendChild(monster.addInventoryRow())
+            if (maddRow){
+                Monster.maddTable.appendChild(maddRow)
+            }
+        })
+
+        inventoryContainer.addEventListener('change', function(event){
+            var monsters = Monster.loadFromLocalStorage()
+            Monster.maddTable.innerHTML = ''
+
+            monsters.forEach(function(monster){
+                var maddRow = monster.addMaddRow()
+                if (maddRow){
+                    Monster.maddTable.appendChild(maddRow)
+                }
+            })
+        })
+
+        Monster.maddTable.addEventListener('change', function(event){
+            BattleMap.buildMapPreview()
+        })
+    }
+
+    getCombatID(number){
+        return (this.getPrefix().includes('#') ? this.getPrefix().replace('#', `${number}`): `${this.getPrefix()}${number}`)
+    }
+
+    getInventoryRow(){
+        return document.getElementById(`monster-${this.index}`)
+    }
+
+    getMaddRow(){
+        return document.getElementById(`madd-${this.index}`)
+    }
+
+    getPrefix(){
+        return (this.label ? this.label : this.name.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
+    }
+
+    addInventoryRow(){
+        var row = document.createElement('div')
+
+        row.classList.add('row', 'monster', 'border', 'rounded', 'bg-secondary', 'm-2')
+        row.id = `monster-${this.index}`
+        row.innerHTML = `<div class="row mt-2">
+                        <div class="col-md-12 d-flex monHeader">
+                            <h3>Monster ${this.index}</h3>
+                            ${(this.index ==1 ? "":`<button type="button" id="remove-${this.index}" class="btn-close ms-auto"></button>`)}
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-sm mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name-${this.index}" name="monsterName"
+                                       placeholder="Monster Name" value=${this.name}>
+                                <label for="name-${this.index}">Monster Name</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="label-${this.index}" name="monsterLabel"
+                                       placeholder="Label" value=${this.label}>
+                                <label for="label-${this.index}">Label</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="quantity-${this.index}" name="monsterQuantity" max="20"
+                                       min="1" value="${this.quantity}">
+                                <label for="quantity-${this.index}">Quantity</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" aria-label="Monster Size" id="size-${this.index}" name="monsterSize">
+                                    <option value="T" ${this.size == "T" ? 'selected':""}>Tiny</option>
+                                    <option value="S" ${this.size == "S" ? 'selected':""}>Small</option>
+                                    <option value="M" ${this.size == "M" ? 'selected':""}>Medium</option>
+                                    <option value="L" ${this.size == "L" ? 'selected':""}>Large</option>
+                                    <option value="H" ${this.size == "H" ? 'selected':""}>Huge</option>
+                                    <option value="G" ${this.size == "G" ? 'selected':""}>Gargantuan</option>
+                                </select>
+                                <label for="size-${this.index}">Size</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" aria-label="Token Color" id="color-${this.index}" name="monsterColor">
+                                    <option value="r" ${this.color == "r" ? 'selected':""}>Red</option>
+                                    <option value="w" ${this.color == "w" ? 'selected':""}>White</option>
+                                    <option value="gy" ${this.color == "gy" ? 'selected':""}>Grey</option>
+                                    <option value="g" ${this.color == "g" ? 'selected':""}>Green</option>
+                                    <option value="y" ${this.color == "y" ? 'selected':""}>Yellow</option>
+                                    <option value="pk" ${this.color == "pk" ? 'selected':""}>Pink</option>
+                                    <option value="bn" ${this.color == "bn" ? 'selected':""}>Brown</option>
+                                    <option value="bk" ${this.color == "bk" ? 'selected':""}>Black</option>
+                                    <option value="b" ${this.color == "b" ? 'selected':""}>Blue</option>
+                                    <option value="p" ${this.color == "p" ? 'selected':""}>Purple</option>
+                                    <option value="c" ${this.color == "c" ? 'selected':""}>Cyan</option>
+                                    <option value="o" ${this.color == "o" ? 'selected':""}>Orange</option>
+                                </select>
+                                <label for="color-${this.index}">Token Color</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-sm-4 mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="token-${this.index}" value="${this.token}" name="monsterToken" placeholder="Token Shortcode/URL">
+                                <label for="token-${this.index}">Token Shortcode/URL</label>
+                            </div>
+                        </div>
+                        <div class="col-sm mb-3">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="args-${this.index}" name="monsterArgs"
+                                       placeholder="Additional Arguments" value=${this.args}>
+                                <label for="args-${this.index}">Additional Arguments</label>
+                            </div>
+                        </div>
+                    </div>`
+
+        const inputs = row.querySelectorAll('input, select')
+        inputs.forEach(input => {
+            input.addEventListener('change', event => {
+                var elm = event.srcElement
+                var node = elm.id.replace(`-${this.index}`, '')
+
+                this[node] = elm.value
+
+                if (node == 'quantity'){
+                    this.coords.length = this.quantity
+                }
+
+                this.saveToLocalStorage()
+            })
+
+            if (input.id.includes('name')){
+                input.addEventListener('change', event => {
+                    var monsters = Monster.loadFromLocalStorage()
+                    var next_monster = monsters[this.index] || undefined
+
+                    if (this.index == monsters.length && this.name != ""){
+                        var new_monster = new Monster(this.index+1)
+                        new_monster.saveToLocalStorage()
+                        inventoryContainer.appendChild(new_monster.addInventoryRow())
+                    } else if (this.name == "" && this.index != monsters.length && (next_monster && next_monster.name == "")){
+                        next_monster.getInventoryRow().remove()
+                        next_monster.removeFromLocalStorage()
+                    }
+                })
+            }
+
+            if (input.id.includes('token')){
+                input.addEventListener('change', event => {
+                    validateToken(event)
+                })
+            }
+        })
+
+        var removeButton = row.querySelector(`#remove-${this.index}`)
+        if (removeButton){
+            removeButton.addEventListener('click', function(event){
+                var monsters = Monster.loadFromLocalStorage()
+                var index = event.srcElement.id.replace('remove-','')
+                var monster = monsters[index-1]
+
+                if (index == monsters.length){
+                    alert("Can't remove the last row")
+                } else {
+                    monster.removeFromLocalStorage()
+                    location.reload()
+                }
+            })
+        }
+
+        return row
+    }
+
+    addMaddRow(){
+        if (this.name == ""){
+            return
+        }
+
+        var event = new Event('change')
+
+        var row = document.createElement("div")
+        row.id = `madd-${this.index}`
+        row.classList.add('row', 'm-2', 'border', 'rounded', 'monGroup', 'bg-secondary')
+
+        // Header
+        var h_row = document.createElement("div")
+        h_row.classList.add('row', 'mt-2')
+
+        var h_col = document.createElement("div")
+        h_col.classList.add('col-md-12', 'd-flex', 'monHeader')
+
+        var h3 = document.createElement('h3')
+        h3.innerHTML = `${this.name}`
+        h_col.appendChild(h3)
+        h_row.appendChild(h_col)
+        row.appendChild(h_row)
+
+        // Monster Fields
+        for (var i=0; i < this.quantity; i++){
+            var cInput = document.createElement('input')
+            cInput.type = "text"
+            cInput.classList.add('form-control')
+            cInput.id = `monster-postition${this.index}-${i+1}`
+            cInput.name = `monster-position`
+            if (this.quantity > 1 || this.getPrefix().includes('#')){
+                cInput.placeholder = this.getCombatID(i+1)
+            } else {
+                cInput.placeholder = this.getPrefix()
+            }
+
+            cInput.value = this && this.coords && this.coords[i] ? this.coords[i]:""
+
+            var cLabel = document.createElement("label")
+            cLabel.setAttribute("for", cInput.id)
+            cLabel.innerHTML = cInput.placeholder
+
+            var form = document.createElement("div")
+            form.classList.add('form-floating')
+            form.appendChild(cInput)
+            form.appendChild(cLabel)
+
+            var col = document.createElement("div")
+            col.classList.add('col-sm-3', 'mb-3', 'monPos')
+            col.appendChild(form)
+
+            row.appendChild(col)
+        }
+
+        // Footer Row
+        var f_row = document.createElement("div")
+        f_row.classList.add('row', 'mt-2')
+
+        var f_col = document.createElement('div')
+        f_col.classList.add('col', 'mb-3')
+
+        // Button
+        var button = document.createElement("button")
+        button.type = "button"
+        button.id = `madd-clear-${this.index}`
+        button.classList.add('btn', 'btn-light', 'float-end')
+        button.innerHTML = "Clear"
+        f_col.appendChild(button)
+        f_row.appendChild(f_col)
+
+
+        row.appendChild(f_row)
+
+        var fields = row.querySelectorAll('input')
+        fields.forEach(input => {
+            input.addEventListener('change', function(){
+                var numbers = this.id.match(/\d+/g)
+                var index = parseInt(numbers[0])
+                var coordIndex = parseInt(numbers[1])
+                var monsters = Monster.loadFromLocalStorage()
+                var monster = monsters[index-1]
+                monster.coords[coordIndex-1] = this.value
+                monster.saveToLocalStorage()
+            })
+        })
+
+        var button = row.querySelector('button')
+        button.addEventListener('click', function(event){
+            var index = event.srcElement.id.replace('madd-clear-','')
+            var monsters = Monster.loadFromLocalStorage()
+            var monster = monsters[index-1]
+
+            monster.getMaddRow().querySelectorAll('input').forEach(input =>{
+                input.value = ""
+            })
+
+            monster.coords = []
+            monster.coords.length = monster.quantity
+            monster.saveToLocalStorage()
+        })
+
+        return row
+    }
+
+    saveToLocalStorage(){
+        var monsters = Monster.loadFromLocalStorage()
+        monsters[this.index -1] = this
+        localStorage.setItem(Monster.node, JSON.stringify(monsters));
+    }
+
+    removeFromLocalStorage(){
+        var monsters = Monster.loadFromLocalStorage()
+        monsters.splice(this.index-1, 1)
+        localStorage.setItem(Monster.node, JSON.stringify(monsters));
+    }
+}
+
+class BattleMap{
+    static node = "battlemap"
+    constructor(url, size, csettings, overlayType, overlayTarget){
+        this.url = url || ""
+        this.size = size || "10x10"
+        this.csettings = csettings || ""
+        this.overlayType = overlayType || ""
+        this.overlayTarget = overlayTarget || ""
+    }
+
+    static loadFromLocalStorage(){
+        var battlemap = JSON.parse(localStorage.getItem(BattleMap.node) || "{}")
+        return new BattleMap(
+            battlemap.url,
+            battlemap.size,
+            battlemap.csettings,
+            battlemap.overlayType,
+            battlemap.overlayTarget
+        )
+    }
+
+    static initialize(){
+        var battlemap = BattleMap.loadFromLocalStorage()
+        BattleMap.buildMapPreview()
+        var mapSetup = document.getElementById('map-setup')
+
+        // Settings
+        // - Defaulting
+        mapSetup.querySelectorAll('input').forEach(input => {
+            input.value = battlemap[`${input.id.replace('map-', '')}`]
+        })
+
+        // - Event
+        mapSetup.addEventListener('change', function(event){
+            var battlemap = BattleMap.loadFromLocalStorage()
+            var elm = event.srcElement
+            var node = elm.id.replace(`map-`, '')
+            battlemap[node] = elm.value
+            battlemap.saveToLocalStorage()
+            BattleMap.buildMapPreview()
+        })
+    }
+
+    static buildMapPreview(){
+        var monsters = Monster.loadFromLocalStorage()
+        var battlemap = BattleMap.loadFromLocalStorage()
+        var mapPreview = document.getElementById("mapPreview")
+        var monsterOnMap = false
+
+        monsters.forEach(function(monster){
+            if (monster.coords.length > 0 && monster.coords.some(coord => coord != null)){
+                monsterOnMap = true
+            }
+        })
+
+        if (battlemap.url != "" || battlemap.size != "" || mon_placed){
+            var imgUrl = 'https://otfbm.io/'
+            imgUrl += battlemap.size ? battlemap.size:"10x10"
+            imgUrl += battlemap.csettings ? `/@c${battlemap.csettings}`:""
+
+            monsters.forEach(function(monster){
+                for (var i=0; i < monster.quantity; i++){
+                    if (monster.coords[i] != null){
+                        var monStr = "/" + monster.coords[i]
+                        monStr += monster.size ? monster.size:"M"
+                        monStr += monster.color ? monster.color:"r"
+                        monStr += "-"
+                        if (monster.quantity > 1 || monster.getPrefix().includes("#")){
+                            monStr += monster.getCombatID(i+1)
+                        } else {
+                            monStr += monster.getPrefix()
+                        }
+
+                        monStr += monster.token ? `~${monster.token}`:""
+                        imgUrl += monStr
+                    }
+                }
+            })
+
+            imgUrl += "/"
+            imgUrl += battlemap.url ? `/?a=2&bg=${battlemap.url}`:""
+
+            var imgDom = document.createElement("img")
+            imgDom.classList.add('img-fluid')
+            imgDom.src = imgUrl
+
+            if (imgDom.outerHTML.localeCompare(mapPreview.innerHTML)!=0){
+                mapPreview.innerHTML = ""
+                mapPreview.hidden=false
+                mapPreview.appendChild(imgDom)
+            }
+        } else{
+            mapPreview.hidden = true
+        }
+    }
+
+    saveToLocalStorage(){
+        localStorage.setItem(BattleMap.node, JSON.stringify(this))
+    }
+}
+
+function onLoadNew(){
+    Monster.initialize()
+    BattleMap.initialize()
+
+
+    // Top Buttons
+
+    // - Reset All
+    document.getElementById("reset-all").addEventListener('click', function(event){
+        Monster.clearLocalStorage()
+        location.reload()
+    })
+
+    // - Reset Monsters Only
+    document.getElementById("reset-monsters").addEventListener('click', function(event){
+        Monster.clearLocalStorage()
+        location.reload()
+    })
 }
 
 function onLoad(){
@@ -464,115 +912,6 @@ function getOverlayCommand(includeNotes = false){
     return str
 }
 
-function buildMaddTable(num, monster){
-    if (!monster || !monster.monName && (!monster.monQty || monster.monQty < 1)){
-        return
-    }
-
-    var monster_row = document.createElement("div")
-    var prefix = (monster.monLabel ? monster.monLabel : monster.monName.split(/\s/).reduce((response,word) => response+=word.slice(0,1),''))
-    var quantity = monster.monQty ? parseInt(monster.monQty): 1
-    monster_row.id=`map${num}`
-    monster_row.className = "row m-2 border rounded monGroup bg-secondary"
-
-    // Header
-    header_row = document.createElement("div")
-    header_row.className = "row mt-2"
-
-    header_col = document.createElement("div")
-    header_col.className = "col-md-12 d-flex monHeader"
-
-    header = document.createElement("h3")
-    header.innerHTML = `${monster.monName}`
-    header_col.appendChild(header)
-
-    header_row.appendChild(header_col)
-    monster_row.appendChild(header_row)
-
-    // Add fields per monster
-    for (var i=0; i < quantity; i++){
-        coord = document.createElement("input")
-        coord.type="text"
-        coord.className = "form-control"
-        coord.id = `mapMon${num}-${i+1}`
-        coord.name = "monCoord"
-        if (quantity>1 || (monster.monLabel && monster.monLabel.includes("#"))){
-            coord.placeholder = (prefix.includes("#") ? prefix.replace("#", `${i+1}`):`${prefix}${i+1}`)
-        } else {
-            coord.placeholder = `${prefix}`
-        }
-
-        coord.value = monster && monster.monCoord && monster.monCoord[i] ? monster.monCoord[i]:""
-
-        label = document.createElement("label")
-        label.setAttribute("for", coord.id)
-        label.innerHTML = coord.placeholder
-
-        form = document.createElement("div")
-        form.className = "form-floating"
-        form.appendChild(coord)
-        form.appendChild(label)
-
-        col = document.createElement("div")
-        col.className = "col-sm-3 mb-3 monPos"
-        col.appendChild(form)
-
-        monster_row.appendChild(col)
-    }
-
-    // Footer Row
-    footer_row = document.createElement("div")
-    footer_row.className = "row mt-2"
-
-    footer_col = document.createElement("div")
-    footer_col.className = "col mb-3"
-
-    button = document.createElement("button")
-    button.type = "button"
-    button.id =`${prefix}${num}-remove`
-    button.className = "btn btn-light float-end"
-    button.innerHTML = "Clear"
-    footer_col.appendChild(button)
-    footer_row.appendChild(footer_col)
-    monster_row.appendChild(footer_row)
-
-    var fields = monster_row.querySelectorAll('input, select')
-    fields.forEach(input => {
-        input.addEventListener('input', saveToLocalStorage)
-    })
-
-    var buttons = monster_row.querySelectorAll('button')[0].addEventListener('click', function(event){
-        var row = parseInt(event.srcElement.id.match(/\d+/)[0])
-        var row = document.getElementById(`map${row}`)
-        input_event = new Event("input")
-        change_event = new Event("change")
-
-
-        row.querySelectorAll('input').forEach(input => {
-            input.value = ""
-            input.dispatchEvent(input_event)
-        })
-
-        document.getElementById('mapPlanner').dispatchEvent(change_event)
-    })
-
-    return monster_row
-}
-
-function updateMaddTable(){
-    var mapPlanner = document.getElementById("mapPlanner")
-    var combat_plan = JSON.parse(localStorage.getItem("combat_plan") || "[]")
-    var monsters = JSON.parse(localStorage.getItem("monsters") || "[]")
-    var event = new Event('change')
-
-    mapPlanner.innerHTML = ''
-
-    combat_plan.forEach(function(monster, index){
-        $('#mapPlanner').append(buildMaddTable(index+1, monster))
-        document.getElementById('mapPlanner').dispatchEvent(event)
-    })
-}
-
 function buildMapPlannerCommand(){
     var maps_header = document.getElementById('maps-header')
     var out = getMapCommand()
@@ -917,4 +1256,4 @@ function buildMapPreview(){
 }
 
 importFromURL()
-onLoad()
+onLoadNew()

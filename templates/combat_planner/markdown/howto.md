@@ -4,18 +4,21 @@ This tool is designed to help with planning encounters in Avrae giving an easy w
 If you have a different Avrae prefix or want to use a different target for the `map` then you can change that in the `General Settings`. This will update the commands the tool gives.
 
 ### Getting Monsters Setup
-Fill out the information on the monster you want to use
-<img src="/static/images/Avrae Combat Planner/monster.png" alt="Monster Information" width="700"/>  
+Fill out the information on the monster you want to use 
+
+<img src="/static/images/Avrae Combat Planner/monster.png" alt="Monster Information" width="95%"/>  
   
 
 Go to the `Map Planner` tab, and you can set the coordinates for the monsters in using `Place Monsters` button. This will also give you the standalone `!map` command.  
-<img src="/static/images/Avrae Combat Planner/coordinates.png" alt="Monster Coordinates" width="700"/>  
+
+<img src="/static/images/Avrae Combat Planner/coordinates.png" alt="Monster Coordinates" width="95%"/>  
   
 This will also show in the map preview embedded on this tab as well. 
 
 ### Setting up the map
 If you need to change the background, or map size being used you can use the `Map Settings` to set a background URL, mapsize, and change csettings if needed.  
-<img src="/static/images/Avrae Combat Planner/mapsettings.png" alt="Map Settings" width="700"/>
+
+<img src="/static/images/Avrae Combat Planner/mapsettings.png" alt="Map Settings" width="95%"/>
 
 ### Overlay
 If you want to use an overlay the `Overlay Settings` can help you setup the command and preview the overlay as well. 

@@ -1,4 +1,6 @@
 import urllib.request
+import markdown
+import re
 
 import flask
 from flask import Blueprint, render_template, request, jsonify, abort
@@ -7,7 +9,11 @@ combat_planner_blueprint = Blueprint("complanner", __name__)
 
 @combat_planner_blueprint.route('/')
 def planner():
-    return render_template('/combat_planner/combat_planner.html')
+
+    with open('templates/combat_planner/markdown/howto.md', 'r', encoding='utf-8') as file:
+        howto = markdown.markdown(file.read())
+
+    return render_template('/combat_planner/combat_planner.html', howto=howto)
 
 @combat_planner_blueprint.route('/shortcode', methods=['POST'])
 def get_shortcode():

@@ -9,6 +9,7 @@
     <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal">
         General Settings
     </button>
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#howtomodal">How-To Use</button>
 </div>
 
 <nav>
@@ -46,7 +47,6 @@
                                 <input class="form-check-input" type="checkbox" id="setting-multiline"
                                        name="setting-multiline">
                                 <label class="form-check-label" for="setting-multiline">Include Multiline</label>
-<!--                                <button type="button" class="btn btn-link m-0 p-0 error-button" data-toggle="tooltip" data-placement="right" title="Multiline won't work with alias (ie. map) commands.&#10;Include notes to use with multiline"><i class="fa-solid fa-triangle-exclamation" tooltip="here"></i></button>-->
                             </div>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="setting-maptarget" name="setting-maptarget">
@@ -281,19 +281,42 @@
                                         <input type="text" class="form-control" id="setting-prefix" value="!"
                                                name="avrae-prefix"
                                                placeholder="!">
-                                        <label for="avrae-prefix">Avrae Prefix</label>
+                                        <label for="setting-prefix">Avrae Prefix</label>
                                     </div>
                                 </div>
                                 <div class="col-sm mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="setting-attach" name="map-attach"
                                                placeholder="DM" value="DM">
-                                        <label for="map-attach">Map Attached to</label>
+                                        <label for="setting-attach">Map Attached to</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How-to Modal -->
+<div class="modal fade" id="howtomodal" tabindex="-1" role="dialog" aria-labelledby="howtomodalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="appSettingsLabel">How to use this tool</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-0 p-0 g-0 bg-dark">
+                    <div class="row m-2">
+                        <div class="col-md overflow-auto">
+                            {{ howto | safe}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

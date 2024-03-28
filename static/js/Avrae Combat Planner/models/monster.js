@@ -138,12 +138,11 @@ export class Monster{
                         <div class="col-sm mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="args-${this.index}" name="monsterArgs"
-                                       placeholder="Additional Arguments" value="${this.args}">
+                                       placeholder="Additional Arguments" value="${this.args.replace(/"/g, '&quot;')}">
                                 <label for="args-${this.index}">Additional Arguments</label>
                             </div>
                         </div>
                     </div>`
-
         const inputs = row.querySelectorAll('input, select')
         inputs.forEach(input => {
             input.addEventListener('change', event => {
@@ -188,6 +187,7 @@ export class Monster{
                 var monsters = Monster.loadAll()
                 var index = event.srcElement.id.replace('remove-','')
                 var monster = monsters[index-1]
+                var change_event = new Event("change")
 
                 if (index == monsters.length){
                     $(`#remove-${index}`).tooltip({title: "Cannot remove the last row.", delay: {show: 500, hide: 1500}})
@@ -196,6 +196,9 @@ export class Monster{
                     monster.remove()
                     inventoryContainer.innerHTML = ""
                     AvraePlanner.setupInventoryTable()
+                    AvraePlanner.buildCommandString()
+                    inventoryContainer.dispatchEvent(change_event)
+                    maddTable.dispatchEvent(change_event)
                 }
             })
         }

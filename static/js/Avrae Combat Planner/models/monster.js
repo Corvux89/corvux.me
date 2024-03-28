@@ -1,4 +1,4 @@
-import {inventoryContainer, maddTable} from './avraeplanner.js'
+import {inventoryContainer, maddTable, AvraePlanner} from './avraeplanner.js'
 
 export class Monster{
     static node = "monsters"
@@ -70,21 +70,21 @@ export class Monster{
         row.innerHTML = `<div class="row mt-2">
                         <div class="col-md-12 d-flex monHeader">
                             <h3>Monster ${this.index}</h3>
-                            ${(this.index ==1 ? "":`<button type="button" id="remove-${this.index}" class="btn-close ms-auto"></button>`)}
+                            ${(this.index ==1 ? "":`<button type="button" id="remove-${this.index}" class="btn btn-close ms-auto"></button>`)}
                         </div>
                     </div>
                     <div class="row m-2">
                         <div class="col-sm mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="name-${this.index}" name="monsterName"
-                                       placeholder="Monster Name" value=${this.name}>
+                                       placeholder="Monster Name" value="${this.name}">
                                 <label for="name-${this.index}">Monster Name</label>
                             </div>
                         </div>
                         <div class="col-sm-2 mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="label-${this.index}" name="monsterLabel"
-                                       placeholder="Label" value=${this.label}>
+                                       placeholder="Label" value="${this.label}">
                                 <label for="label-${this.index}">Label</label>
                             </div>
                         </div>
@@ -138,7 +138,7 @@ export class Monster{
                         <div class="col-sm mb-3">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="args-${this.index}" name="monsterArgs"
-                                       placeholder="Additional Arguments" value=${this.args}>
+                                       placeholder="Additional Arguments" value="${this.args}">
                                 <label for="args-${this.index}">Additional Arguments</label>
                             </div>
                         </div>
@@ -190,10 +190,12 @@ export class Monster{
                 var monster = monsters[index-1]
 
                 if (index == monsters.length){
-                    alert("Can't remove the last row")
+                    $(`#remove-${index}`).tooltip({title: "Cannot remove the last row.", delay: {show: 500, hide: 1500}})
+                    $(`#remove-${index}`).tooltip('show')
                 } else {
                     monster.remove()
-                    location.reloadAll()
+                    inventoryContainer.innerHTML = ""
+                    AvraePlanner.setupInventoryTable()
                 }
             })
         }

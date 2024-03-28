@@ -134,11 +134,37 @@ export class AvraePlanner{
                 var settings = PlannerSettings.load()
                 var elm = event.srcElement
                 var node = elm.id.replace('setting-', '')
+                var multiColumn = document.getElementById("multiColumn")
+                var errorButton = multiColumn.querySelector('.error-button')
                 if (elm.type == "text") {
                     settings[node] = elm.value
                 } else {
                     settings[node] = elm.checked
                 }
+
+                if (settings.multiline == true && (settings.notes == false && (settings.battlemap == true || settings.overlay == true))){
+                    if (!errorButton){
+                        errorButton = document.createElement('button')
+                        errorButton.setAttribute("type", "button")
+                        errorButton.classList.add("btn", "btn-light", "m-0", "p-0", "error-button")
+                        errorButton.setAttribute("data-bs-toggle", "tooltip")
+                        errorButton.setAttribute("data-bs-trigger", "hover")
+                        errorButton.setAttribute("data-bs-placement", "right")
+                        errorButton.setAttribute("title", "Multiline won't work with alias (ie. map) commands.\nInclude Notes to use with multiline")
+
+                        var icon = document.createElement("i")
+                        icon.classList.add("fa-solid", "fa-triangle-exclamation")
+
+                        errorButton.appendChild(icon)
+
+                        var tooltip = new bootstrap.Tooltip(errorButton)
+
+                        multiColumn.appendChild(errorButton)
+                    }
+                } else if (errorButton){
+                    multiColumn.removeChild(errorButton)
+                }
+
                 settings.save()
                 setMaddHeader()
                 setMapSettingsHeader()
@@ -349,8 +375,6 @@ export class AvraePlanner{
     static buildCommandString(){
         var settings = PlannerSettings.load()
         var commands = []
-        var multiColumn = document.getElementById("multiColumn")
-        var errorButton = multiColumn.querySelector('.error-button')
         var commandStr = document.getElementById('commandStr')
         var avraeCommand = document.getElementById('avrae-command')
 
@@ -383,29 +407,6 @@ export class AvraePlanner{
         }
 
         avraeCommand.innerHTML = out
-
-        if (settings.multiline == true && (settings.notes == false && (settings.battlemap == true || settings.overlay == true))){
-            if (!errorButton){
-                errorButton = document.createElement('button')
-                errorButton.setAttribute("type", "button")
-                errorButton.classList.add("btn", "btn-light", "m-0", "p-0", "error-button")
-                errorButton.setAttribute("data-bs-toggle", "tooltip")
-                errorButton.setAttribute("data-bs-trigger", "hover")
-                errorButton.setAttribute("data-bs-placement", "right")
-                errorButton.setAttribute("title", "Multiline won't work with alias (ie. map) commands.\nInclude Notes to use with multiline")
-
-                var icon = document.createElement("i")
-                icon.classList.add("fa-solid", "fa-triangle-exclamation")
-
-                errorButton.appendChild(icon)
-
-                var tooltip = new bootstrap.Tooltip(errorButton)
-
-                multiColumn.appendChild(errorButton)
-            }
-        } else if (errorButton){
-            multiColumn.removeChild(errorButton)
-        }
     }
 
     static exportPlanner(){

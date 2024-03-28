@@ -16,7 +16,7 @@ def planner():
 def get_shortcode():
     queryUrl = request.get_json().get('url')
 
-    try:lo
+    try:
         url = urllib.request.urlopen(queryUrl)
     except:
         return jsonify({"token": ""})

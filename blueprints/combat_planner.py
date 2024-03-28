@@ -1,9 +1,6 @@
 import urllib.request
 import markdown
-import re
-
-import flask
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify
 
 combat_planner_blueprint = Blueprint("complanner", __name__)
 

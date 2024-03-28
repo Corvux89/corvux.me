@@ -189,40 +189,34 @@ export class AvraePlanner{
         $("#appSettingsModal").draggable({
             handle: ".modal-header"
         })
+
+        $('#confirmModal').on('show.bs.modal', function (event){
+            var button = $(event.relatedTarget)
+            var reset = button.data('reset')
+            var resetButton = document.getElementById("confirm-reset")
+            var modal = $(this)
+            var str = ""
+
+            switch(reset){
+                case "monster":
+                    str = "Are you sure you want to delete all monsters?"
+                    break
+
+                case "map":
+                    str = "Are you sure you want to delete all map information?"
+                    break
+
+                case "all":
+                    str = "Are you sure you want to clear the entire encounter?"
+                    break
+            }
+
+            modal.find('p').text(str)
+            resetButton.setAttribute("data-reset", reset)
+        })
     }
 
     static buttonSetup() {
-        // Reset All
-        document.getElementById("reset-all").addEventListener('click', function (event) {
-            localStorage.removeItem(Monster.node)
-            localStorage.removeItem(BattleMap.node)
-            location.reload()
-        })
-        // Reset Monsters Only
-        document.getElementById("reset-monsters").addEventListener('click', function (event) {
-            var change_event = new Event("change")
-            localStorage.removeItem(Monster.node)
-            inventoryContainer.innerHTML = ''
-            AvraePlanner.setupInventoryTable()
-            AvraePlanner.buildCommandString()
-            inventoryContainer.dispatchEvent(change_event)
-            maddTable.dispatchEvent(change_event)
-
-        })
-        // Reset Map Only
-        document.getElementById("reset-map").addEventListener('click', function (event) {
-            var change_event = new Event("change")
-            var mapSetup = document.getElementById('map-setup')
-            localStorage.removeItem(BattleMap.node)
-            var battlemap = BattleMap.load()
-
-            mapSetup.querySelectorAll('input, select').forEach(input => {
-                input.value = battlemap[`${input.id.replace('map-', '')}`]
-            })
-
-            overlaySetup.dispatchEvent(change_event)
-            mapSetup.dispatchEvent(change_event)
-        })
         // Export
         document.getElementById("export-planner").addEventListener('click', function(event) {
             AvraePlanner.exportPlanner()
@@ -243,7 +237,6 @@ export class AvraePlanner{
 
             overlaySetup.dispatchEvent(change_event)
         })
-
         // Copy Buttons
         // - Main command line
         document.getElementById("command-copy").addEventListener('click', function (event) {
@@ -288,6 +281,41 @@ export class AvraePlanner{
                 $('#overlay-copy').tooltip({title: "Command copied to clipboard!", delay: {show: 500, hide: 1500}})
                 $('#overlay-copy').tooltip('show')
             }
+        })
+        // - Confirm Reset Button
+        document.getElementById("confirm-reset").addEventListener('click', function (event) {
+            var button = $(event.srcElement)
+            var reset = button.data('reset')
+            var change_event = new Event("change")
+
+            switch(reset){
+                case "monster":
+                    localStorage.removeItem(Monster.node)
+                    inventoryContainer.innerHTML = ''
+                    AvraePlanner.setupInventoryTable()
+                    AvraePlanner.buildCommandString()
+                    inventoryContainer.dispatchEvent(change_event)
+                    maddTable.dispatchEvent(change_event)
+                    break
+
+                case "map":
+                    var mapSetup = document.getElementById('map-setup')
+                    localStorage.removeItem(BattleMap.node)
+                    var battlemap = BattleMap.load()
+                    mapSetup.querySelectorAll('input, select').forEach(input => {
+                        input.value = battlemap[`${input.id.replace('map-', '')}`]
+                    })
+                    overlaySetup.dispatchEvent(change_event)
+                    mapSetup.dispatchEvent(change_event)
+                    break
+
+                case "all":
+                    localStorage.removeItem(Monster.node)
+                    localStorage.removeItem(BattleMap.node)
+                    location.reload()
+                    break
+            }
+
         })
     }
 

@@ -1,7 +1,5 @@
 {% extends "template.html" %} {% block body %}
 
-<!--<img src="{{ url_for('static', filename='/images/shield.png') }}" class="bg-image opacity-25 w-100">-->
-
 <div class="card main text-bg-dark bg-transparent border-0 m-2">
     <div class="card-body">
         <h1 class="text-start">Bryce Hadsell</h1>
@@ -24,7 +22,7 @@
         </div>
         <div class="row">
             <div class="btn-group-vertical" role="group" aria-label="Education and Work">
-                <p class="mb-0"><i class="fa-solid fa-briefcase"></i> NorthShore Unviersity Healthsystem-EEH (2013-2014,
+                <p class="mb-0"><i class="fa-solid fa-briefcase"></i> Endeavor Health (2013-2014,
                     2017-Present)</p>
                 <p class="mb-0"><i class="fa-solid fa-briefcase"></i> UW Health - Madison (2014-2017)</p>
                 <p class="mb-0"><i class="fa-solid fa-landmark"></i> Northwestern University (2014-2016, MSIS)</p>
@@ -34,28 +32,38 @@
             </div>
         </div>
         <h2 class="mt-3">About Me</h2>
-        <p>
-            I've been working in Healthcare IT for over 10 years working to automate workflow to improve patient outcomes, and
-            increase provider and patient satisfaction. I've done work to help streamline and automate patient
-            scheduling and triage from the first point of contact, diagnostic tools to help physicians diagnose and
-            manage treatment
-            for various complex neurological conditions, and tools for physicians to determine the best antibiotic to
-            prescribe
-            to a patient based on empiric recommendations.
-        </p>
-        <p>
-            The past couple of years I've been working with Personalized
-            Medicine to help integrate genetic testing into patient care, with a small deviation during COVID to help
-            our organization and staff shift to addressing the surge of patients we were expecting. I built tools to
-            help patients navigate our system for symptomatic, asymptomatic, and pre-procedural testing, serology testing,
-            while helping our operational staff gauge supplies and volumes. This helped route patients where most appropriate
-            and freed up clinical staff so they could attend to patients rather than phone calls/messages checking symptoms
-            against the latest guidelines.
-        </p>
-        <p>
-            When not at work, I enjoy spending time with my family, playing various video/tabletop games,
-            and working on some passions projects to help refine skills and learn something new.
-        </p>
+        {{ aboutme | safe }}
+<!--        <p>-->
+<!--            I've been working in Healthcare IT for over 10 years working to automate workflow to improve patient-->
+<!--            outcomes, and-->
+<!--            increase provider and patient satisfaction. I've done work to help streamline and automate patient-->
+<!--            scheduling and triage from the first point of contact, diagnostic tools to help physicians diagnose and-->
+<!--            manage treatment-->
+<!--            for various complex neurological conditions, and tools for physicians to determine the best antibiotic to-->
+<!--            prescribe-->
+<!--            to a patient based on empiric recommendations.-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            The past couple of years I've been working with-->
+<!--            <a href="https://www.northshore.org/personalized-medicine/" target="_blank" class="undecorated-link">Personalized Medicine</a> helping integrate-->
+<!--            genetic testing into patient care as part of one of the only pharmacogenomics clinics in the country.-->
+<!--            This covers disciplines from medical genetics, clinical practices, informatics, lab services, and research.-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            During COVID I helped-->
+<!--            our organization and staff shift to addressing the surge of patients we were expecting. I built tools to-->
+<!--            help patients navigate our system for symptomatic, asymptomatic, and pre-procedural testing, serology-->
+<!--            testing,-->
+<!--            while helping our operational staff gauge supplies and volumes. This helped route patients where most-->
+<!--            appropriate-->
+<!--            and freed up clinical staff so they could attend to patients rather than phone calls/messages checking-->
+<!--            symptoms-->
+<!--            against the latest guidelines.-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            When not at work, I enjoy spending time with my family, playing various video/tabletop games,-->
+<!--            and working on some passions projects to help refine skills and learn something new.-->
+<!--        </p>-->
         <h2 class="ms-3">Personal Projects</h2>
         <div class="row m-2 row-cols-1 row-cols-xxl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-lg-3 g-2">
             {% for project in projects %}

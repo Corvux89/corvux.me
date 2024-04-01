@@ -1,4 +1,5 @@
 import json
+import markdown
 from urllib.parse import urlparse
 
 from flask import Flask, render_template, request, make_response
@@ -21,9 +22,12 @@ app.config.update(
 @app.route('/')
 @app.route('/home')
 def homepage():
+    with open('templates/aboutme.md', 'r', encoding='utf-8') as file:
+        aboutme = markdown.markdown(file.read())
+
     f = open('static/json/projects.json', encoding="utf8")
     projects = json.load(f)
-    return render_template("main.html", projects = projects)
+    return render_template("main.html", projects=projects, aboutme=aboutme)
 
 @app.route('/sitemap.xml')
 def site_map():

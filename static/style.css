@@ -42,7 +42,7 @@ body{
       mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
 }
 
-.icon-link, .popover-link{
+.icon-link, .popover-link, .undecorated-link{
     text-decoration: none;
 }
 

@@ -146,16 +146,20 @@ export class Monster{
         const inputs = row.querySelectorAll('input, select')
         inputs.forEach(input => {
             input.addEventListener('change', event => {
-                var elm = event.srcElement
+                var monsters = Monster.loadAll()
+                var monster = monsters[this.index-1]
+                var elm = event.target
                 var node = elm.id.replace(`-${this.index}`, '')
+                console.log(this)
+                console.log(monster)
 
-                this[node] = elm.value
+                monster[node] = elm.value
 
                 if (node == 'quantity'){
-                    this.coords.length = this.quantity
+                    monster.coords.length = this.quantity
                 }
 
-                this.save()
+                monster.save()
             })
 
             if (input.id.includes('name')){
@@ -185,9 +189,8 @@ export class Monster{
         if (removeButton){
             removeButton.addEventListener('click', function(event){
                 var monsters = Monster.loadAll()
-                var index = event.srcElement.id.replace('remove-','')
+                var index = event.target.id.replace('remove-','')
                 var monster = monsters[index-1]
-                var change_event = new Event("change")
 
                 if (index == monsters.length){
                     $(`#remove-${index}`).tooltip({title: "Cannot remove the last row.", delay: {show: 500, hide: 1500}})
@@ -198,7 +201,6 @@ export class Monster{
                     AvraePlanner.setupInventoryTable()
                     AvraePlanner.buildCommandString()
                     inventoryContainer.dispatchEvent(change_event)
-                    maddTable.dispatchEvent(change_event)
                 }
             })
         }
@@ -291,7 +293,7 @@ export class Monster{
 
         var button = row.querySelector('button')
         button.addEventListener('click', function(event){
-            var index = event.srcElement.id.replace('madd-clear-','')
+            var index = event.target.id.replace('madd-clear-','')
             var monsters = Monster.loadAll()
             var monster = monsters[index-1]
 
@@ -311,6 +313,12 @@ export class Monster{
         var monsters = Monster.loadAll()
         monsters[this.index -1] = this
         localStorage.setItem(Monster.node, JSON.stringify(monsters));
+
+        var change_event = new Event("change")
+        maddTable.dispatchEvent(change_event)
+        AvraePlanner.buildMapPreview()
+
+
     }
 
     remove(){
@@ -348,15 +356,15 @@ function getShortcode(queryUrl){
 }
 
 function validateToken(e){
-    var val = document.getElementById(e.srcElement.id).value
+    var val = document.getElementById(e.target.id).value
     var row = $('#monInventory div.monster').length
-    var parent = e.srcElement.parentElement
+    var parent = e.target.parentElement
     var helpDom = document.getElementById(`mTokenHelp${row}`)
 
     if (isValidHttpUrl(val)){
         var base64 = btoa(val)
         var queryUrl = `https://token.otfbm.io/meta/${base64}`
-        var tokenDom = document.getElementById(e.srcElement.id)
+        var tokenDom = document.getElementById(e.target.id)
         var err_str = "Something went wrong with that image. Either OTFBM doesn't have access to the image, or it is malformed.<br>Try a different image URL please"
 
         tokenDom.value = "loading..."

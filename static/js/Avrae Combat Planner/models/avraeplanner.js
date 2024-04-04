@@ -81,7 +81,7 @@ export class AvraePlanner{
         // Event
         mapSetup.addEventListener('change', function(event){
             var battlemap = BattleMap.load()
-            var elm = event.srcElement
+            var elm = event.target
             var node = elm.id.replace(`map-`, '')
             battlemap[node] = elm.value
             battlemap.save()
@@ -102,7 +102,7 @@ export class AvraePlanner{
         // Event
         overlaySetup.addEventListener('change', function(event){
             var battlemap = BattleMap.load()
-            var elm = event.srcElement
+            var elm = event.target
             var node = elm.id.replace('map-overlay', '').toLowerCase()
 
             battlemap.overlay[node] = elm.value
@@ -132,7 +132,7 @@ export class AvraePlanner{
             // Event
             elm.addEventListener('change', function (event) {
                 var settings = PlannerSettings.load()
-                var elm = event.srcElement
+                var elm = event.target
                 var node = elm.id.replace('setting-', '')
                 var multiColumn = document.getElementById("multiColumn")
                 var errorButton = multiColumn.querySelector('.error-button')
@@ -284,7 +284,7 @@ export class AvraePlanner{
         })
         // - Confirm Reset Button
         document.getElementById("confirm-reset").addEventListener('click', function (event) {
-            var button = $(event.srcElement)
+            var button = $(event.target)
             var reset = button.data('reset')
             var change_event = new Event("change")
 

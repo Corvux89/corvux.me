@@ -150,8 +150,6 @@ export class Monster{
                 var monster = monsters[this.index-1]
                 var elm = event.target
                 var node = elm.id.replace(`-${this.index}`, '')
-                console.log(this)
-                console.log(monster)
 
                 monster[node] = elm.value
 

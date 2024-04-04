@@ -528,7 +528,7 @@ function getMapCommand(mapOnly = false){
     var commands = []
 
     if (battlemap.url || battlemap.size){
-        if (settings.notes == true){
+        if (settings.notes == true && mapOnly == false){
             str = `${settings.prefix}i effect ${settings.attach} map -attack "||Size: `
             str += battlemap.size ? battlemap.size:"10x10"
             str += battlemap.url ? ` ~ Background: ${battlemap.url}`:''
@@ -540,7 +540,6 @@ function getMapCommand(mapOnly = false){
             str += battlemap.size ? ` -mapsize ${battlemap.size}`:""
             str += battlemap.csettings ? ` -options c${battlemap.csettings}`:""
             str += settings.attach ? ` -t ${settings.attach}`:""
-
             if (settings.monsters == true && mapOnly == false){
                 var monStr = getMonsterMapCommand()
                 if (monStr){commands.push(monStr)}
@@ -639,7 +638,7 @@ function getOverlayCommand(mapOnly = false){
     }
 
     if (str.length > 0){
-        if (settings.notes == true){
+        if (settings.notes == true && mapOnly == false){
             str = `${settings.prefix}i note ${overlay.target ? overlay.target:settings.attach} ${str}`
         } else {
             str += overlay.target ? ` -t ${overlay.target}`:""

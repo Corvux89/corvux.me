@@ -163,13 +163,13 @@ export class Monster{
             if (input.id.includes('name')){
                 input.addEventListener('change', event => {
                     var monsters = Monster.loadAll()
+                    var monster = monsters[this.index-1]
                     var next_monster = monsters[this.index] || undefined
-
-                    if (this.index == monsters.length && this.name != ""){
+                    if (next_monster == undefined || next_monster.index == monsters.length && next_monster.name == ""  && !next_monster.getInventoryRow()){
                         var new_monster = new Monster(this.index+1)
-                        new_monster.save()
                         inventoryContainer.appendChild(new_monster.addInventoryRow())
-                    } else if (this.name == "" && this.index != monsters.length && (next_monster && next_monster.name == "")){
+                        new_monster.save()
+                    } else if (monster.name == "" && monster.index < monsters.length && (next_monster && next_monster.name == "")){
                         next_monster.getInventoryRow().remove()
                         next_monster.remove()
                     }
@@ -189,6 +189,7 @@ export class Monster{
                 var monsters = Monster.loadAll()
                 var index = event.target.id.replace('remove-','')
                 var monster = monsters[index-1]
+                var change_event = new Event("change")
 
                 if (index == monsters.length){
                     $(`#remove-${index}`).tooltip({title: "Cannot remove the last row.", delay: {show: 500, hide: 1500}})
@@ -199,6 +200,7 @@ export class Monster{
                     AvraePlanner.setupInventoryTable()
                     AvraePlanner.buildCommandString()
                     inventoryContainer.dispatchEvent(change_event)
+                    AvraePlanner.buildMapPreview()
                 }
             })
         }
@@ -315,8 +317,6 @@ export class Monster{
         var change_event = new Event("change")
         maddTable.dispatchEvent(change_event)
         AvraePlanner.buildMapPreview()
-
-
     }
 
     remove(){

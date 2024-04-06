@@ -17,6 +17,9 @@
     <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal">
         General Settings
     </button>
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#saveModal">
+        Save Plan
+    </button>
     <button type="button" class="btn btn-info m-2" data-bs-toggle="modal" data-bs-target="#howtomodal">How-To Use
     </button>
 </div>
@@ -328,6 +331,32 @@
                     <div class="row m-2">
                         <div class="col-md overflow-auto">
                             {{ howto | safe}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Plan Modal -->
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black">Save Plan</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-sm mb-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="plan-name"
+                                   name="plan-name"
+                                   placeholder="Plan Name?">
+                            <label for="plan-name">Plan Name</label>
                         </div>
                     </div>
                 </div>

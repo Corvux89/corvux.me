@@ -9,6 +9,8 @@ overlayRow = document.getElementById("overlay-row"),
 overlaySetup = document.getElementById("overlay-setup")
 
 export class AvraePlanner{
+    static node = "savedPlans"
+
     static start(){
         AvraePlanner.importPlanner()
         AvraePlanner.setupInventoryTable()

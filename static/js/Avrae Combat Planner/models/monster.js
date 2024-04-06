@@ -30,8 +30,8 @@ export class Monster{
             data.coords
         ))
 
-        if (monsters.length == 0){
-            monsters.push(new Monster(1))
+        if (monsters.length == 0 || monsters[monsters.length-1].name != ""){
+            monsters.push(new Monster(monsters.length+1))
         }
 
         return monsters

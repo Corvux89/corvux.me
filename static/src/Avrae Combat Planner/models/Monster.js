@@ -167,7 +167,13 @@ export class Monster {
         maddRow.appendChild(f_row);
         return maddRow;
     }
+    getMaddRow() {
+        return document.getElementById(`madd-${this._index}`);
+    }
     save() {
+        if (this.name == "") {
+            return;
+        }
         const monsters = loadAllMonsters();
         monsters[this._index - 1] = this;
         localStorage.setItem(node, JSON.stringify(monsters));
@@ -199,4 +205,7 @@ export function importMonsters() {
             console.error("Error parsong monster data: ", error);
         }
     }
+}
+export function dumpMonsters() {
+    localStorage.removeItem(node);
 }

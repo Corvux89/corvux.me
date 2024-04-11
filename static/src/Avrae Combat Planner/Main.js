@@ -1,12 +1,28 @@
-import { Monster, loadAllMonsters, importMonsters } from './models/Monster.js';
-import { buildInventoryContainer, monsterInventory, isValidHttpUrl, getTokenShortcode, buildMaddContainer, maddTable, buildMaddHeader } from './utils/helpers.js';
+import { Monster, loadAllMonsters, importMonsters, dumpMonsters } from './models/Monster.js';
+import { loadBattleMap, importBattleMap, dumpBattleMap } from './models/Battlemap.js';
+import { buildInventoryContainer, monsterInventory, isValidHttpUrl, getTokenShortcode, buildMaddContainer, maddTable, buildMaddHeader, buildMapSettingsheader, defaultMapSettings, buildMapPreview, defaultOverlaySettings, buildOverlayHeader, defaultSettings, buildOverlayContainer, validateSettings, copyString, encodeBuild, buildSavedList } from './utils/helpers.js';
+import { Overlay } from './models/Overlay.js';
+import { loadSettings } from './models/Settings.js';
+import { getCommandString } from './utils/commands.js';
+import { SavedBuild, dumpPlan, importPlan, loadSavedBuilds } from './models/Saves.js';
 const extractIndex = (str) => { const match = str.match(/-(\d+)/); return match ? parseInt(match[1], 10) : null; };
 // Initial Setup
 importMonsters();
+importBattleMap();
+importPlan();
+window.history.replaceState({}, document.title, window.location.pathname);
 buildInventoryContainer();
 buildMaddContainer();
+buildOverlayContainer();
+defaultMapSettings();
+defaultOverlaySettings();
+defaultSettings();
 buildMaddHeader();
-window.history.replaceState({}, document.title, window.location.pathname);
+buildMapSettingsheader();
+buildOverlayHeader();
+buildMapPreview();
+buildSavedList();
+getCommandString();
 // Monster Inventory Event Delegate
 monsterInventory.addEventListener('change', function (event) {
     const target = event.target;
@@ -42,9 +58,9 @@ monsterInventory.addEventListener('change', function (event) {
                 buildInventoryContainer();
             });
         }
-        const nameDom = document.getElementById(`name-${index}`);
-        if (nameDom) {
-            nameDom.focus();
+        const focusDom = document.getElementById(`label-${index}`);
+        if (focusDom) {
+            focusDom.focus();
         }
     }
     else if (node.includes("token")) {
@@ -102,9 +118,15 @@ monsterInventory.addEventListener('click', function (event) {
     const monster = monsters[index - 1];
     if (monster) {
         if (target.id.includes('remove')) {
-            monster.remove();
-            buildInventoryContainer();
-            buildMaddContainer();
+            if (index == monsters.length) {
+                $(`#remove-${index}`).tooltip({ title: "Cannot remove the last row.", delay: { show: 500, hide: 1500 } });
+                $(`#remove-${index}`).tooltip('show');
+            }
+            else {
+                monster.remove();
+                buildInventoryContainer();
+                buildMaddContainer();
+            }
         }
     }
 });
@@ -121,4 +143,197 @@ maddTable.addEventListener("change", function (event) {
         monster.save();
     }
     buildMaddHeader();
+    buildMapPreview();
+});
+maddTable.addEventListener("click", function (event) {
+    const target = event.target;
+    const index = extractIndex(target.id);
+    const monsters = loadAllMonsters();
+    const monster = monsters[index - 1];
+    if (target.id.split('-').indexOf("clear") != -1) {
+        monster.getMaddRow().querySelectorAll("input").forEach(input => {
+            input.value = "";
+        });
+        monster.coords = [];
+        monster.coords.length = monster.quantity;
+        monster.save();
+        buildMaddHeader();
+        buildMapPreview();
+    }
+});
+// Map Settings Table
+document.getElementById('map-setup').addEventListener("change", function (event) {
+    const battlemap = loadBattleMap();
+    const target = event.target;
+    const node = target.id.replace('map-', '');
+    battlemap[node] = target.value;
+    battlemap.save();
+    buildMapSettingsheader();
+    buildMapPreview();
+});
+// Overlay Settings Table
+document.getElementById("overlay-setup").addEventListener("change", function (event) {
+    const battlemap = loadBattleMap();
+    const target = event.target;
+    const node = target.id.replace("map-overlay", "").toLowerCase();
+    if (target instanceof HTMLInputElement) {
+        battlemap.overlay[node] = target.value;
+    }
+    else if (target instanceof HTMLSelectElement) {
+        battlemap.overlay[node] = target.options[target.selectedIndex].value;
+    }
+    battlemap.save();
+    buildOverlayContainer();
+    buildMapPreview();
+    buildOverlayHeader();
+});
+document.getElementById("overlay-setup").addEventListener("click", function (event) {
+    const battlemap = loadBattleMap();
+    const target = event.target;
+    const change_event = new Event("change");
+    if (target.id.split('-').indexOf("reset") != -1) {
+        battlemap.overlay = new Overlay();
+        battlemap.save();
+        document.getElementById("overlay-setup").dispatchEvent(change_event);
+    }
+});
+// General Settings
+document.getElementById("appSettings-setup").addEventListener("change", function (event) {
+    const settings = loadSettings();
+    const target = event.target;
+    const node = target.id.replace("setting-", "");
+    settings[node] = target.value;
+    settings.save();
+    buildMapSettingsheader();
+    buildMaddHeader();
+    buildOverlayHeader();
+});
+// Inventory Header
+document.getElementById("inventory-header").addEventListener("change", function (event) {
+    const settings = loadSettings();
+    const target = event.target;
+    const node = target.id.replace("setting-", "");
+    settings[node] = target.checked;
+    settings.save();
+    validateSettings();
+});
+// Copy Buttons
+document.querySelectorAll('.copy-button').forEach(function (element) {
+    switch (element.id) {
+        case "export-planner":
+            element.addEventListener("click", function (event) {
+                const encodedData = encodeBuild();
+                const url = `?data=${encodedData}`;
+                copyString(`${window.location.href}${url}`, "Build copied to clipboard!", element.id);
+            });
+            break;
+        case "command-copy":
+            element.addEventListener("click", function (e) {
+                const rawText = document.getElementById("avrae-command").innerHTML;
+                const copyText = rawText.replace(/<br>/g, '\n');
+                copyString(copyText, "Build copied to clipboard!", element.id);
+            });
+            break;
+        case "madd-copy":
+            element.addEventListener("click", function (e) {
+                const rawText = document.getElementById("madd-command").innerHTML;
+                const copyText = rawText.replace(/<br>/g, '\n');
+                copyString(copyText, "Build copied to clipboard!", element.id);
+            });
+            break;
+        case "map-command-copy":
+            element.addEventListener("click", function (e) {
+                const rawText = document.getElementById("map-command").innerHTML;
+                const copyText = rawText.replace(/<br>/g, '\n');
+                copyString(copyText, "Build copied to clipboard!", element.id);
+            });
+            break;
+        case "overlay-copy":
+            element.addEventListener("click", function (e) {
+                const rawText = document.getElementById("overlay-command").innerHTML;
+                const copyText = rawText.replace(/<br>/g, '\n');
+                copyString(copyText, "Build copied to clipboard!", element.id);
+            });
+            break;
+        case "save-plan":
+            element.addEventListener("click", function (e) {
+                const planName = document.getElementById("plan-name");
+                const plans = loadSavedBuilds();
+                const limit = 10;
+                if (Object.keys(plans).length >= limit) {
+                    $(`#save-plan`).tooltip({ title: `Can only save ${limit} builds at this time.`, delay: { show: 500, hide: 1500 } });
+                    $(`#save-plan`).tooltip('show');
+                    return;
+                }
+                if (planName.value != "") {
+                    const plan = new SavedBuild(planName.value, encodeBuild(planName.value));
+                    plan.save();
+                    buildSavedList();
+                    $('#saveModal').modal('hide');
+                }
+            });
+            break;
+    }
+});
+// Reset Button
+document.querySelectorAll(".reset-button").forEach(function (element) {
+    switch (element.id.replace("reset-", "")) {
+        case "monsters":
+            element.addEventListener("click", function (e) {
+                dumpMonsters();
+                buildInventoryContainer();
+                buildMaddContainer();
+                getCommandString();
+            });
+            break;
+        case "battlemap":
+            element.addEventListener("click", function (e) {
+                dumpBattleMap();
+                buildOverlayContainer();
+                defaultMapSettings();
+                buildMapSettingsheader();
+                getCommandString();
+                buildMapPreview();
+            });
+            break;
+        case "all":
+            element.addEventListener('click', function (e) {
+                dumpMonsters();
+                dumpBattleMap();
+                location.reload();
+            });
+            break;
+        case "plan":
+            element.addEventListener('click', function (e) {
+                const planName = document.getElementById('plan-name');
+                const name = planName.value;
+                if (name != "") {
+                    console.log(name);
+                    dumpMonsters();
+                    dumpBattleMap();
+                    dumpPlan(name);
+                    location.reload();
+                }
+            });
+            break;
+    }
+});
+// Content listener
+document.getElementById('content').addEventListener('change', function (event) {
+    getCommandString();
+});
+// After everything loaded
+document.addEventListener("DOMContentLoaded", function () {
+    validateSettings();
+    const modals = [
+        $("#monsterMapModal"),
+        $("#mapOverlayModal"),
+        $("#mapSettingsModal"),
+        $("#appSettingsModal")
+    ];
+    modals.forEach(function (modal) {
+        modal.draggable({
+            handle: ".modal-header"
+        });
+    });
 });

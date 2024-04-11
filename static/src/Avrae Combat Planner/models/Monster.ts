@@ -191,7 +191,14 @@ export class Monster{
         return maddRow
     }
 
-    save(){
+    getMaddRow() {
+        return document.getElementById(`madd-${this._index}`)
+    }
+
+    save() {
+        if (this.name == "") {
+            return
+        }
         const monsters = loadAllMonsters()
         monsters[this._index - 1] = this
         localStorage.setItem(node, JSON.stringify(monsters))
@@ -205,25 +212,24 @@ export class Monster{
 }
 
 
-export function loadAllMonsters(){
- const monsterData = JSON.parse(localStorage.getItem(node) || "[]")
-        const monsters = monsterData.map((data, index) => new Monster(
-            index+1,
-            data.name,
-            data.label,
-            data.quantity,
-            data.size,
-            data.color,
-            data.token,
-            data.args,
-            data.coords
-        ))
+export function loadAllMonsters() {
+    const monsterData = JSON.parse(localStorage.getItem(node) || "[]")
+    const monsters = monsterData.map((data, index) => new Monster(
+        index+1,
+        data.name,
+        data.label,
+        data.quantity,
+        data.size,
+        data.color,
+        data.token,
+        data.args,
+        data.coords
+    ))
+    if (monsters.length == 0 || monsters[monsters.length-1].name != ""){
+        monsters.push(new Monster(monsters.length+1));
+    }
 
-        if (monsters.length == 0 || monsters[monsters.length-1].name != ""){
-            monsters.push(new Monster(monsters.length+1));
-        }
-
-        return monsters
+    return monsters
 }
 
 export function importMonsters() {
@@ -240,4 +246,8 @@ export function importMonsters() {
             console.error("Error parsong monster data: ", error)
         }
     }
+}
+
+export function dumpMonsters() {
+    localStorage.removeItem(node)
 }

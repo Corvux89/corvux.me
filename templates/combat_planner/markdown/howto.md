@@ -39,7 +39,9 @@ On the `Monster Inventory` tab there are multiple toggle switches that change ho
 `Overlay` - Includes all information pertaining to the overlay  
 
 
-## Exporting/Importing
-Because this planner relies on local storage it is recommended to export/import when you can. If reviewing someone elses plan however, we would recommend either exporting your current plan or opening in incognito mode.   
+## Exporting/Importing/Saving
+Because this planner relies on local storage it is recommended to export/import when you can. If reviewing someone elses plan however, we would recommend either exporting your current plan or opening in incognito mode.
 
 Exporting will add a url to your clipboard encoding all the information for the `Monster Inventory` and `Map planner` (`General Settings` do not get exported). Then going to that link again will load up all the information stored in the url
+
+You can additionally locally save up to 10 plans (monsters and map settings) to reload for later use

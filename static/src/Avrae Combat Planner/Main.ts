@@ -321,6 +321,8 @@ document.querySelectorAll(".reset-button").forEach(function (element) {
                 dumpMonsters()
                 buildInventoryContainer()
                 buildMaddContainer()
+                buildMaddHeader()
+                buildMapPreview()
                 getCommandString()
             })
             break

@@ -1,10 +1,10 @@
-import { loadAllMonsters } from '../models/Monster.js'
-import { loadSettings } from '../models/Settings.js'
-import { loadBattleMap } from '../models/Battlemap.js'
+import { Monster } from '../models/Monster.js'
+import { Settings } from '../models/Settings.js'
+import { BattleMap } from '../models/Battlemap.js'
 
 export function getMonsterMapCommand() {
-    const monsters = loadAllMonsters()
-    var settings = loadSettings()
+    const monsters = Monster.load()
+    var settings = Settings.load()
     const coords = []
 
     monsters.forEach(monster => {
@@ -30,8 +30,8 @@ export function getMonsterMapCommand() {
 }
 
 export function getMonsterMaddCommand() {
-    const monsters = loadAllMonsters()
-    const settings = loadSettings()
+    const monsters = Monster.load()
+    const settings = Settings.load()
     const commands: string[] = []
 
     monsters.forEach(monster => {
@@ -81,8 +81,8 @@ export function getMonsterMaddCommand() {
 }
 
 export function getMapCommand(mapOnly: boolean = false) {
-    const settings = loadSettings()
-    const battlemap = loadBattleMap()
+    const settings = Settings.load()
+    const battlemap = BattleMap.load()
     var str: string = ""
     var commands: string[] = []
 
@@ -94,10 +94,12 @@ export function getMapCommand(mapOnly: boolean = false) {
             str += battlemap.csettings ? ` ~ Options: c${battlemap.csettings}` : ""
             str += `"`
         } else {
+            var settingStr = battlemap.csettings ? `c${battlemap.csettings}` : ""
+
             str = `${settings.prefix}map`
             str += battlemap.url ? ` -bg "${battlemap.url}"` : ""
             str += battlemap.size ? ` -mapsize ${battlemap.size}` : ""
-            str += battlemap.csettings ? ` -options c${battlemap.csettings}` : ""
+            str += settingStr != "" ? ` -options ${settingStr}` : ""
             str += settings.attach ? ` -t ${settings.attach}` : ""
             if (settings.monsters == true && mapOnly == false) {
                 var monStr = getMonsterMapCommand()
@@ -110,8 +112,8 @@ export function getMapCommand(mapOnly: boolean = false) {
 }
 
 export function getOverlayCommand(mapOnly = false) {
-    const settings = loadSettings()
-    const battlemap = loadBattleMap()
+    const settings = Settings.load()
+    const battlemap = BattleMap.load()
     const overlay = battlemap.overlay
     var str = ""
 
@@ -181,7 +183,7 @@ export function getOverlayCommand(mapOnly = false) {
 }
 
 export function getCommandString() {
-    const settings = loadSettings()
+    const settings = Settings.load()
     const commandStr = document.getElementById("commandStr")
     const avraeCommand = document.getElementById("avrae-command")
     var commands = []

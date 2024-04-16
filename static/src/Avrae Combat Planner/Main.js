@@ -1,15 +1,15 @@
-import { Monster, loadAllMonsters, importMonsters, dumpMonsters } from './models/Monster.js';
-import { loadBattleMap, importBattleMap, dumpBattleMap } from './models/Battlemap.js';
+import { Monster } from './models/Monster.js';
+import { BattleMap } from './models/Battlemap.js';
 import { buildInventoryContainer, monsterInventory, isValidHttpUrl, getTokenShortcode, buildMaddContainer, maddTable, buildMaddHeader, buildMapSettingsheader, defaultMapSettings, buildMapPreview, defaultOverlaySettings, buildOverlayHeader, defaultSettings, buildOverlayContainer, validateSettings, copyString, encodeBuild, buildSavedList } from './utils/helpers.js';
 import { Overlay } from './models/Overlay.js';
-import { loadSettings } from './models/Settings.js';
+import { Settings } from './models/Settings.js';
 import { getCommandString } from './utils/commands.js';
-import { SavedBuild, dumpPlan, importPlan, loadSavedBuilds } from './models/Saves.js';
+import { SavedBuild } from './models/Saves.js';
 const extractIndex = (str) => { const match = str.match(/-(\d+)/); return match ? parseInt(match[1], 10) : null; };
 // Initial Setup
-importMonsters();
-importBattleMap();
-importPlan();
+Monster.import();
+BattleMap.import();
+SavedBuild.import();
 window.history.replaceState({}, document.title, window.location.pathname);
 buildInventoryContainer();
 buildMaddContainer();
@@ -28,7 +28,7 @@ monsterInventory.addEventListener('change', function (event) {
     const target = event.target;
     const index = extractIndex(target.id);
     const node = target.id.replace(`-${index}`, "");
-    const monsters = loadAllMonsters();
+    const monsters = Monster.load();
     const monster = monsters[index - 1];
     const madd_nodes = ["label", "quantity", "size", "color", "token", "name"];
     // Update Monster
@@ -114,7 +114,7 @@ monsterInventory.addEventListener('change', function (event) {
 monsterInventory.addEventListener('click', function (event) {
     const target = event.target;
     const index = extractIndex(target.id);
-    const monsters = loadAllMonsters();
+    const monsters = Monster.load();
     const monster = monsters[index - 1];
     if (monster) {
         if (target.id.includes('remove')) {
@@ -126,6 +126,9 @@ monsterInventory.addEventListener('click', function (event) {
                 monster.remove();
                 buildInventoryContainer();
                 buildMaddContainer();
+                buildMaddHeader();
+                buildMapPreview();
+                getCommandString();
             }
         }
     }
@@ -137,7 +140,7 @@ maddTable.addEventListener("change", function (event) {
     if (numbers) {
         const index = parseInt(numbers[0]);
         const coordIndex = parseInt(numbers[1]);
-        const monsters = loadAllMonsters();
+        const monsters = Monster.load();
         const monster = monsters[index - 1];
         monster.coords[coordIndex - 1] = target.value;
         monster.save();
@@ -148,7 +151,7 @@ maddTable.addEventListener("change", function (event) {
 maddTable.addEventListener("click", function (event) {
     const target = event.target;
     const index = extractIndex(target.id);
-    const monsters = loadAllMonsters();
+    const monsters = Monster.load();
     const monster = monsters[index - 1];
     if (target.id.split('-').indexOf("clear") != -1) {
         monster.getMaddRow().querySelectorAll("input").forEach(input => {
@@ -163,7 +166,7 @@ maddTable.addEventListener("click", function (event) {
 });
 // Map Settings Table
 document.getElementById('map-setup').addEventListener("change", function (event) {
-    const battlemap = loadBattleMap();
+    const battlemap = BattleMap.load();
     const target = event.target;
     const node = target.id.replace('map-', '');
     battlemap[node] = target.value;
@@ -173,7 +176,7 @@ document.getElementById('map-setup').addEventListener("change", function (event)
 });
 // Overlay Settings Table
 document.getElementById("overlay-setup").addEventListener("change", function (event) {
-    const battlemap = loadBattleMap();
+    const battlemap = BattleMap.load();
     const target = event.target;
     const node = target.id.replace("map-overlay", "").toLowerCase();
     if (target instanceof HTMLInputElement) {
@@ -188,7 +191,7 @@ document.getElementById("overlay-setup").addEventListener("change", function (ev
     buildOverlayHeader();
 });
 document.getElementById("overlay-setup").addEventListener("click", function (event) {
-    const battlemap = loadBattleMap();
+    const battlemap = BattleMap.load();
     const target = event.target;
     const change_event = new Event("change");
     if (target.id.split('-').indexOf("reset") != -1) {
@@ -199,7 +202,7 @@ document.getElementById("overlay-setup").addEventListener("click", function (eve
 });
 // General Settings
 document.getElementById("appSettings-setup").addEventListener("change", function (event) {
-    const settings = loadSettings();
+    const settings = Settings.load();
     const target = event.target;
     const node = target.id.replace("setting-", "");
     settings[node] = target.value;
@@ -210,7 +213,7 @@ document.getElementById("appSettings-setup").addEventListener("change", function
 });
 // Inventory Header
 document.getElementById("inventory-header").addEventListener("change", function (event) {
-    const settings = loadSettings();
+    const settings = Settings.load();
     const target = event.target;
     const node = target.id.replace("setting-", "");
     settings[node] = target.checked;
@@ -258,7 +261,7 @@ document.querySelectorAll('.copy-button').forEach(function (element) {
         case "save-plan":
             element.addEventListener("click", function (e) {
                 const planName = document.getElementById("plan-name");
-                const plans = loadSavedBuilds();
+                const plans = SavedBuild.load();
                 const limit = 10;
                 if (Object.keys(plans).length >= limit) {
                     $(`#save-plan`).tooltip({ title: `Can only save ${limit} builds at this time.`, delay: { show: 500, hide: 1500 } });
@@ -280,7 +283,7 @@ document.querySelectorAll(".reset-button").forEach(function (element) {
     switch (element.id.replace("reset-", "")) {
         case "monsters":
             element.addEventListener("click", function (e) {
-                dumpMonsters();
+                Monster.dump();
                 buildInventoryContainer();
                 buildMaddContainer();
                 buildMaddHeader();
@@ -290,7 +293,7 @@ document.querySelectorAll(".reset-button").forEach(function (element) {
             break;
         case "battlemap":
             element.addEventListener("click", function (e) {
-                dumpBattleMap();
+                BattleMap.dump();
                 buildOverlayContainer();
                 defaultMapSettings();
                 buildMapSettingsheader();
@@ -300,8 +303,8 @@ document.querySelectorAll(".reset-button").forEach(function (element) {
             break;
         case "all":
             element.addEventListener('click', function (e) {
-                dumpMonsters();
-                dumpBattleMap();
+                Monster.dump();
+                BattleMap.dump();
                 location.reload();
             });
             break;
@@ -311,9 +314,9 @@ document.querySelectorAll(".reset-button").forEach(function (element) {
                 const name = planName.value;
                 if (name != "") {
                     console.log(name);
-                    dumpMonsters();
-                    dumpBattleMap();
-                    dumpPlan(name);
+                    Monster.dump();
+                    BattleMap.dump();
+                    SavedBuild.dump(name);
                     location.reload();
                 }
             });

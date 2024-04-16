@@ -1,9 +1,9 @@
-import { loadAllMonsters } from '../models/Monster.js';
-import { loadSettings } from '../models/Settings.js';
-import { loadBattleMap } from '../models/Battlemap.js';
+import { Monster } from '../models/Monster.js';
+import { Settings } from '../models/Settings.js';
+import { BattleMap } from '../models/Battlemap.js';
 export function getMonsterMapCommand() {
-    const monsters = loadAllMonsters();
-    var settings = loadSettings();
+    const monsters = Monster.load();
+    var settings = Settings.load();
     const coords = [];
     monsters.forEach(monster => {
         if (monster.name != "" && monster.quantity > 0) {
@@ -26,8 +26,8 @@ export function getMonsterMapCommand() {
     return "";
 }
 export function getMonsterMaddCommand() {
-    const monsters = loadAllMonsters();
-    const settings = loadSettings();
+    const monsters = Monster.load();
+    const settings = Settings.load();
     const commands = [];
     monsters.forEach(monster => {
         var coords = [];
@@ -88,8 +88,8 @@ export function getMonsterMaddCommand() {
     return commands;
 }
 export function getMapCommand(mapOnly = false) {
-    const settings = loadSettings();
-    const battlemap = loadBattleMap();
+    const settings = Settings.load();
+    const battlemap = BattleMap.load();
     var str = "";
     var commands = [];
     if (battlemap.url || battlemap.size) {
@@ -101,10 +101,11 @@ export function getMapCommand(mapOnly = false) {
             str += `"`;
         }
         else {
+            var settingStr = battlemap.csettings ? `c${battlemap.csettings}` : "";
             str = `${settings.prefix}map`;
             str += battlemap.url ? ` -bg "${battlemap.url}"` : "";
             str += battlemap.size ? ` -mapsize ${battlemap.size}` : "";
-            str += battlemap.csettings ? ` -options c${battlemap.csettings}` : "";
+            str += settingStr != "" ? ` -options ${settingStr}` : "";
             str += settings.attach ? ` -t ${settings.attach}` : "";
             if (settings.monsters == true && mapOnly == false) {
                 var monStr = getMonsterMapCommand();
@@ -118,8 +119,8 @@ export function getMapCommand(mapOnly = false) {
     return commands;
 }
 export function getOverlayCommand(mapOnly = false) {
-    const settings = loadSettings();
-    const battlemap = loadBattleMap();
+    const settings = Settings.load();
+    const battlemap = BattleMap.load();
     const overlay = battlemap.overlay;
     var str = "";
     switch (overlay.type) {
@@ -187,7 +188,7 @@ export function getOverlayCommand(mapOnly = false) {
     return str;
 }
 export function getCommandString() {
-    const settings = loadSettings();
+    const settings = Settings.load();
     const commandStr = document.getElementById("commandStr");
     const avraeCommand = document.getElementById("avrae-command");
     var commands = [];

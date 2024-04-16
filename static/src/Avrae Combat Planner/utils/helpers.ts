@@ -1,14 +1,14 @@
-import { loadBattleMap } from '../models/Battlemap.js'
-import { loadAllMonsters } from '../models/Monster.js'
-import { loadSettings } from '../models/Settings.js'
-import { loadSavedBuilds } from '../models/Saves.js'
+import { BattleMap } from '../models/Battlemap.js'
+import { Monster } from '../models/Monster.js'
+import { Settings } from '../models/Settings.js'
+import { SavedBuild } from '../models/Saves.js'
 import { getMonsterMapCommand, getMapCommand, getOverlayCommand } from './commands.js'
 
 export const monsterInventory = document.getElementById("monster-inventory")
 export const maddTable = document.getElementById("madd-table")
 
 export function buildInventoryContainer(){
-    const monsters = loadAllMonsters()
+    const monsters = Monster.load()
     monsterInventory.innerHTML = ""
     monsters.forEach(function (monster){
         monsterInventory.appendChild(monster.appendInventoryRow())
@@ -16,7 +16,7 @@ export function buildInventoryContainer(){
 }
 
 export function buildMaddContainer() {
-    const monsters = loadAllMonsters()
+    const monsters = Monster.load()
     maddTable.innerHTML = ""
     monsters.forEach(function (monster) {
         if (monster.name != "") {
@@ -26,7 +26,9 @@ export function buildMaddContainer() {
 }
 
 export function buildOverlayContainer() {
-    const overlay = loadBattleMap().overlay
+    const overlay = BattleMap.load().overlay
+    console.log(BattleMap.load())
+    console.log(overlay)
     const overlayRow = document.getElementById("overlay-row")
     var columns = []
 
@@ -96,8 +98,8 @@ export function buildOverlayHeader() {
 }
 
 export function buildMapPreview() {
-    const monsters = loadAllMonsters()
-    const battlemap = loadBattleMap()
+    const monsters = Monster.load()
+    const battlemap = BattleMap.load()
     const overlay = battlemap.overlay
     const mapPreview = document.getElementById('mapPreview')
     var monsterOnMap: boolean = false
@@ -110,8 +112,11 @@ export function buildMapPreview() {
 
     if (battlemap.url != "" || battlemap.size != "" || monsterOnMap) {
         var imgUrl = 'https://otfbm.io/'
+        var settingString = `/@`
+        settingString += battlemap.csettings ? `c${battlemap.csettings}` : ""
+        
         imgUrl += battlemap.size ? battlemap.size : "10x10"
-        imgUrl += battlemap.csettings ? `/@c${battlemap.csettings}` : ""
+        imgUrl += settingString.length > 2 ? settingString : ""
 
         // Monster placement
         monsters.forEach(function (monster) {
@@ -177,7 +182,7 @@ export function buildMapPreview() {
 }
 
 export function buildSavedList() {
-    const builds = loadSavedBuilds()
+    const builds = SavedBuild.load()
     const loadButton = document.getElementById("load-plan")
     const deleteButton = document.getElementById("reset-plan")
     const loadList = document.getElementById("load-plan-list")
@@ -249,7 +254,7 @@ export function getTokenShortcode(url): Promise<string> {
 }
 
 export function defaultMapSettings() {
-    const battlemap = loadBattleMap()
+    const battlemap = BattleMap.load()
 
     document.getElementById("map-setup").querySelectorAll('input').forEach(input => {
         input.value = battlemap[`${input.id.replace('map-','')}`]
@@ -257,7 +262,7 @@ export function defaultMapSettings() {
 }
 
 export function defaultOverlaySettings() {
-    const battlemap = loadBattleMap()
+    const battlemap = BattleMap.load()
 
     document.getElementById("overlay-setup").querySelectorAll('input, select').forEach(input => {
         if (input instanceof HTMLInputElement) {
@@ -269,7 +274,7 @@ export function defaultOverlaySettings() {
 }
 
 export function defaultSettings() {
-    const settings = loadSettings()
+    const settings = Settings.load()
 
     document.querySelectorAll(".settings").forEach(elm => {
         elm.querySelectorAll("input").forEach(input => {
@@ -284,7 +289,7 @@ export function defaultSettings() {
 }
 
 export function validateSettings() {
-    const settings = loadSettings()
+    const settings = Settings.load()
     const multiColumn = document.getElementById("multiColumn")
     var errorButton = multiColumn.querySelector('.error-button')
 
@@ -318,8 +323,8 @@ export function copyString(content: string, tooltipString: string, elementID: st
 }
 
 export function encodeBuild(name: string = "") {
-    const monsters = loadAllMonsters()
-    const battlemap = loadBattleMap()
+    const monsters = Monster.load()
+    const battlemap = BattleMap.load()
     const raw_data = { "monsters": monsters, "battlemap": battlemap }
     if (name != "") {
         raw_data["name"] = name

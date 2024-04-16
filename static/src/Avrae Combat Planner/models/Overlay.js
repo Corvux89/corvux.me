@@ -13,7 +13,7 @@ export class Overlay {
         this.topleft = topleft;
         this.color = color;
     }
-    load(overlay) {
+    static load(overlay) {
         return new Overlay(overlay.type, overlay.target, overlay.radius, overlay.center, overlay.size, overlay.start, overlay.end, overlay.length, overlay.width, overlay.topleft, overlay.color);
     }
 }

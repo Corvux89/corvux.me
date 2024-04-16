@@ -199,55 +199,54 @@ export class Monster{
         if (this.name == "") {
             return
         }
-        const monsters = loadAllMonsters()
+        const monsters = Monster.load()
         monsters[this._index - 1] = this
         localStorage.setItem(node, JSON.stringify(monsters))
     }
 
     remove(){
-        const monsters = loadAllMonsters()
+        const monsters = Monster.load()
         monsters.splice(this._index-1, 1)
         localStorage.setItem(node, JSON.stringify(monsters))
     }
-}
 
-
-export function loadAllMonsters() {
-    const monsterData = JSON.parse(localStorage.getItem(node) || "[]")
-    const monsters = monsterData.map((data, index) => new Monster(
-        index+1,
-        data.name,
-        data.label,
-        data.quantity,
-        data.size,
-        data.color,
-        data.token,
-        data.args,
-        data.coords
-    ))
-    if (monsters.length == 0 || monsters[monsters.length-1].name != ""){
-        monsters.push(new Monster(monsters.length+1));
-    }
-
-    return monsters
-}
-
-export function importMonsters() {
-    const urlParams = new URLSearchParams(window.location.search)
-    const encodedData = urlParams.get('data')
-
-    if (encodedData) {
-        const data = decodeURIComponent(encodedData)
-
-        try {
-            const parsedData = JSON.parse(data)
-            localStorage.setItem(node, JSON.stringify(parsedData.monsters))
-        } catch (error) {
-            console.error("Error parsong monster data: ", error)
+    static load(){
+        const monsterData = JSON.parse(localStorage.getItem(node) || "[]")
+        const monsters = monsterData.map((data, index) => new Monster(
+            index+1,
+            data.name,
+            data.label,
+            data.quantity,
+            data.size,
+            data.color,
+            data.token,
+            data.args,
+            data.coords
+        ))
+        if (monsters.length == 0 || monsters[monsters.length-1].name != ""){
+            monsters.push(new Monster(monsters.length+1));
         }
-    }
-}
 
-export function dumpMonsters() {
-    localStorage.removeItem(node)
+        return monsters
+    }
+
+    static import(){
+        const urlParams = new URLSearchParams(window.location.search)
+        const encodedData = urlParams.get('data')
+    
+        if (encodedData) {
+            const data = decodeURIComponent(encodedData)
+    
+            try {
+                const parsedData = JSON.parse(data)
+                localStorage.setItem(node, JSON.stringify(parsedData.monsters))
+            } catch (error) {
+                console.error("Error parsong monster data: ", error)
+            }
+        }  
+    }
+
+    static dump(){
+        localStorage.removeItem(node)
+    }
 }

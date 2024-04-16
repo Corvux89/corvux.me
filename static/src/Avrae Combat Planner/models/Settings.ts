@@ -19,18 +19,18 @@ export class Settings {
     conflict(): boolean {
         return (this.multiline == true && (this.notes == false && (this.battlemap == true || this.overlay == true)))
     }
-}
 
-export function loadSettings() {
-    const settings = JSON.parse(localStorage.getItem(node) || "{}")
-    return new Settings(
-        settings.multiline,
-        settings.maptarget,
-        settings.notes,
-        settings.monsters,
-        settings.battlemap,
-        settings.overlay,
-        settings.prefix,
-        settings.attack
-    )
+    static load(){
+        const settings = JSON.parse(localStorage.getItem(node) || "{}")
+        return new Settings(
+            settings.multiline,
+            settings.maptarget,
+            settings.notes,
+            settings.monsters,
+            settings.battlemap,
+            settings.overlay,
+            settings.prefix,
+            settings.attack
+        )
+    }
 }

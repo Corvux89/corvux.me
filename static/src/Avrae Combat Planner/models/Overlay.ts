@@ -15,7 +15,7 @@ export class Overlay {
         public color: string = ""
     ) { }
 
-    load(overlay) {
+    static load(overlay) {
         return new Overlay(
             overlay.type,
             overlay.target,

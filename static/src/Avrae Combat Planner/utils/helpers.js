@@ -5,6 +5,7 @@ import { SavedBuild } from '../models/Saves.js';
 import { getMonsterMapCommand, getMapCommand, getOverlayCommand } from './commands.js';
 export const monsterInventory = document.getElementById("monster-inventory");
 export const maddTable = document.getElementById("madd-table");
+export const extractIndex = (str) => { const match = str.match(/-(\d+)/); return match ? parseInt(match[1], 10) : null; };
 export function buildInventoryContainer() {
     const monsters = Monster.load();
     monsterInventory.innerHTML = "";
@@ -23,8 +24,6 @@ export function buildMaddContainer() {
 }
 export function buildOverlayContainer() {
     const overlay = BattleMap.load().overlay;
-    console.log(BattleMap.load());
-    console.log(overlay);
     const overlayRow = document.getElementById("overlay-row");
     var columns = [];
     if (overlay.type == "circle") {

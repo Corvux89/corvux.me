@@ -6,6 +6,7 @@ import { getMonsterMapCommand, getMapCommand, getOverlayCommand } from './comman
 
 export const monsterInventory = document.getElementById("monster-inventory")
 export const maddTable = document.getElementById("madd-table")
+export const extractIndex = (str: string): number | null => { const match = str.match(/-(\d+)/); return match ? parseInt(match[1], 10) : null; }
 
 export function buildInventoryContainer(){
     const monsters = Monster.load()
@@ -20,15 +21,13 @@ export function buildMaddContainer() {
     maddTable.innerHTML = ""
     monsters.forEach(function (monster) {
         if (monster.name != "") {
-            maddTable.appendChild(monster.appendMaddRow())
+            maddTable.appendChild(monster.appendMaddRow())  
         }
     })
 }
 
 export function buildOverlayContainer() {
     const overlay = BattleMap.load().overlay
-    console.log(BattleMap.load())
-    console.log(overlay)
     const overlayRow = document.getElementById("overlay-row")
     var columns = []
 

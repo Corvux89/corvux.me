@@ -23,6 +23,9 @@ export function setupKeybinds(){
             // @ts-ignore
             var tab: Tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom)            
             tab.show()
+        } else if (e.altKey && e.key == 'h'){
+            // @ts-ignore
+            new bootstrap.Modal(document.getElementById("howtomodal")).show()
         }
 
         // Map Planner Keyboard Shortcuts

@@ -9,6 +9,7 @@ import { setupMADDContainer } from './blocks/MADD Container.js';
 import { setupBattlemap } from './blocks/Battlemap.js';
 import { setupButtons } from './blocks/Buttons.js';
 import { setupKeybinds } from './blocks/Keybinds.js';
+import { setupModals } from './blocks/Modals.js';
 // Initial Setup
 Monster.import();
 BattleMap.import();
@@ -63,15 +64,6 @@ document.getElementById('content').addEventListener('change', function (event) {
 // After everything loaded
 document.addEventListener("DOMContentLoaded", function () {
     validateSettings();
-    const modals = [
-        $("#monsterMapModal"),
-        $("#mapOverlayModal"),
-        $("#mapSettingsModal"),
-        $("#appSettingsModal")
-    ];
-    modals.forEach(function (modal) {
-        modal.draggable({
-            handle: ".modal-header"
-        });
-    });
+    setupModals();
 });
+document.getElementById("name-1") ? document.getElementById("name-1").focus() : "";

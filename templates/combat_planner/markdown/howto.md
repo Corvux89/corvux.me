@@ -52,6 +52,7 @@ You can additionally locally save up to 10 plans (monsters and map settings) to 
   
 `alt + 1`   - Navigates to the Monster Inventory tab  
 `alt + 2`   - Navigates to the Map Planner tab  
+`alt + h`   - Opens the help text
 
 ### While on the Map Planner Tab
 `alt + m`   - Opens the Place Monsters form

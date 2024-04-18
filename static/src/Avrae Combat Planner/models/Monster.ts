@@ -39,7 +39,7 @@ export class Monster{
             <div class="row mt-2">
                 <div class="col-md-12 d-flex monHeader">
                     <h3>Monster ${this._index}</h3>
-                    ${this._index ==1 ? "":`<button type="button" id="remove-${this._index}" class="btn btn-close ms-auto"></button>`}
+                    ${this._index ==1 ? "":`<button type="button" id="remove-${this._index}" class="btn btn-close ms-auto" tabindex="-1"></button>`}
                 </div>
             </div>
             <div class="row m-2">
@@ -148,7 +148,7 @@ export class Monster{
             var cInput = document.createElement('input')
             cInput.type = "text"
             cInput.classList.add('form-control')
-            cInput.id = `monster-postition${this._index}-${i + 1}`
+            cInput.id = `monster-position${this._index}-${i + 1}`
             cInput.name = `monster-position`
             cInput.placeholder = this.getCombatID(i + 1)
 

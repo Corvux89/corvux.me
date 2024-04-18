@@ -1,3 +1,5 @@
+import { buildSavedList, encodeBuild } from "../utils/helpers.js"
+
 const node = "savedplans"
 
 export class SavedBuild{
@@ -52,5 +54,24 @@ export class SavedBuild{
                 break
             }
         }
+    }
+}
+
+export function savePlan(){
+    const planName = document.getElementById("plan-name") as HTMLInputElement               
+    const plans = SavedBuild.load()
+    const limit = 10
+
+    if (Object.keys(plans).length >= limit) {
+        $(`#save-plan`).tooltip({ title: `Can only save ${limit} builds at this time.`, delay: { show: 500, hide: 1500 } })
+        $(`#save-plan`).tooltip('show')
+        return
+    }
+
+    if (planName.value != "") {
+        const plan = new SavedBuild(planName.value, encodeBuild(planName.value))
+        plan.save()
+        buildSavedList()
+        $('#saveModal').modal('hide')
     }
 }

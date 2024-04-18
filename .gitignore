@@ -20,7 +20,7 @@ venv.bak/
 .vscode/*
 .vscode/settings.json
 .vscode/tasks.json
-.vscode/launch.json
+!.vscode/launch.json
 .vscode/extensions.json
 .vscode/*.code-snippets
 
@@ -34,5 +34,4 @@ venv.bak/
 # User-specific stuff
 .idea
 
-node_modules/
-
+node_modules

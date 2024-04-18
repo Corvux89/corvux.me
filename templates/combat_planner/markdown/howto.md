@@ -45,3 +45,15 @@ Because this planner relies on local storage it is recommended to export/import 
 Exporting will add a url to your clipboard encoding all the information for the `Monster Inventory` and `Map planner` (`General Settings` do not get exported). Then going to that link again will load up all the information stored in the url
 
 You can additionally locally save up to 10 plans (monsters and map settings) to reload for later use
+
+## Keyboard Shortcuts
+`ctrl + 2`  - Saves the current plan  
+`ctrl + x`  - Exports the current plan  
+  
+`alt + 1`   - Navigates to the Monster Inventory tab  
+`alt + 2`   - Navigates to the Map Planner tab  
+
+### While on the Map Planner Tab
+`alt + m`   - Opens the Place Monsters form
+`alt + s`   - Opens the Map Settings form
+`alt + o`   - Opens the Overlay Settings form

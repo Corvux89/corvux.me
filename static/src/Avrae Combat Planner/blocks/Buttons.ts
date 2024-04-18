@@ -1,8 +1,8 @@
 import { BattleMap } from "../models/Battlemap.js"
 import { Monster } from "../models/Monster.js"
-import { SavedBuild } from "../models/Saves.js"
+import { SavedBuild, savePlan } from "../models/Saves.js"
 import { getCommandString } from "../utils/commands.js"
-import { buildMapPreview, buildMapSettingsheader, buildOverlayContainer, buildSavedList, copyString, defaultMapSettings, encodeBuild } from "../utils/helpers.js"
+import { buildMapPreview, buildMapSettingsheader, buildOverlayContainer, buildSavedList, copyString, defaultMapSettings, encodeBuild, exportBuild } from "../utils/helpers.js"
 import { monsterInventoryRemoveEvent } from "./Monster Inventory.js"
 
 
@@ -17,10 +17,7 @@ function copyButtons(){
         switch (element.id) {
             case "export-planner":
                 element.addEventListener("click", function (event) {
-                    const encodedData = encodeBuild()
-                    const url = `?data=${encodedData}`
-    
-                    copyString(`${window.location.href}${url}`, "Build copied to clipboard!", element.id)
+                    exportBuild(element)
                 })
                 break
     
@@ -58,22 +55,7 @@ function copyButtons(){
     
             case "save-plan":
                 element.addEventListener("click", function (e) {
-                    const planName = document.getElementById("plan-name") as HTMLInputElement               
-                    const plans = SavedBuild.load()
-                    const limit = 10
-    
-                    if (Object.keys(plans).length >= limit) {
-                        $(`#save-plan`).tooltip({ title: `Can only save ${limit} builds at this time.`, delay: { show: 500, hide: 1500 } })
-                        $(`#save-plan`).tooltip('show')
-                        return
-                    }
-    
-                    if (planName.value != "") {
-                        const plan = new SavedBuild(planName.value, encodeBuild(planName.value))
-                        plan.save()
-                        buildSavedList()
-                        $('#saveModal').modal('hide')
-                    }
+                    savePlan()
                 })
                 break
         }

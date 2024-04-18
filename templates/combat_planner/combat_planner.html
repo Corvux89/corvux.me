@@ -2,25 +2,41 @@
 
 <div class="container m-2">
     <h1>Avrae/OTFBM Combat Planner</h1>
-    <button type="button" class="btn btn-danger m-2" id="reset-all" data-bs-toggle="modal"
-            data-bs-target="#confirmModal" data-reset="all">Reset All
+    <!-- Reset Button -->
+    <button type="button" class="btn btn-danger m-2" id="reset-button" data-bs-toggle="modal"
+            data-bs-target="#resetModal" data-reset="all" title="Reset All">
+        Reset
     </button>
-    <button type="button" class="btn btn-primary m-2" id="reset-monsters" data-bs-toggle="modal"
-            data-bs-target="#confirmModal"
-            data-reset="monster">Reset
-        Monsters Only
+
+    <!-- Load Plan Button -->
+    <div class="dropdown d-inline">
+        <a type="button" class="btn btn-info m-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="load-plan" title="Load Saved Plan" hidden>Load Saved Plan</a>
+        <ul class="dropdown-menu" aria-labelledby="load-plan" id="load-plan-list"></ul>
+    </div>
+
+    <!-- Delete Plan Button -->
+    <button class="btn btn-danger m-2 reset-button" role="button" id="reset-plan" title="Delete Plan" hidden><i class="fa-solid fa-trash"></i></button>
+
+    <!-- Save Plan Button Icon -->
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#saveModal" title="Save plan" id="savePlanButton">
+        <i class="fa-solid fa-floppy-disk"></i>
     </button>
-    <button type="button" class="btn btn-primary m-2" id="reset-map" data-bs-toggle="modal"
-            data-bs-target="#confirmModal" data-reset="map">Reset Map Only
+
+    <!-- Export Button Icon-->
+    <button type="button" class="btn btn-primary m-2 copy-button" id="export-planner" title="Export Build"><i class="fa-solid fa-file-export"></i></button>
+
+    <!-- General Settings Button Icon -->
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal" title="General Settings">
+        <i class="fa-solid fa-gear"></i>
     </button>
-    <button type="button" class="btn btn-primary m-2" id="export-planner">Export</button>
-    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal">
-        General Settings
-    </button>
-    <button type="button" class="btn btn-info m-2" data-bs-toggle="modal" data-bs-target="#howtomodal">How-To Use
+
+    <!-- Information Button Icon -->
+    <button type="button" class="btn btn-info m-2" data-bs-toggle="modal" data-bs-target="#howtomodal" title="About this tool">
+        <i class="fa-solid fa-circle-info"></i>
     </button>
 </div>
 
+<!-- Nav Tabs -->
 <nav>
     <div class="nav nav-tabs complanner-tabs m-2" id="complannerTab" role="tablist">
         <button class="nav-link active complanner" id="inventory-tab" data-bs-toggle="tab"
@@ -35,7 +51,9 @@
     </div>
 </nav>
 
+<!-- Tab Content -->
 <div class="tab-content" id="complannerTabContent">
+
     <!--    Main  Tab   -->
     <div class="tab-pane fade show active" id="main-tab" role="tabpanel" aria-labelledby="inventory-tab"
          tabindex="0">
@@ -46,7 +64,7 @@
                         <div class="col-sm">
                             <p class="text-black">Avrae Command String</p>
                             <div id="commandStr" hidden>
-                                <button class="btn float-end pe-2 me-2" id="command-copy"><i
+                                <button class="btn float-end pe-2 me-2 copy-button" id="command-copy"><i
                                         class="fa-solid fa-copy pe-2"></i></button>
                                 <div id="avrae-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                             </div>
@@ -140,7 +158,7 @@
                             <div id="madd-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                         </div>
                         <div class="col-1 m-0 p-0">
-                            <button class="btn" id="madd-copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn copy-button" id="madd-copy"><i class="fa-solid fa-copy"></i></button>
                         </div>
                     </div>
                     <div class="row m-2">
@@ -156,11 +174,11 @@
 </div>
 
 <!--    Map Settings    -->
-<div class="modal fade" id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
+<div class="modal fade " id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header text-center">
+            <div class="modal-header text-center ">
                 <h4 class="modal-title w-100 font-weight-bold text-black" id="mapSettingsModalLabel">Map Settings</h4>
                 <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
                         aria-label="Close"></button>
@@ -173,7 +191,7 @@
                             <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                         </div>
                         <div class="col-1 m-0 p-0">
-                            <button class="btn" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn copy-button" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
                         </div>
                     </div>
                     <form method="dialog" id="map-setup">
@@ -230,7 +248,7 @@
                             <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
                         </div>
                         <div class="col-1 m-0 p-0">
-                            <button class="btn" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn copy-button" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
                         </div>
                     </div>
                     <form method="dialog" id="overlay-setup">
@@ -276,7 +294,7 @@
 
 <!-- General Settings -->
 <div class="modal fade" id="appSettingsModal" tabindex="-1" role="dialog" aria-labelledby="appSettingsModalTitle"
-     aria-hidden="true">
+     aria-hidden="true" draggable="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-center">
@@ -347,28 +365,41 @@
                         aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row m-2">
-                    <div class="col-sm mb-3">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="plan-name"
-                                   name="plan-name"
-                                   placeholder="Plan Name?">
-                            <label for="plan-name">Plan Name</label>
-                        </div>
-                    </div>
-                </div>
+               <div class="container m-2">
+                   <form method="dialog" id="save-plan-form">
+                       <div class="row border rounded bg-secondary m-2">
+                           <div class="row m-2">
+                               <div class="col-sm mb-3">
+                                   <div class="form-floating">
+                                       <input type="text" class="form-control" id="plan-name" name="plan-name" placeholder="Plan Name" required>
+                                       <label for="plan-name">Plan Name</label>
+                                   </div>
+                               </div>
+                           </div>
+                           <div class="row">
+                               <div class="col mb-3">
+                                   <button type="submit" class="btn btn-primary m-2 copy-button" id="save-plan">Save Build</button>
+                                   <button type="button" class="btn btn-light float-end m-2" data-bs-dismiss="modal"
+                                           data-dismiss="modal">
+                                       Cancel
+                                   </button>
+                               </div>
+                           </div>
+                       </div>
+                   </form>
+               </div>
             </div>
         </div>
     </div>
 </div>
 
-<! -- Confirmation Modal -->
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalTitle"
+<! -- Reset Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalTitle"
      aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black">Confirm Reset</h4>
+                <h4 class="modal-title w-100 font-weight-bold text-black">Reset</h4>
                 <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
@@ -376,16 +407,27 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md">
-                            <p class="text-dark">Here</p>
+                            <p class="text-dark">What do you want to reset?</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <button type="button" class="btn btn-danger m-2" id="confirm-reset"
+                            <button type="button" class="btn btn-danger m-2 reset-button" id="reset-all"
                                     data-bs-dismiss="modal" data-dismiss="modal">
-                                Reset
+                                Reset All
                             </button>
-                            <button type="button" class="btn btn-primary float-end m-2" data-bs-dismiss="modal"
+
+                            <button type="button" class="btn btn-primary m-2 reset-button" id="reset-monsters"
+                                    data-bs-dismiss="modal" data-dismiss="modal">
+                                Reset Monsters
+                            </button>
+
+                            <button type="button" class="btn btn-primary m-2 reset-button" id="reset-battlemap"
+                                    data-bs-dismiss="modal" data-dismiss="modal">
+                                Reset Battlemap
+                            </button>
+
+                            <button type="button" class="btn btn-secondary float-end m-2" data-bs-dismiss="modal"
                                     data-dismiss="modal">
                                 Cancel
                             </button>
@@ -398,7 +440,7 @@
 </div>
 
 <script nonce="{{ csp_nonce() }}"
-        src="{{ url_for('static', filename='/js/Avrae Combat Planner/main.js')}}" type="module"></script>
+        src="{{ url_for('static', filename='src/Avrae Combat Planner/Main.js')}}" type="module"></script>
 
 
 {% endblock %}

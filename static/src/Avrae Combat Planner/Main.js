@@ -8,6 +8,7 @@ import { setupMonsterInventory } from './blocks/Monster Inventory.js';
 import { setupMADDContainer } from './blocks/MADD Container.js';
 import { setupBattlemap } from './blocks/Battlemap.js';
 import { setupButtons } from './blocks/Buttons.js';
+import { setupKeybinds } from './blocks/Keybinds.js';
 // Initial Setup
 Monster.import();
 BattleMap.import();
@@ -31,6 +32,8 @@ setupMonsterInventory();
 setupMADDContainer();
 // Map Stuff
 setupBattlemap();
+// Keybinds
+setupKeybinds();
 // General Settings
 document.getElementById("appSettings-setup").addEventListener("change", function (event) {
     const settings = Settings.load();

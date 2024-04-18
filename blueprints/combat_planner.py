@@ -13,7 +13,6 @@ def planner():
     return render_template('/combat_planner/combat_planner.html', howto=howto)
 
 @combat_planner_blueprint.route('/shortcode', methods=['POST'])
-@combat_planner_blueprint.route('/dev/shortcode', methods=['POST'])
 def get_shortcode():
     queryUrl = request.get_json().get('url')
 
@@ -32,10 +31,3 @@ def get_shortcode():
         token = html[start+6:end]
 
     return jsonify({"token": token})
-
-@combat_planner_blueprint.route('/dev/')
-def dev():
-    with open('templates/combat_planner/markdown/howto.md', 'r', encoding='utf-8') as file:
-        howto = markdown.markdown(file.read())
-
-    return render_template('/combat_planner/combat_planner_dev.html', howto=howto)

@@ -364,3 +364,10 @@ function createInputElement(id: string, label: string, value: string, type: stri
     return column
 }
 
+export function exportBuild(element: Element){
+    const encodedData = encodeBuild()
+    const url = `?data=${encodedData}`
+
+    copyString(`${window.location.href}${url}`, "Build copied to clipboard!", element.id)
+}
+

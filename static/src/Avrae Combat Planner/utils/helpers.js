@@ -316,3 +316,8 @@ function createInputElement(id, label, value, type, max = null) {
     column.appendChild(formFloating);
     return column;
 }
+export function exportBuild(element) {
+    const encodedData = encodeBuild();
+    const url = `?data=${encodedData}`;
+    copyString(`${window.location.href}${url}`, "Build copied to clipboard!", element.id);
+}

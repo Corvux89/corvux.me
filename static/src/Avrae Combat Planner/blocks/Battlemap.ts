@@ -3,12 +3,12 @@ import { Overlay } from "../models/Overlay.js"
 import { buildMapPreview, buildMapSettingsheader, buildOverlayContainer, buildOverlayHeader } from "../utils/helpers.js"
 
 
-export function setupBattlemap(){
+export function setupBattlemap(): void{
     mapSettingsTable()
     overlayTable()
 }
 
-function mapSettingsTable(){
+function mapSettingsTable(): void{
     document.getElementById('map-setup').addEventListener("change", function (event) {
         const battlemap = BattleMap.load()
         const target = event.target as HTMLInputElement
@@ -20,12 +20,12 @@ function mapSettingsTable(){
     })
 }
 
-function overlayTable(){
+function overlayTable(): void{
   overlay_change()
   overlay_click()
 }
 
-function overlay_change(){
+function overlay_change(): void{
     document.getElementById("overlay-setup").addEventListener("change", function (event) {
         const battlemap = BattleMap.load()
         const target = event.target
@@ -44,7 +44,7 @@ function overlay_change(){
     })
 }
 
-function overlay_click(){
+function overlay_click(): void{
     document.getElementById("overlay-setup").addEventListener("click", function (event) {
         const battlemap = BattleMap.load()
         const target = event.target as Element

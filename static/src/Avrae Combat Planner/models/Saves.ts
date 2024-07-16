@@ -16,7 +16,7 @@ export class SavedBuild{
 
     static load(){
         const savedBuildData: { [name: string]: SavedBuild } = JSON.parse(localStorage.getItem(node) || "{}")
-        var savedBuilds = {}
+        let savedBuilds = {}
 
         for (const name in savedBuildData) {
             const build = savedBuildData[name]

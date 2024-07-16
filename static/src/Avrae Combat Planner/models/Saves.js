@@ -12,7 +12,7 @@ export class SavedBuild {
     }
     static load() {
         const savedBuildData = JSON.parse(localStorage.getItem(node) || "{}");
-        var savedBuilds = {};
+        let savedBuilds = {};
         for (const name in savedBuildData) {
             const build = savedBuildData[name];
             savedBuilds[name] = new SavedBuild(name, build.data);

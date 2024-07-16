@@ -26,7 +26,7 @@ function change_event() {
         monster.save();
         // Manage Inventory Rows 
         if (node.includes("name")) {
-            var next_monster = monsters[index];
+            let next_monster = monsters[index];
             if (next_monster == undefined && monster.name != "") {
                 next_monster = new Monster(index + 1);
                 next_monster.save();
@@ -46,7 +46,7 @@ function change_event() {
             }
         }
         else if (node.includes("token")) {
-            var helpDom = document.getElementById(`mTokenHelp${index}`);
+            let helpDom = document.getElementById(`mTokenHelp${index}`);
             const tokenDom = target;
             if (isValidHttpUrl(monster.token)) {
                 tokenDom.value = "loading...";

@@ -2,12 +2,12 @@ import { Monster } from "../models/Monster.js"
 import { buildMaddHeader, buildMapPreview, extractIndex, maddTable } from "../utils/helpers.js"
 
 
-export function setupMADDContainer(){
+export function setupMADDContainer(): void{
     change_event()
     click_event()
 }
 
-function change_event(){
+function change_event(): void{
     maddTable.addEventListener("change", function (event) {
         const target = event.target as HTMLInputElement
         const numbers = target.id.match(/\d+/g)
@@ -25,7 +25,7 @@ function change_event(){
     })
 }
 
-function click_event(){
+function click_event(): void{
     maddTable.addEventListener("click", function (event) {
         const target = event.target as Element
         const index = extractIndex(target.id)
@@ -47,7 +47,7 @@ function click_event(){
     })
 }
 
-export function maddUpdateEvent(){
+export function maddUpdateEvent(): void{
     buildMaddHeader()
     buildMapPreview()
 }

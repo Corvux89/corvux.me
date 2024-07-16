@@ -131,22 +131,22 @@ export class Monster {
         h_row.appendChild(h_col);
         maddRow.appendChild(h_row);
         // Monster Fields
-        for (var i = 0; i < this.quantity; i++) {
-            var cInput = document.createElement('input');
+        for (let i = 0; i < this.quantity; i++) {
+            let cInput = document.createElement('input');
             cInput.type = "text";
             cInput.classList.add('form-control');
             cInput.id = `monster-position${this._index}-${i + 1}`;
             cInput.name = `monster-position`;
             cInput.placeholder = this.getCombatID(i + 1);
             cInput.value = this && this.coords && this.coords[i] ? this.coords[i] : "";
-            var cLabel = document.createElement("label");
+            let cLabel = document.createElement("label");
             cLabel.setAttribute("for", cInput.id);
             cLabel.innerHTML = cInput.placeholder;
-            var form = document.createElement("div");
+            let form = document.createElement("div");
             form.classList.add('form-floating');
             form.appendChild(cInput);
             form.appendChild(cLabel);
-            var col = document.createElement("div");
+            let col = document.createElement("div");
             col.classList.add('col-sm-3', 'mb-3', 'monPos');
             col.appendChild(form);
             maddRow.appendChild(col);

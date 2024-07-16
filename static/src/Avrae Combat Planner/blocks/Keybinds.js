@@ -14,14 +14,14 @@ export function setupKeybinds() {
             e.preventDefault();
             const tabDom = document.querySelector('#inventory-tab');
             // @ts-ignore
-            var tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom);
+            let tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom);
             tab.show();
         }
         else if (e.altKey && e.key == '2') {
             e.preventDefault;
             const tabDom = document.querySelector('#map-tab');
             // @ts-ignore
-            var tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom);
+            let tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom);
             tab.show();
         }
         else if (e.altKey && e.key == 'h') {

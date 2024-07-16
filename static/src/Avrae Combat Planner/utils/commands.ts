@@ -4,14 +4,14 @@ import { BattleMap } from '../models/Battlemap.js'
 
 export function getMonsterMapCommand() {
     const monsters = Monster.load()
-    var settings = Settings.load()
+    let settings = Settings.load()
     const coords = []
 
     monsters.forEach(monster => {
         if (monster.name != "" && monster.quantity > 0) {
-            for (var i = 0; i < monster.quantity; i++) {
+            for (let i = 0; i < monster.quantity; i++) {
                 if (monster.coords[i] != null && monster.coords[i] != "") {
-                    var str = ` -t "${monster.getCombatID(i + 1)}|`
+                    let str = ` -t "${monster.getCombatID(i + 1)}|`
                     str += monster.coords[i] + "|"
                     str += monster.size + "|"
                     str += monster.color
@@ -35,40 +35,40 @@ export function getMonsterMaddCommand() {
     const commands: string[] = []
 
     monsters.forEach(monster => {
-        var coords: string[] = []
+        let coords: string[] = []
         if (monster.name != "" && monster.quantity > 0) {
             if (settings.notes == true) {
-                var note = ""
+                let note = ""
 
                 if (monster.coords.filter(x => x != null && x != "").length > 0) {
-                    for (var i = 0; i < monster.quantity; i++) {
-                        var note_str = []
+                    for (let i = 0; i < monster.quantity; i++) {
+                        let note_str = []
                         if (monster.token) { note_str.push(`Token: ${monster.token}`) }
                         if (monster.coords[i]) { note_str.push(`Location: ${monster.coords[i]}`) }
                         if (monster.size) { note_str.push(`Size: ${monster.size}`) }
                         if (monster.color) { note_str.push(`Color: ${monster.color}`) }
                         note = note_str.join(" | ")
 
-                        var str = `${settings.prefix}i madd "${monster.name}"`
+                        let str = `${settings.prefix}i madd "${monster.name}"`
                         str += monster.label ? ` -name "${monster.label}"` : ""
                         str += note ? ` -note "${note}"` : ""
                         str += monster.args ? ` ${monster.args}` : ""
                         commands.push(str)
                     }
                 } else {
-                    var note_str = []
+                    let note_str = []
                     if (monster.token) { note_str.push(`Token: ${monster.token}`) }
                     if (monster.size) { note_str.push(`Size: ${monster.size}`) }
                     if (monster.color) { note_str.push(`Color: ${monster.color}`) }
                     note = note_str.join(" | ")
-                    var str = `${settings.prefix}i madd "${monster.name}"`
+                    let str = `${settings.prefix}i madd "${monster.name}"`
                     str += monster.label ? ` -name "${monster.label}"` : ""
                     str += note ? ` -note "${note}"` : ""
                     str += monster.args ? ` ${monster.args}` : ""
                     commands.push(str)
                 }
             } else {
-                var str = `${settings.prefix}i madd "${monster.name}"`
+                let str = `${settings.prefix}i madd "${monster.name}"`
                 str += monster.quantity > 1 ? ` -n ${monster.quantity}` : ""
                 str += monster.label ? ` -name "${monster.label}"` : ""
                 str += monster.args ? ` ${monster.args}` : ""
@@ -83,8 +83,8 @@ export function getMonsterMaddCommand() {
 export function getMapCommand(mapOnly: boolean = false) {
     const settings = Settings.load()
     const battlemap = BattleMap.load()
-    var str: string = ""
-    var commands: string[] = []
+    let str: string = ""
+    let commands: string[] = []
 
     if (battlemap.url || battlemap.size) {
         if (settings.notes == true && mapOnly == false) {
@@ -94,7 +94,7 @@ export function getMapCommand(mapOnly: boolean = false) {
             str += battlemap.csettings ? ` ~ Options: c${battlemap.csettings}` : ""
             str += `"`
         } else {
-            var settingStr = battlemap.csettings ? `c${battlemap.csettings}` : ""
+            let settingStr = battlemap.csettings ? `c${battlemap.csettings}` : ""
 
             str = `${settings.prefix}map`
             str += battlemap.url ? ` -bg "${battlemap.url}"` : ""
@@ -102,7 +102,7 @@ export function getMapCommand(mapOnly: boolean = false) {
             str += settingStr != "" ? ` -options ${settingStr}` : ""
             str += settings.attach ? ` -t ${settings.attach}` : ""
             if (settings.monsters == true && mapOnly == false) {
-                var monStr = getMonsterMapCommand()
+                let monStr = getMonsterMapCommand()
                 if (monStr) { commands.push(monStr) }
             }
         }
@@ -115,12 +115,12 @@ export function getOverlayCommand(mapOnly = false) {
     const settings = Settings.load()
     const battlemap = BattleMap.load()
     const overlay = battlemap.overlay
-    var str = ""
+    let str = ""
 
     switch (overlay.type) {
         case "circle":
             if (overlay.radius && overlay.color && overlay.center) {
-                var nodes = [overlay.radius, overlay.color, overlay.center]
+                let nodes = [overlay.radius, overlay.color, overlay.center]
                 if (settings.notes == true && mapOnly == false) {
                     str = "Overlay: c"
                     str += nodes.join("")
@@ -133,7 +133,7 @@ export function getOverlayCommand(mapOnly = false) {
 
         case "cone":
             if (overlay.size && overlay.start && overlay.end && overlay.color) {
-                var nodes = [overlay.size, overlay.color, overlay.start, overlay.end]
+                let nodes = [overlay.size, overlay.color, overlay.start, overlay.end]
                 if (settings.notes == true && mapOnly == false) {
                     str = "Overlay: t"
                     str += nodes.join("")
@@ -146,7 +146,7 @@ export function getOverlayCommand(mapOnly = false) {
 
         case "line":
             if (overlay.start && overlay.end && overlay.length && overlay.width && overlay.color) {
-                var nodes = [overlay.length, overlay.width, overlay.color, overlay.start, overlay.end]
+                let nodes = [overlay.length, overlay.width, overlay.color, overlay.start, overlay.end]
                 if (settings.notes == true && mapOnly == false) {
                     str = "Overlay: l"
                     str += nodes.join("")
@@ -159,7 +159,7 @@ export function getOverlayCommand(mapOnly = false) {
 
         case "square":
             if (overlay.size && overlay.color && overlay.topleft) {
-                var nodes = [overlay.size, overlay.color, overlay.topleft]
+                let nodes = [overlay.size, overlay.color, overlay.topleft]
                 if (settings.notes == true && mapOnly == false) {
                     str = "Overlay: s"
                     str += nodes.join("")
@@ -186,7 +186,7 @@ export function getCommandString() {
     const settings = Settings.load()
     const commandStr = document.getElementById("commandStr")
     const avraeCommand = document.getElementById("avrae-command")
-    var commands = []
+    let commands = []
 
     if (settings.maptarget == true) {
         commands.unshift(`${settings.prefix}i add 20 ${settings.attach} -p`)

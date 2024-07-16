@@ -11,7 +11,7 @@ export class BattleMap {
         public overlay: Overlay = new Overlay()
     ) { }
 
-    save() {
+    save(): void {
         localStorage.setItem(node, JSON.stringify(this))
     }
 
@@ -27,7 +27,7 @@ export class BattleMap {
         return battlemap
     }
 
-    static import(){
+    static import(): void{
         const urlParams = new URLSearchParams(window.location.search)
         const encodedData = urlParams.get('data')
     
@@ -42,7 +42,7 @@ export class BattleMap {
         }
     }
 
-    static dump(){
+    static dump(): void{
         localStorage.removeItem(node)
     }
 

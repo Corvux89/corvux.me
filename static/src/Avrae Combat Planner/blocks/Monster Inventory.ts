@@ -2,12 +2,12 @@ import { Monster } from "../models/Monster.js";
 import { getCommandString } from "../utils/commands.js";
 import { buildInventoryContainer, buildMaddContainer, buildMaddHeader, buildMapPreview, extractIndex, getTokenShortcode, isValidHttpUrl, maddTable, monsterInventory } from "../utils/helpers.js";
 
-export function setupMonsterInventory(){
+export function setupMonsterInventory(): void{
     change_event()
     click_event()
 }
 
-function change_event(){
+function change_event(): void{
      monsterInventory.addEventListener("change", function(e){
         const target = event.target
         const index = extractIndex((target as Element).id)
@@ -29,7 +29,7 @@ function change_event(){
     
         // Manage Inventory Rows 
         if (node.includes("name")) {
-            var next_monster = monsters[index]
+            let next_monster = monsters[index]
             
     
             if (next_monster == undefined && monster.name != "") {
@@ -48,7 +48,7 @@ function change_event(){
             if (focusDom) { focusDom.focus() }
     
         } else if (node.includes("token")) {
-            var helpDom = document.getElementById(`mTokenHelp${index}`)
+            let helpDom = document.getElementById(`mTokenHelp${index}`)
             const tokenDom = target as HTMLInputElement
             if (isValidHttpUrl(monster.token)) {
                 tokenDom.value = "loading..."
@@ -97,7 +97,7 @@ function change_event(){
     })
 }
 
-function click_event(){
+function click_event(): void{
     monsterInventory.addEventListener('click', function (event) {
         const target = event.target as Element
         const index = extractIndex(target.id)
@@ -118,7 +118,7 @@ function click_event(){
     })
 }
 
-export function monsterInventoryRemoveEvent(){
+export function monsterInventoryRemoveEvent(): void{
     buildInventoryContainer()
     buildMaddContainer()
     buildMaddHeader()

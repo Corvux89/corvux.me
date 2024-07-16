@@ -6,12 +6,12 @@ import { buildMapPreview, buildMapSettingsheader, buildOverlayContainer, buildSa
 import { monsterInventoryRemoveEvent } from "./Monster Inventory.js"
 
 
-export function setupButtons(){
+export function setupButtons(): void{
     copyButtons()
     resetButtons()
 }
 
-function copyButtons(){
+function copyButtons(): void{
     document.querySelectorAll('.copy-button').forEach(function (element) {
 
         switch (element.id) {
@@ -62,7 +62,7 @@ function copyButtons(){
     })
 }
 
-function resetButtons(){
+function resetButtons(): void{
     document.querySelectorAll(".reset-button").forEach(function (element) {
         switch (element.id.replace("reset-", "")) {
             case "monsters":

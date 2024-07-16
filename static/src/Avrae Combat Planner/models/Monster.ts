@@ -13,7 +13,7 @@ export class Monster{
         public coords: string[] = [],
     ) {}
 
-    getPrefix(){
+    getPrefix(): string{
         if (this.label){
             return this.label;
         } else {
@@ -27,11 +27,11 @@ export class Monster{
         }
     }
 
-    getCombatID(number) {
+    getCombatID(number): string{
         return (this.getPrefix().includes("#") ? this.getPrefix().replace("#", `${number}`): this.quantity > 1 ? `${this.getPrefix()}${number}`:this.getPrefix())
     }
 
-    appendInventoryRow(){
+    appendInventoryRow(): HTMLDivElement{
         const monsterRow = document.createElement('div')
         monsterRow.classList.add('row', 'monster', 'border', 'rounded', 'bg-secondary', 'm-2')
         monsterRow.id = `monster-${this._index}`
@@ -116,11 +116,11 @@ export class Monster{
         return monsterRow
     }
 
-    getInventoryRow(){
+    getInventoryRow(): HTMLElement{
         return document.getElementById(`monster-${this._index}`)
     }
 
-    appendMaddRow() {
+    appendMaddRow(): HTMLDivElement {
         if (this.name == "") {
             return
         }
@@ -144,8 +144,8 @@ export class Monster{
         maddRow.appendChild(h_row)
 
         // Monster Fields
-        for (var i = 0; i < this.quantity; i++) {
-            var cInput = document.createElement('input')
+        for (let i = 0; i < this.quantity; i++) {
+            let cInput = document.createElement('input')
             cInput.type = "text"
             cInput.classList.add('form-control')
             cInput.id = `monster-position${this._index}-${i + 1}`
@@ -154,16 +154,16 @@ export class Monster{
 
             cInput.value = this && this.coords && this.coords[i] ? this.coords[i] : ""
 
-            var cLabel = document.createElement("label")
+            let cLabel = document.createElement("label")
             cLabel.setAttribute("for", cInput.id)
             cLabel.innerHTML = cInput.placeholder
 
-            var form = document.createElement("div")
+            let form = document.createElement("div")
             form.classList.add('form-floating')
             form.appendChild(cInput)
             form.appendChild(cLabel)
 
-            var col = document.createElement("div")
+            let col = document.createElement("div")
             col.classList.add('col-sm-3', 'mb-3', 'monPos')
             col.appendChild(form)
 
@@ -191,11 +191,11 @@ export class Monster{
         return maddRow
     }
 
-    getMaddRow() {
+    getMaddRow(): HTMLElement {
         return document.getElementById(`madd-${this._index}`)
     }
 
-    save() {
+    save(): void {
         if (this.name == "") {
             return
         }
@@ -204,13 +204,13 @@ export class Monster{
         localStorage.setItem(node, JSON.stringify(monsters))
     }
 
-    remove(){
+    remove(): void{
         const monsters = Monster.load()
         monsters.splice(this._index-1, 1)
         localStorage.setItem(node, JSON.stringify(monsters))
     }
 
-    static load(){
+    static load(): Monster[]{
         const monsterData = JSON.parse(localStorage.getItem(node) || "[]")
         const monsters = monsterData.map((data, index) => new Monster(
             index+1,
@@ -230,7 +230,7 @@ export class Monster{
         return monsters
     }
 
-    static import(){
+    static import(): void{
         const urlParams = new URLSearchParams(window.location.search)
         const encodedData = urlParams.get('data')
     
@@ -246,7 +246,7 @@ export class Monster{
         }  
     }
 
-    static dump(){
+    static dump(): void{
         localStorage.removeItem(node)
     }
 }

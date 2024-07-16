@@ -25,7 +25,7 @@ export function buildMaddContainer() {
 export function buildOverlayContainer() {
     const overlay = BattleMap.load().overlay;
     const overlayRow = document.getElementById("overlay-row");
-    var columns = [];
+    let columns = [];
     if (overlay.type == "circle") {
         columns.push(createInputElement("map-overlayRadius", "Radius", overlay.radius, "number", "200"));
         columns.push(createInputElement("map-overlayCenter", "Center", overlay.center, "text"));

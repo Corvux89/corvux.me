@@ -2,7 +2,7 @@ import { Tab } from "bootstrap"
 import { savePlan } from "../models/Saves.js"
 import { exportBuild } from "../utils/helpers.js"
 
-export function setupKeybinds(){
+export function setupKeybinds(): void{
     document.addEventListener("keydown", function(e){
         if (e.ctrlKey && e.key === "s"){
             e.preventDefault()
@@ -14,14 +14,14 @@ export function setupKeybinds(){
             e.preventDefault()
             const tabDom = document.querySelector('#inventory-tab')
             // @ts-ignore
-            var tab: Tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom)
+            let tab: Tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom)
             tab.show()
 
         } else if (e.altKey && e.key == '2'){
             e.preventDefault
             const tabDom = document.querySelector('#map-tab')
             // @ts-ignore
-            var tab: Tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom)            
+            let tab: Tab = bootstrap.Tab.getInstance(tabDom) ? bootstrap.Tab.getInstance(tabDom) : new bootstrap.Tab(tabDom)            
             tab.show()
         } else if (e.altKey && e.key == 'h'){
             // @ts-ignore

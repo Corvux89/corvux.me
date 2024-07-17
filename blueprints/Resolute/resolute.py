@@ -1,6 +1,7 @@
 import json
 from flask import Blueprint, Flask, current_app, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
 from models.resolute import AlchemyEncoder, ResoluteGuild
 
@@ -17,14 +18,14 @@ def before_request():
 def resolute_main():
     db: SQLAlchemy = current_app.config.get('DB')
 
-    guild = db.get_or_404(ResoluteGuild, 226741726943903754)
+    guild = db.get_or_404(ResoluteGuild, DISCORD_GUILD_ID)
     return render_template('Resolute/resolute_main.html', guild=guild)
 
 
 @resolute_blueprint.route('/guild', methods=['GET', 'POST'])
 def upsert_guild():
     db: SQLAlchemy = current_app.config.get('DB')
-    guild: ResoluteGuild = db.get_or_404(ResoluteGuild, 226741726943903754)
+    guild: ResoluteGuild = db.get_or_404(ResoluteGuild, DISCORD_GUILD_ID)
 
     if request.method == 'GET':
         return json.dumps(guild, cls=AlchemyEncoder) 

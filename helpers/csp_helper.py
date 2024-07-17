@@ -19,12 +19,17 @@ def get_csp():
         ],
         'img-src': [
             '*',
+            '\'self\'',
             'data:'
         ],
         'style-src': [
             '\'self\'',
             'https://use.fontawesome.com',
             'https://cdn.jsdelivr.net/',
+        ],
+        'font-src': [
+            '\'self\'',
+            'https://use.fontawesome.com'
         ]
     }
 

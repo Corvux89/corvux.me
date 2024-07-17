@@ -1,4 +1,6 @@
 import json
+from flask_discord import DiscordOAuth2Session
+from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
@@ -8,7 +10,9 @@ from flask_talisman import Talisman
 
 from blueprints.combat_planner import combat_planner_blueprint
 from blueprints.sw5e_weapon_calculator import weapon_calc
-from constants import WEB_DEBUG, SECRET_KEY
+from blueprints.auth import auth_blueprint
+from blueprints.Resolute.resolute import resolute_blueprint
+from constants import DB_URI, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
 
 app = Flask(__name__)
@@ -18,15 +22,25 @@ app.secret_key = SECRET_KEY
 app.config.update(
     DEBUG=WEB_DEBUG
 )
+app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
+app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
+app.config["DISCORD_CLIENT_ID"] = DISCORD_CLIENT_ID
+app.config["DISCORD_REDIRECT_URI"] = DISCORD_REDIRECT_URI
+app.config["DISCORD_CLIENT_SECRET"] = DISCORD_SECRET_KEY
+
+app.config['DISCORD_SESSION'] = DiscordOAuth2Session(app)
+app.config['DB'] = db =  SQLAlchemy()    
+db.init_app(app)
 
 @app.route('/')
-@app.route('/home')
+# @app.route('/home')
 def homepage():
     with open('templates/aboutme.md', 'r', encoding='utf-8') as file:
         aboutme = markdown.markdown(file.read())
 
     f = open('static/json/projects.json', encoding="utf8")
     projects = json.load(f)
+    
     return render_template("main.html", projects=projects, aboutme=aboutme)
 
 @app.route('/sitemap.xml')
@@ -57,6 +71,8 @@ talisman = Talisman(
 
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
 app.register_blueprint(weapon_calc, url_prefix="/SW5E_Weapon_Calculator")
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+app.register_blueprint(resolute_blueprint,url_prefix='/resolute')
 
 if __name__ == "__main__":
     app.run()

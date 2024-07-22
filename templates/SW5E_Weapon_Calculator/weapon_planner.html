@@ -1,0 +1,42 @@
+{% extends "template.html" %} {% block body %}
+
+<div class="containter m-2">
+    <h1>SW5E Weapon Planner</h1>
+</div>
+
+<div class="container m-2">
+    <div class="row border rounded border-success bg-light" id="weapon-header">
+        <div class="col-sm">
+            <p class="text-black">Command String</p>
+            <div id="command-str-container" hidden>
+                <button class="btn float-end pe-2 me-2 copy-button" id="command-copy"><i
+                                        class="fa-solid fa-copy pe-2"></i></button>
+                <div id="weapon-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-auto">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="weapon-type" name="weapon-type">
+                <label class="form-check-label text-white" for="weapon-type">Melee Weapon</label>
+            </div>
+        </div>
+
+        <div class="col-auto">
+            <div class="form-floating">
+                <select class="form-select" id="weapon-damage-type" aria-label="Weapon Damage Type">
+                    <option selected>Select a damage type:</option>
+                    <option value="kinetic">Kinetic</option>
+                </select>
+                <label for="weapon-damage-type">Damage Type</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+

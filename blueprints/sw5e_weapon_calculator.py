@@ -9,3 +9,8 @@ def calc():
     f = open('static/json/sw5e_weapon_calculator.json', encoding="utf8")
     fields = json.load(f)
     return render_template('/SW5E_Weapon_Calculator/weapon_calculator.html', data=fields)
+
+
+@weapon_calc.route('/dev')
+def dev():
+    return render_template('/SW5E_Weapon_Calculator/weapon_planner.html')

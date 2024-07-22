@@ -1,0 +1,37 @@
+<div class="modal fade" id="appSettingsModal" tabindex="-1" role="dialog" aria-labelledby="appSettingsModalTitle"
+     aria-hidden="true" draggable="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="appSettingsLabel">General Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <form method="dialog" id="appSettings-setup" class="settings">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="setting-prefix" value="!"
+                                               name="avrae-prefix"
+                                               placeholder="!">
+                                        <label for="setting-prefix">Avrae Prefix</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="setting-attach" name="map-attach"
+                                               placeholder="DM" value="DM">
+                                        <label for="setting-attach">Map Attached to</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

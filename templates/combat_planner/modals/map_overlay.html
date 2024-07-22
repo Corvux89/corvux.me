@@ -1,0 +1,61 @@
+<div class="modal fade" id="mapOverlayModal" tabindex="-1" role="dialog" aria-labelledby="mapOverlayModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapOverlayModalLabel">Overlay
+                    Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="overlay-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn copy-button" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <form method="dialog" id="overlay-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm-5 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" arial-label="Overlay Type" id="map-overlayType"
+                                                name="map-overlay-type">
+                                            <option value="" selected></option>
+                                            <option value="circle">Circle</option>
+                                            <option value="cone">Cone</option>
+                                            <option value="line">Line</option>
+                                            <option value="square">Square</option>
+                                        </select>
+                                        <label for="map-overlayType">Overlay</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-overlayTarget"
+                                               name="map-overlay-target" placeholder="Target">
+                                        <label for="map-overlayTarget">Target</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-2" id="overlay-row">
+                            </div>
+                            <div class="row m-2">
+                                <div class="col mb-3">
+                                    <button type="button" class="btn btn-light float-end" id="reset-overlay">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

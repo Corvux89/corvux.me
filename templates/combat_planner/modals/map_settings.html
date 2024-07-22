@@ -1,0 +1,54 @@
+<div class="modal fade " id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center ">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapSettingsModalLabel">Map Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="maps-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn copy-button" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <form method="dialog" id="map-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-url" name="map-url"
+                                               placeholder="Map URL">
+                                        <label for="map-url">Map URL</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-size" name="map-size"
+                                               placeholder="Map Size">
+                                        <label for="map-url">Map Size</label>
+                                        <small id="map-url-help" class="form-text text-white-50">Ex: 25x25</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="map-csettings"
+                                               name="map-csettings"
+                                               placeholder="Map CSettings">
+                                        <label for="map-url">Map CSettings</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

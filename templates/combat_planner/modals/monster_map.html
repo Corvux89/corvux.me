@@ -1,0 +1,32 @@
+<div class="modal fade" id="monsterMapModal" tabindex="-1" role="dialog" aria-labelledby="monsterMapModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="monsterMapModalLabel">Monster
+                    Coordinates</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="madd-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <div id="madd-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
+                        </div>
+                        <div class="col-1 m-0 p-0">
+                            <button class="btn copy-button" id="madd-copy"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-md">
+                            <form method="dialog" id="madd-table">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

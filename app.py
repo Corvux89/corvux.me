@@ -33,7 +33,6 @@ app.config['DB'] = db =  SQLAlchemy()
 db.init_app(app)
 
 @app.route('/')
-# @app.route('/home')
 def homepage():
     with open('templates/aboutme.md', 'r', encoding='utf-8') as file:
         aboutme = markdown.markdown(file.read())
@@ -58,6 +57,10 @@ def site_map():
     response = make_response(response)
     response.headers["Content-Type"] = "application/xml"
     return response
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html")
 
 
 csp = get_csp()

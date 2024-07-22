@@ -5,11 +5,12 @@
   "type": "module",
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "jqeury": "^0.0.1-security",
     "typescript": "^5.4.4"
   },
   "devDependencies": {
     "@popperjs/core": "^2.11.8",
-    "@types/jquery": "^3.5.29",
-    "@types/bootstrap": "^5.2.10"
+    "@types/bootstrap": "^5.2.10",
+    "@types/jquery": "^3.5.29"
   }
 }

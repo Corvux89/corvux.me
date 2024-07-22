@@ -75,4 +75,4 @@ app.register_blueprint(auth_blueprint, url_prefix='/auth')
 app.register_blueprint(resolute_blueprint,url_prefix='/resolute')
 
 if __name__ == "__main__":
-    app.run()
+   app.run()

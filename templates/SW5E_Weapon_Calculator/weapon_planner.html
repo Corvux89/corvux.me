@@ -15,28 +15,108 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row mt-5">
-        <div class="col-auto">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="weapon-type" name="weapon-type">
-                <label class="form-check-label text-white" for="weapon-type">Melee Weapon</label>
+        <div class="col-sm">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="weapon-name">
+                <label for="weapon-name">Weapon Name</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col-sm">
+            <div class="form-floating">
+                <input type="number" class="form-control" id="weapon-damage-die-number" value="1" min="1" max="100">
+                <label for="damage-die-number"># Damage Die</label> 
             </div>
         </div>
 
-        <div class="col-auto">
+        <div class="col-sm">
             <div class="form-floating">
-                <select class="form-select" id="weapon-damage-type" aria-label="Weapon Damage Type">
-                    <option selected>Select a damage type:</option>
-                    <option value="kinetic">Kinetic</option>
+                <select class="form-select" id="weapon-damage-die-size">
+                    <option value="d4">d4</option>
+                    <option value="d6">d6</option>
+                    <option value="d8">d8</option>
+                    <option value="d10">d10</option>
+                    <option value="d12">d12</option>
+                    <option value="d20">d20</option>
                 </select>
-                <label for="weapon-damage-type">Damage Type</label>
+                <label for="weapon-damage-die-size">Damage Die Size</label>
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="search" list="damage-type-options" id="weapon-damage-type" name="weapon-damage-type" autoSelect="true"/>
+                <label for="weapon-damage-type">Primary Damage Type</label>
+                <datalist id="damage-type-options">
+                </datalist>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col-sm">
+            <div class="form-floating">
+                <select class="form-select" id="weapon-to-hit-stat">
+                </select>
+                <label for="weapon-to-hit-stat">Attack Stat</label>
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="number" id="weapon-to-hit-bonus" value="0" min="0" max="100">
+                <label for="weapon-to-hit-bonus">Attack Bonus</label>
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="number" id="weapon-criton" value="20" min="1" max="20">
+                <label for="weapon-criton">Crits on</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col-sm">
+            <div class="form-floating">
+                <select class="form-select" id="weapon-damage-stat">
+                </select>
+                <label for="weapon-damage-stat">Damage Stat</label>
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="number" id="weapon-damage-bonus" value="0" min="0" max="100">
+                <label for="weapon-damage-bonus">Damage Bonus</label>
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="text" id="weapon-additional-damage">
+                <label for="weapon-additional-damage">Additional damage</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col-sm">
+            <div class="form-floating">
+                <input class="form-control" type="text" id="weapon-additional-crit-damage">
+                <label for="weapon-additional-crit-damage">Additional Crit Damage</label>
             </div>
         </div>
     </div>
 </div>
 
-
+<script nonce="{{ csp_nonce() }}"
+        src="{{ url_for('static', filename='src/Weapon Planner/main.js')}}" type="module"></script>
 
 {% endblock %}
 

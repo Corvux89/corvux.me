@@ -80,8 +80,12 @@ body{
     cursor: pointer;
 }
 
-.announcement-edit-body{
+.big-edit-body{
     height: 30vh !important;
     overflow-y: scroll !important;
     resize: none !important;
+}
+
+.toasts{
+    z-index: 3;
 }

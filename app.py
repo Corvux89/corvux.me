@@ -12,12 +12,14 @@ from blueprints.combat_planner import combat_planner_blueprint
 from blueprints.sw5e_weapon_calculator import weapon_calc
 from blueprints.auth import auth_blueprint
 from blueprints.Resolute.resolute import resolute_blueprint
-from constants import DB_URI, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
+from constants import DB_URI, DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
+from models.resolute import AlchemyEncoder
 
 app = Flask(__name__)
 
 app.secret_key = SECRET_KEY
+app.json_encoder = AlchemyEncoder
 
 app.config.update(
     DEBUG=WEB_DEBUG
@@ -27,6 +29,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
 app.config["DISCORD_CLIENT_ID"] = DISCORD_CLIENT_ID
 app.config["DISCORD_REDIRECT_URI"] = DISCORD_REDIRECT_URI
 app.config["DISCORD_CLIENT_SECRET"] = DISCORD_SECRET_KEY
+app.config["DISCORD_BOT_TOKEN"] = DISCORD_BOT_TOKEN
 
 app.config['DISCORD_SESSION'] = DiscordOAuth2Session(app)
 app.config['DB'] = db =  SQLAlchemy()    

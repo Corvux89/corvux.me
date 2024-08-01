@@ -10,7 +10,7 @@ resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
 
 @resolute_blueprint.before_request
-# @is_admin
+@is_admin
 def before_request():
     pass
 

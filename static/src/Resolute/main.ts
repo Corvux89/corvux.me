@@ -261,7 +261,7 @@ function builTabContent(message: RefMessage): void{
 
             <div class="row mb-3">
                 <div class="form-floating">
-                    <textarea id="${message.message_id}-body" class="form-control big-edit-body" required>${message.content}</textarea>
+                    <textarea id="${message.message_id}-body" class="form-control big-edit-body" required maxlength="2000">${message.content}</textarea>
                     <label for="${message.message_id}-body">Message</label>
                 </div>
             </div>

@@ -124,7 +124,7 @@ def get_channels():
     channels = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/channels")
     clean_out = []
     for c in channels:
-        if 'parent_id' in c and c.get('parent_id') != "":
+        if 'parent_id' in c and c.get('parent_id') != "" and c.get('type',0) not in [4, 13, 15]:
             clean_out.append({"id": c.get('id'), "name": c.get('name')})
 
     return jsonify(clean_out)

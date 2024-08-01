@@ -16,13 +16,10 @@ def before_request():
 
 @resolute_blueprint.route('/')
 def resolute_main():
-    db: SQLAlchemy = current_app.config.get('DB')
-
-    guild = db.get_or_404(ResoluteGuild, DISCORD_GUILD_ID)
-    return render_template('Resolute/resolute_main.html', guild=guild)
+    return render_template('Resolute/resolute_main.html')
 
 
-@resolute_blueprint.route('/guild', methods=['GET', 'PATCH'])
+@resolute_blueprint.route('/api/guild', methods=['GET', 'PATCH'])
 def upsert_guild():
     db: SQLAlchemy = current_app.config.get('DB')
     guild: ResoluteGuild = db.get_or_404(ResoluteGuild, DISCORD_GUILD_ID)
@@ -40,7 +37,7 @@ def upsert_guild():
     
     return abort(404)
 
-@resolute_blueprint.route('/message', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@resolute_blueprint.route('/api/message', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def ref_messages():
     db: SQLAlchemy = current_app.config.get('DB')
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
@@ -118,7 +115,7 @@ def ref_messages():
     return abort(404)
     
     
-@resolute_blueprint.route('/channels', methods=['GET'])
+@resolute_blueprint.route('/api/channels', methods=['GET'])
 def get_channels():
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
     channels = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/channels")

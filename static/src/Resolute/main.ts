@@ -1,4 +1,5 @@
-import { ResoluteGuild, RefMessage, DiscordChannel, NewMessage } from './types.js'
+import { deleteMessage, getChannels, getGuild, getMessages, newMessage, updateGuild, updateMessage } from './api.js'
+import { RefMessage, NewMessage } from './types.js'
 
 buildAnnouncementTable()
 buildMessageTab()
@@ -155,7 +156,10 @@ function buildAnnouncementTable(){
     getGuild()
     .then(guild => {
         let table = document.getElementById('announcement-table-body')
+        let ping = document.getElementById("announcement-ping") as HTMLInputElement
         table.innerHTML = ""
+
+        ping.checked = guild.ping_announcement
 
         guild.weekly_announcement.forEach((announcement, index) => {
             let parts = announcement.split("|")
@@ -270,126 +274,5 @@ function builTabContent(message: RefMessage): void{
     messageContent.appendChild(pane)
 }
 
-function getGuild(): Promise<ResoluteGuild>{
-    const url = `${window.location.href}guild`
-    return fetch(url)
-    .then(res => res.json())
-    .then(res => {
-        return res as ResoluteGuild
-    })
-}
 
-function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}guild`
-        const request = new XMLHttpRequest()
-
-        request.open('PATCH', url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                resolve(this.response.responseText)
-            } else {
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(guild))
-    })
-}
-
-function getMessages(): Promise<RefMessage[]>{
-    const url = `${window.location.href}message`
-    return fetch(url)
-    .then(res => res.json())
-    .then(res => {
-        return res as RefMessage[]
-    })
-}
-
-function newMessage(message: NewMessage): Promise<RefMessage>{
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`
-        const request = new XMLHttpRequest()
-
-        request.open('POST', url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                resolve(JSON.parse(this.responseText))
-            } else {
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(message))
-    })
-}
-
-function updateMessage(message: RefMessage): Promise<RefMessage>{
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`
-        const request = new XMLHttpRequest()
-
-        request.open('PATCH', url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                resolve(this.response.responseText)
-            } else {
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(message))
-    })
-}
-
-function deleteMessage(mesage_id: string): void{
-    new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`
-        const request = new XMLHttpRequest()
-
-        request.open('DELETE', url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                resolve(this.response.responseText)
-            } else {
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify({"message_id": mesage_id}))
-    })
-}
-
-function getChannels(): Promise<DiscordChannel[]>{
-    const url = `${window.location.href}channels`
-    return fetch(url)
-    .then(res => res.json())
-    .then(res => {
-        return res as DiscordChannel[]
-    })
-}
 

@@ -1,3 +1,4 @@
+import { deleteMessage, getChannels, getGuild, getMessages, newMessage, updateGuild, updateMessage } from './api.js';
 buildAnnouncementTable();
 buildMessageTab();
 document.getElementById("announcement-ping").addEventListener("change", function (event) {
@@ -129,7 +130,9 @@ function buildAnnouncementTable() {
     getGuild()
         .then(guild => {
         let table = document.getElementById('announcement-table-body');
+        let ping = document.getElementById("announcement-ping");
         table.innerHTML = "";
+        ping.checked = guild.ping_announcement;
         guild.weekly_announcement.forEach((announcement, index) => {
             let parts = announcement.split("|");
             let title = parts.length > 1 ? parts[0] : "None";
@@ -231,108 +234,3 @@ function builTabContent(message) {
     `;
     messageContent.appendChild(pane);
 }
-function getGuild() {
-    const url = `${window.location.href}guild`;
-    return fetch(url)
-        .then(res => res.json())
-        .then(res => {
-        return res;
-    });
-}
-function updateGuild(guild) {
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}guild`;
-        const request = new XMLHttpRequest();
-        request.open('PATCH', url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                resolve(this.response.responseText);
-            }
-            else {
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(guild));
-    });
-}
-function getMessages() {
-    const url = `${window.location.href}message`;
-    return fetch(url)
-        .then(res => res.json())
-        .then(res => {
-        return res;
-    });
-}
-function newMessage(message) {
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`;
-        const request = new XMLHttpRequest();
-        request.open('POST', url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                resolve(JSON.parse(this.responseText));
-            }
-            else {
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(message));
-    });
-}
-function updateMessage(message) {
-    return new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`;
-        const request = new XMLHttpRequest();
-        request.open('PATCH', url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                resolve(this.response.responseText);
-            }
-            else {
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(message));
-    });
-}
-function deleteMessage(mesage_id) {
-    new Promise((resolve, reject) => {
-        const url = `${window.location.href}message`;
-        const request = new XMLHttpRequest();
-        request.open('DELETE', url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                resolve(this.response.responseText);
-            }
-            else {
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify({ "message_id": mesage_id }));
-    });
-}
-function getChannels() {
-    const url = `${window.location.href}channels`;
-    return fetch(url)
-        .then(res => res.json())
-        .then(res => {
-        return res;
-    });
-}
-export {};

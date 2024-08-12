@@ -32,6 +32,7 @@ def upsert_guild():
 
         guild.weekly_announcement = update_guild.weekly_announcement
         guild.ping_announcement = update_guild.ping_announcement
+        guild.max_level = update_guild.max_level
         
         db.session.commit()
     

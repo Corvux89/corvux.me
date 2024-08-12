@@ -1,6 +1,9 @@
 export interface ResoluteGuild {
-    id: bigint,
-    weekly_announcement: string[],
+    id: bigint
+    max_level: number
+    handicap_cc: number
+    max_characters: number
+    weekly_announcement: string[]
     ping_announcement: boolean
 }
 

@@ -1,144 +1,120 @@
 import { deleteMessage, getChannels, getGuild, getMessages, newMessage, updateGuild, updateMessage } from './api.js';
 buildAnnouncementTable();
 buildMessageTab();
-document.getElementById("announcement-ping").addEventListener("change", function (event) {
-    const target = event.target;
+$("#announcement-ping").on("change", function () {
     getGuild()
         .then(guild => {
-        guild.ping_announcement = target.checked;
+        guild.ping_announcement = $(this).prop("checked");
         updateGuild(guild);
     });
 });
-$(document).on('click', '.open-edit', function (e) {
-    const index = $(this).data('id');
+$(document).on('click', '.open-edit', function () {
     getGuild()
         .then(guild => {
-        const announcement = guild.weekly_announcement[index];
-        const parts = announcement.split("|");
-        const title = parts.length > 1 ? parts[0] : "";
-        const body = parts.length > 1 ? parts[1] : parts[0];
-        let modal = document.getElementById("announcement-modal-edit-form");
-        modal.setAttribute('data-id', `${index}`);
+        var announcement = guild.weekly_announcement[$(this).data('id')];
+        var parts = announcement.split("|");
+        var title = parts.length > 1 ? parts[0] : "";
+        var body = parts.length > 1 ? parts[1] : parts[0];
+        $("#announcement-modal-edit-form").data("id", $(this).data('id'));
         $(".modal-body #announcement-title").val(title);
         $(".modal-body #announcement-body").val(body);
     });
 });
-$(document).on('click', '.announcement-delete', function (e) {
-    const index = $(this).data('id');
+$(document).on('click', '.announcement-delete', function () {
     getGuild()
         .then(guild => {
-        guild.weekly_announcement.splice(index, 1);
+        guild.weekly_announcement.splice($(this).data('id'), 1);
         updateGuild(guild)
-            .then(guild => {
+            .then(function () {
             buildAnnouncementTable();
         });
     });
 });
 $(document).on('click', '.message-edit', function (e) {
-    const target = e.target;
-    const message_id = target.id.replace("-edit-button", "");
-    const channelDom = document.getElementById(`${message_id}-channel`);
-    const titleDom = document.getElementById(`${message_id}-title`);
-    const bodyDom = document.getElementById(`${message_id}-body`);
-    const pinDom = document.getElementById(`${message_id}-pin`);
-    let message = {};
-    message.message_id = message_id;
-    message.channel_id = channelDom.value;
-    message.channel_name = channelDom.innerHTML;
-    message.title = titleDom.value;
-    message.content = bodyDom.value;
-    message.pin = pinDom.checked;
+    var message = {};
+    message.message_id = $(this).data('id');
+    message.channel_id = $(`#${message.message_id}-channel`).find(":selected").val().toString();
+    message.channel_name = $(`#${message.message_id}-channel`).find(":selected").text();
+    message.title = $(`#${message.message_id}-title`).val().toString();
+    message.content = $(`#${message.message_id}-body`).val().toString();
+    message.pin = $(`#${message.message_id}-pin`).prop("checked");
     updateMessage(message)
         .then(() => {
-        let toast = document.getElementById("confirm-toast");
         //@ts-ignore
-        let toastAlert = new bootstrap.Toast(toast);
+        let toastAlert = new bootstrap.Toast($("#confirm-toast"));
         toastAlert.show();
     });
 });
-$(document).on('click', '.message-delete', function (e) {
-    const target = e.target;
-    const message_id = target.id.replace("-delete-button", "");
-    let button = document.getElementById("message-delete-button");
-    button.setAttribute("data-id", message_id);
+$(document).on('click', '.message-delete', function () {
+    var message_id = $(this).data('id');
+    $("#message-delete-button").data("id", message_id);
 });
-document.getElementById("message-delete-button").addEventListener('click', function (e) {
-    const target = e.target;
-    const message_id = target.getAttribute("data-id");
+$("#message-delete-button").on('click', function () {
+    var message_id = $(this).data('id');
     deleteMessage(message_id);
-    document.getElementById(`${message_id}-tab`).remove();
-    document.getElementById(`edit-${message_id}`).remove();
-    let defaultTab = document.getElementById("new-message-tab");
-    let defaultPane = document.getElementById(defaultTab.getAttribute("aria-controls"));
-    defaultTab.classList.add("active");
-    defaultTab.setAttribute("aria-selected", "true");
-    defaultPane.classList.add("show", "active");
+    $(`#${message_id}-tab`).remove();
+    $(`#edit-${message_id}`).remove();
+    $("#new-message-tab").addClass("active");
+    $("#new-message-tab").attr("aria-selected", "true");
+    $("#new-message").addClass("show active");
 });
-document.getElementById("announcement-new-button").addEventListener('click', function (e) {
-    let modal = document.getElementById("announcement-modal-edit-form");
-    modal.setAttribute('data-id', "new");
+$("#announcement-new-button").on('click', function () {
+    $("#announcement-modal-edit-form").data('id', "new");
     $(".modal-body #announcement-title").val("");
     $(".modal-body #announcement-body").val("");
 });
-document.getElementById("announcement-submit-button").addEventListener('click', function (event) {
-    const titleDom = document.getElementById("announcement-title");
-    const bodyDom = document.getElementById("announcement-body");
-    const modal = document.getElementById("announcement-modal-edit-form");
-    const index = modal.getAttribute("data-id");
-    const title = titleDom.value;
-    const body = bodyDom.value != undefined ? bodyDom.value : "";
-    const announcement = title != "" ? `${title}|${body}` : body;
-    getGuild()
-        .then(guild => {
-        if (index == "new") {
-            guild.weekly_announcement.push(announcement);
-        }
-        else {
-            guild.weekly_announcement[index] = announcement;
-        }
-        updateGuild(guild)
+$("#announcement-submit-button").on('click', function () {
+    var title = $("#announcement-title").val();
+    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : "";
+    var index = $("#announcement-modal-edit-form").data("id");
+    var announcement = title != "" ? `${title}|${body}` : body;
+    if (announcement != "") {
+        getGuild()
             .then(guild => {
-            buildAnnouncementTable();
+            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString();
+            updateGuild(guild)
+                .then(function () {
+                buildAnnouncementTable();
+            });
         });
+    }
+});
+$('#new-message-submit-button').on('click', function (e) {
+    if ($('#message-title').val() == '' || $('#message-body').val() == '') {
+        return alert("Please fill out a title and a body");
+    }
+    var NewMessage = {};
+    NewMessage.channel_id = $('#message-channel').find(':selected').val().toString();
+    NewMessage.channel_name = $('#message-channel').find(':selected').text();
+    NewMessage.message = $("#message-body").val().toString();
+    NewMessage.pin = $("#message-pin").prop('checked');
+    NewMessage.title = $("#message-title").val().toString();
+    newMessage(NewMessage)
+        .then(message => {
+        $("#message-title").val("");
+        $("#message-pin").prop('checked', false);
+        $("#message-body").val("");
+        builTabContent(message);
     });
 });
-document.getElementById("new-message-submit-button").addEventListener('click', function (event) {
-    const titleDom = document.getElementById("message-title");
-    const channelDom = document.getElementById("message-channel");
-    const bodyDom = document.getElementById("message-body");
-    const pinDom = document.getElementById("message-pin");
-    const NewMessage = {};
-    if (titleDom.value == "" || bodyDom.value == "") {
-        alert("Please fill out a title and body");
-    }
-    else {
-        NewMessage.channel_id = channelDom.value;
-        NewMessage.channel_name = channelDom.options[channelDom.selectedIndex].text;
-        NewMessage.message = bodyDom.value;
-        NewMessage.pin = pinDom.checked;
-        NewMessage.title = titleDom.value;
-        newMessage(NewMessage)
-            .then(message => {
-            titleDom.value = "";
-            pinDom.checked = false;
-            bodyDom.value = "";
-            builTabContent(message);
-        });
-    }
+$('#guild-settings-button').on('click', function () {
+    getGuild()
+        .then(guild => {
+        $('#guild-max-level').val(`${guild.max_level}`);
+        $('#guild-handicap-cc').val(`${guild.handicap_cc}`);
+        $('#guild-max-characters').val(`${guild.max_characters}`);
+    });
 });
 function buildAnnouncementTable() {
     getGuild()
         .then(guild => {
-        let table = document.getElementById('announcement-table-body');
-        let ping = document.getElementById("announcement-ping");
-        table.innerHTML = "";
-        ping.checked = guild.ping_announcement;
+        $("#announcement-table-body").html('');
+        $("#announcement-ping").prop("checked", guild.ping_announcement);
         guild.weekly_announcement.forEach((announcement, index) => {
             let parts = announcement.split("|");
             let title = parts.length > 1 ? parts[0] : "None";
-            let link = document.createElement("a");
+            let link = document.createElement("button");
             let col1 = document.createElement("td");
-            link.href = "";
             link.classList.add("btn", "fa-solid", "fa-trash", "text-white", "announcement-delete");
             link.setAttribute("data-id", `${index}`);
             col1.appendChild(link);
@@ -151,7 +127,7 @@ function buildAnnouncementTable() {
             let row = document.createElement("tr");
             row.appendChild(col1);
             row.appendChild(col2);
-            table.appendChild(row);
+            $("#announcement-table-body").append(row);
         });
     });
 }
@@ -164,20 +140,16 @@ function buildMessageTab() {
     });
     getChannels()
         .then(channels => {
-        let select = document.getElementById("message-channel");
-        select.innerHTML = "";
+        $("#message-channel").html('');
         channels.forEach(channel => {
-            let option = document.createElement("option");
-            option.value = `${channel.id}`;
-            option.innerHTML = channel.name;
-            select.appendChild(option);
+            $("#message-channel").append(`
+                <option value="${channel.id}">${channel.name}</option>
+                `);
         });
     });
 }
 function builTabContent(message) {
-    let tabpanel = document.getElementById("messageTab");
-    let messageContent = document.getElementById("messageContent");
-    let button = document.createElement("button");
+    var button = document.createElement("button");
     button.classList.add("nav-link", "resolute");
     button.id = `${message.message_id}-tab`;
     button.setAttribute("data-bs-toggle", "tab");
@@ -187,8 +159,8 @@ function builTabContent(message) {
     button.setAttribute("aria-controls", `edit-${message.message_id}`);
     button.setAttribute("aria-selected", "false");
     button.innerHTML = message.title;
-    tabpanel.appendChild(button);
-    let pane = document.createElement("div");
+    $("#messageTab").append(button);
+    var pane = document.createElement("div");
     pane.classList.add("tab-pane", "fade");
     pane.id = `edit-${message.message_id}`;
     pane.role = "tabpanel";
@@ -208,7 +180,7 @@ function builTabContent(message) {
                         <select class="form-select" arial-label="Channel Select" id="${message.message_id}-channel" name="${message.message_id}-channel" disabled>
                             <option value="${message.channel_id}" selected>${message.channel_name}</option>
                         </select>
-                        <label for="${message.message_id}">Channel</label>
+                        <label for="${message.message_id}-channel">Channel</label>
                     </div>
                 </div>
 
@@ -227,10 +199,10 @@ function builTabContent(message) {
                 </div>
             </div>
             <div class="col-auto">
-                <button type="button" id="${message.message_id}-delete-button" class="btn btn-danger float-end m-3 message-delete" data-bs-target="#message-modal-delete-form" data-bs-toggle="modal">Delete</button>
-                <button type="button" id="${message.message_id}-edit-button" class="btn btn-primary float-end m-3 message-edit">Update</button>
+                <button type="button" id="${message.message_id}-delete-button" data-id="${message.message_id}" class="btn btn-danger float-end m-3 message-delete" data-bs-target="#message-modal-delete-form" data-bs-toggle="modal">Delete</button>
+                <button type="button" id="${message.message_id}-edit-button" data-id="${message.message_id}" class="btn btn-primary float-end m-3 message-edit">Update</button>
             </div>
         </div>
     `;
-    messageContent.appendChild(pane);
+    $("#messageContent").append(pane);
 }

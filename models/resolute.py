@@ -22,6 +22,7 @@ class ResoluteGuild(db.Model):
     div_limit: Mapped[int]
     weekly_announcement: Mapped[list[str]] = mapped_column(ARRAY(String))
     ping_announcement: Mapped[bool]
+    handicap_cc: Mapped[int]
 
     def __init__(self, **kwargs):
         self.id = DISCORD_GUILD_ID
@@ -32,6 +33,7 @@ class ResoluteGuild(db.Model):
         self.div_limit = kwargs.get('div_limit')
         self.weekly_announcement = kwargs.get('weekly_announcement')
         self.ping_announcement = kwargs.get('ping_announcement')
+        self.handicap_cc = kwargs.get('handicap_cc')
 
 class RefMessage(db.Model):
     __tablename__ = "ref_messages"

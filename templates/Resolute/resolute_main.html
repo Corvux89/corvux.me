@@ -25,6 +25,9 @@
         <button class="nav-link resolute" id="bot-messages-button" data-bs-toggle="tab"
             data-bs-target="#bot-messages-tab" type="button" role="tab" aria-selected="true"
             aria-controls="bot-messages-tab">Bot Posts</button>
+
+        <!-- <button class="nav-link resolute" id="guild-settings-button" data-bs-toggle="tab" data-bs-target="#guild-settings-tab"
+            type="button" role="tab" aria-selected="true" aria-controls="guild-settings-tab">Guild Settings</button> -->
     </div>
 </nav>
 
@@ -112,6 +115,34 @@
                         <button type="button" id="new-message-submit-button" class="btn btn-primary float-end m-3">
                             Submit
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guild Settings -->
+    <div class="tab-pane fade" id="guild-settings-tab" role="tabpanel" aria-labelledby="guild-settings-button" tabindex="0">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-3">
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="guild-max-level">
+                        <label for="guild-max-level">Max Level</label>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="guild-max-characters">
+                        <label for="guild-max-characters">Max Characters</label>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="guild-handicap-cc">
+                        <label for="guild-handicap-cc">Handicap CC</label>
                     </div>
                 </div>
             </div>

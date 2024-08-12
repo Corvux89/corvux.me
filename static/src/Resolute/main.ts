@@ -142,24 +142,24 @@ function buildAnnouncementTable(){
             let parts = announcement.split("|")
             let title = parts.length > 1 ? parts[0] : "None"
 
-            let link = document.createElement("button")
-            let col1 = document.createElement("td")
+            let button = jQuery("<button>")
+                .addClass("btn fa-solid fa-trash text-white announcement-delete")
+                .data("id", `${index}`)
 
-            link.classList.add("btn", "fa-solid", "fa-trash", "text-white", "announcement-delete")
-            link.setAttribute("data-id", `${index}`)
-            col1.appendChild(link)
+            let col1 = jQuery("<td>")
+                .append(button)
 
-            let col2 = document.createElement("td")
-            col2.classList.add("open-edit")
-            col2.setAttribute("data-bs-toggle", "modal")
-            col2.setAttribute("data-bs-target", "#announcement-modal-edit-form")
-            col2.setAttribute("data-id", `${index}`)
-            col2.innerHTML = title
 
-            let row = document.createElement("tr")
-            row.appendChild(col1)
-            row.appendChild(col2)
+            let col2 = jQuery("<td>")
+                .addClass("open-edit")
+                .attr("data-bs-toggle", "modal")
+                .attr("data-bs-target", "#announcement-modal-edit-form")
+                .data("id", `${index}`)
+                .html(title)
 
+            let row = jQuery("<tr>")
+                .append(col1)
+                .append(col2)
             $("#announcement-table-body").append(row)
         })
     })
@@ -184,27 +184,27 @@ function buildMessageTab(){
     })
 }
 
-function builTabContent(message: RefMessage): void{    
-    var button = document.createElement("button")
-    button.classList.add("nav-link", "resolute")
-    button.id = `${message.message_id}-tab`
-    button.setAttribute("data-bs-toggle", "tab")
-    button.setAttribute("data-bs-target", `#edit-${message.message_id}`)
-    button.type = "button"
-    button.role = "tab"
-    button.setAttribute("aria-controls", `edit-${message.message_id}`)
-    button.setAttribute("aria-selected", "false")
-    button.innerHTML=message.title
-    $("#messageTab").append(button)
+function builTabContent(message: RefMessage): void{
+    let button = jQuery("<button>")
+        .addClass("nav-link resolute")
+        .attr("id", `${message.message_id}-tab`)
+        .attr("type", "button")
+        .attr("role", "tab")
+        .attr("aria-controls", `edit-${message.message_id}`)
+        .attr("aria-selected", "false")
+        .attr("data-bs-toggle", "tab")
+        .attr("data-bs-target", `#edit-${message.message_id}`)
+        .html(message.title)
     
-    var pane = document.createElement("div")
-    pane.classList.add("tab-pane", "fade")
-    pane.id = `edit-${message.message_id}`
-    pane.role = "tabpanel"
-    pane.setAttribute("aria-labelledby", `${message.message_id}-tab`)
-    pane.tabIndex = 0
+    $("#messageTab").append(button)
 
-    pane.innerHTML = `
+    let pane = jQuery("<div>")
+        .addClass("tab-pane fade")
+        .attr("id", `edit-${message.message_id}`)
+        .attr("role", "tabpanel")
+        .attr("aria-labelledby", `${message.message_id}-tab`)
+        .attr("tabIndex", 0)
+        .html(`
         <div class="container-fluid m-2">
             <div class="row mb-3">
                 <div class="form-floating">
@@ -241,8 +241,8 @@ function builTabContent(message: RefMessage): void{
                 <button type="button" id="${message.message_id}-edit-button" data-id="${message.message_id}" class="btn btn-primary float-end m-3 message-edit">Update</button>
             </div>
         </div>
-    `
-
+    `)
+   
     $("#messageContent").append(pane)
 }
 

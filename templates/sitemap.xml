@@ -6,16 +6,20 @@
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
     {% for url in static_urls %}
+    {% if 'api' not in url["loc"] and 'auth' not in url["loc"]%}
     <url>
         <loc>{{ url["loc"] }}</loc>
     </url>
+    {% endif %}
     {% endfor %}
 
     {% for url in dynamic_urls %}
+    {% if 'api' not in url["loc"] and 'auth' not in url["loc"] %}
     <url>
         <loc>{{ url["loc"] }}</loc>
         <lastmod>{{ url["lastmod"] }}</lastmod>
     </url>
+    {% endif %}
     {% endfor %}
 
 </urlset>

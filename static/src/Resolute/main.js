@@ -40,9 +40,7 @@ $(document).on('click', '.message-edit', function (e) {
     message.pin = $(`#${message.message_id}-pin`).prop("checked");
     updateMessage(message)
         .then(() => {
-        //@ts-ignore
-        let toastAlert = new bootstrap.Toast($("#confirm-toast"));
-        toastAlert.show();
+        $("#confirm-toast").toast("show");
     });
 });
 $(document).on('click', '.message-delete', function () {
@@ -54,9 +52,10 @@ $("#message-delete-button").on('click', function () {
     deleteMessage(message_id);
     $(`#${message_id}-tab`).remove();
     $(`#edit-${message_id}`).remove();
-    $("#new-message-tab").addClass("active");
-    $("#new-message-tab").attr("aria-selected", "true");
-    $("#new-message").addClass("show active");
+    // $("#new-message-tab").addClass("active")
+    // $("#new-message-tab").attr("aria-selected", "true")
+    // $("#new-message").addClass("show active")
+    $("#new-message-tab").tab("show");
 });
 $("#announcement-new-button").on('click', function () {
     $("#announcement-modal-edit-form").data('id', "new");
@@ -159,16 +158,6 @@ function builTabContent(message) {
         .attr("data-bs-toggle", "tab")
         .attr("data-bs-target", `#edit-${message.message_id}`)
         .html(message.title);
-    // let button = document.createElement("button")
-    // button.classList.add("nav-link", "resolute")
-    // button.id = `${message.message_id}-tab`
-    // button.setAttribute("data-bs-toggle", "tab")
-    // button.setAttribute("data-bs-target", `#edit-${message.message_id}`)
-    // button.type = "button"
-    // button.role = "tab"
-    // button.setAttribute("aria-controls", `edit-${message.message_id}`)
-    // button.setAttribute("aria-selected", "false")
-    // button.innerHTML=message.title
     $("#messageTab").append(button);
     let pane = jQuery("<div>")
         .addClass("tab-pane fade")
@@ -214,47 +203,5 @@ function builTabContent(message) {
             </div>
         </div>
     `);
-    // let pane = document.createElement("div")
-    // pane.classList.add("tab-pane", "fade")
-    // pane.id = `edit-${message.message_id}`
-    // pane.role = "tabpanel"
-    // pane.setAttribute("aria-labelledby", `${message.message_id}-tab`)
-    // pane.tabIndex = 0
-    // pane.innerHTML = `
-    //     <div class="container-fluid m-2">
-    //         <div class="row mb-3">
-    //             <div class="form-floating">
-    //                 <input type="text" class="form-control" id="${message.message_id}-title" name="${message.message_id}-title" required value="${message.title}">
-    //                 <label for="${message.message_id}-title">Post Title/Description</label>
-    //             </div>
-    //         </div>
-    //         <div class="row mb-3">
-    //             <div class="col-sm">
-    //                 <div class="form-floating">
-    //                     <select class="form-select" arial-label="Channel Select" id="${message.message_id}-channel" name="${message.message_id}-channel" disabled>
-    //                         <option value="${message.channel_id}" selected>${message.channel_name}</option>
-    //                     </select>
-    //                     <label for="${message.message_id}-channel">Channel</label>
-    //                 </div>
-    //             </div>
-    //             <div class="col-sm">
-    //                 <div class="form-check form-check-inline">
-    //                     <input class="form-check-input" type="checkbox" id="${message.message_id}-pin" name="${message.message_id}-pin" ${message.pin == true ? 'checked':''}>
-    //                     <label class="form-check-label text-white" for="${message.message_id}-pin">Pin Message?</label> 
-    //                 </div>
-    //             </div>
-    //         </div>
-    //         <div class="row mb-3">
-    //             <div class="form-floating">
-    //                 <textarea id="${message.message_id}-body" class="form-control big-edit-body" required maxlength="2000">${message.content}</textarea>
-    //                 <label for="${message.message_id}-body">Message</label>
-    //             </div>
-    //         </div>
-    //         <div class="col-auto">
-    //             <button type="button" id="${message.message_id}-delete-button" data-id="${message.message_id}" class="btn btn-danger float-end m-3 message-delete" data-bs-target="#message-modal-delete-form" data-bs-toggle="modal">Delete</button>
-    //             <button type="button" id="${message.message_id}-edit-button" data-id="${message.message_id}" class="btn btn-primary float-end m-3 message-edit">Update</button>
-    //         </div>
-    //     </div>
-    // `
     $("#messageContent").append(pane);
 }

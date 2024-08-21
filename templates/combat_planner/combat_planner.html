@@ -15,15 +15,15 @@
     </div>
 
     <!-- Delete Plan Button -->
-    <button class="btn btn-danger m-2 reset-button" role="button" id="reset-plan" title="Delete Plan" hidden><i class="fa-solid fa-trash"></i></button>
+    <button class="btn btn-danger m-2" role="button" id="delete-plan" title="Delete Plan" hidden><i class="fa-solid fa-trash"></i></button>
 
     <!-- Save Plan Button Icon -->
-    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#saveModal" title="Save plan" id="savePlanButton">
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#saveModal" title="Save plan" id="save-plan-button">
         <i class="fa-solid fa-floppy-disk"></i>
     </button>
 
     <!-- Export Button Icon-->
-    <button type="button" class="btn btn-primary m-2 copy-button" id="export-planner" title="Export Build"><i class="fa-solid fa-file-export"></i></button>
+    <button type="button" class="btn btn-primary m-2" id="export-planner" title="Export Build"><i class="fa-solid fa-file-export"></i></button>
 
     <!-- General Settings Button Icon -->
     <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal" title="General Settings">
@@ -38,13 +38,13 @@
 
 <!-- Nav Tabs -->
 <nav>
-    <div class="nav nav-tabs complanner-tabs m-2" id="complannerTab" role="tablist">
-        <button class="nav-link active complanner" id="inventory-tab" data-bs-toggle="tab"
+    <div class="nav nav-tabs combat-planner-tabs m-2" id="combat-plannerTab" role="tablist">
+        <button class="nav-link active combat-planner" id="inventory-tab" data-bs-toggle="tab"
                 data-bs-target="#main-tab"
                 type="button" role="tab" aria-selected="true" aria-controls="main-tab">Monster Inventory
         </button>
 
-        <button class="nav-link complanner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
+        <button class="nav-link combat-planner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
                 type="button"
                 role="tab" aria-selected="true" aria-controls="map-planner">Map Planner
         </button>
@@ -52,7 +52,7 @@
 </nav>
 
 <!-- Tab Content -->
-<div class="tab-content" id="complannerTabContent">
+<div class="tab-content" id="combat-plannerTabContent">
 
     <!--    Main  Tab   -->
     <div class="tab-pane fade show active" id="main-tab" role="tabpanel" aria-labelledby="inventory-tab"
@@ -82,7 +82,7 @@
                     </button>
                 </div>
             </div>
-            <div id="mapPreview" class="text-center" hidden></div>
+            <div id="map-preview" class="text-center" hidden></div>
         </div>
     </div>
 

@@ -13,10 +13,8 @@
                     <div class="row border rounded border-success bg-light" id="overlay-header" hidden>
                         <div class="col-sm">
                             <p class="text-black">Avrae Command String</p>
-                            <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2"></div>
-                        </div>
-                        <div class="col-1 m-0 p-0">
-                            <button class="btn copy-button" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="btn copy-button pe-2 me-2 float-end" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
+                            <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2 command"></div>
                         </div>
                     </div>
                     <form method="dialog" id="overlay-setup">
@@ -24,22 +22,22 @@
                             <div class="row m-2">
                                 <div class="col-sm-5 mb-3">
                                     <div class="form-floating">
-                                        <select class="form-select" arial-label="Overlay Type" id="map-overlayType"
-                                                name="map-overlay-type">
+                                        <select class="form-select default-focus" arial-label="Overlay Type" id="map-overlay-type"
+                                                name="type">
                                             <option value="" selected></option>
-                                            <option value="circle">Circle</option>
-                                            <option value="cone">Cone</option>
-                                            <option value="line">Line</option>
-                                            <option value="square">Square</option>
+                                            <option value="Circle">Circle</option>
+                                            <option value="Cone">Cone</option>
+                                            <option value="Line">Line</option>
+                                            <option value="Square">Square</option>
                                         </select>
-                                        <label for="map-overlayType">Overlay</label>
+                                        <label for="map-overlay-type">Overlay</label>
                                     </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="map-overlayTarget"
-                                               name="map-overlay-target" placeholder="Target">
-                                        <label for="map-overlayTarget">Target</label>
+                                        <input type="text" class="form-control" id="map-overlay-target"
+                                               name="target" placeholder="Target">
+                                        <label for="map-overlay-target">Target</label>
                                     </div>
                                 </div>
                             </div>

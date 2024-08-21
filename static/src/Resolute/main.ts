@@ -49,9 +49,7 @@ $(document).on('click', '.message-edit', function(e){
 
     updateMessage(message)
     .then(() => {
-        //@ts-ignore
-        let toastAlert = new bootstrap.Toast($("#confirm-toast"))
-        toastAlert.show()
+        $("#confirm-toast").toast("show")
     })
 })
 
@@ -67,9 +65,7 @@ $("#message-delete-button").on('click', function(){
     $(`#${message_id}-tab`).remove()
     $(`#edit-${message_id}`).remove()
 
-    $("#new-message-tab").addClass("active")
-    $("#new-message-tab").attr("aria-selected", "true")
-    $("#new-message").addClass("show active")
+    $("#new-message-tab").tab("show")
     
 })
 
@@ -245,6 +241,3 @@ function builTabContent(message: RefMessage): void{
    
     $("#messageContent").append(pane)
 }
-
-
-

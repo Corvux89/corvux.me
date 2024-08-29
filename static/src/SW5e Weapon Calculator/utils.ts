@@ -1,4 +1,4 @@
-import { Field, Note, SavedBuilds, Tab, Weapon, Weight } from "./types.js"
+import { Field, Note, SavedBuilds, Tab, Weight } from "./types.js"
 
 export function getTabs(): Promise<Tab[]>{
     return fetch(`${window.location.href.replace("#/","")}api/fields`)

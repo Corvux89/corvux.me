@@ -249,7 +249,6 @@ $("#map-setup :input").map(function () {
     target.val(battlemap[target.attr("name")]);
 });
 $(document).on("DOMContentLoaded", function () {
-    // $(".settings").trigger("change")
     buildMapPreview();
     $(document).on("keydown", function (e) {
         if (e.ctrlKey) {

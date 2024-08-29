@@ -302,8 +302,6 @@ $("#map-setup :input").map(function() {
 
 
 $(document).on("DOMContentLoaded", function() {
-    // $(".settings").trigger("change")
-
     buildMapPreview()
 
     $(document).on("keydown", function(e) {

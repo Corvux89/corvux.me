@@ -4,6 +4,8 @@
     "allowJs": true,
     "target": "ES2020",
     "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "module": "NodeNext"
   },
   "include": ["./static/src/**/*"]

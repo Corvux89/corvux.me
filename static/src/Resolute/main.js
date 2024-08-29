@@ -52,9 +52,6 @@ $("#message-delete-button").on('click', function () {
     deleteMessage(message_id);
     $(`#${message_id}-tab`).remove();
     $(`#edit-${message_id}`).remove();
-    // $("#new-message-tab").addClass("active")
-    // $("#new-message-tab").attr("aria-selected", "true")
-    // $("#new-message").addClass("show active")
     $("#new-message-tab").tab("show");
 });
 $("#announcement-new-button").on('click', function () {

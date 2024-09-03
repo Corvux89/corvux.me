@@ -1,3 +1,4 @@
+import { ToastError } from "./main.js";
 const guild_url = `${window.location.href}api/guild`;
 const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;
@@ -18,6 +19,7 @@ export function updateGuild(guild) {
                 resolve(this.response.responseText);
             }
             else {
+                ToastError(this.response);
                 resolve(null);
             }
         };
@@ -44,6 +46,7 @@ export function newMessage(message) {
                 resolve(JSON.parse(this.responseText));
             }
             else {
+                ToastError(this.response);
                 resolve(null);
             }
         };
@@ -63,6 +66,7 @@ export function updateMessage(message) {
                 resolve(this.response.responseText);
             }
             else {
+                ToastError(this.response);
                 resolve(null);
             }
         };

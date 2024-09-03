@@ -48,6 +48,15 @@ class RefMessage(db.Model):
         self.channel_id = kwargs.get('channel_id')
         self.title = kwargs.get('title')
 
+class Character(db.Model):
+    __tablename__ = "characters"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    guild_id: Mapped[int]
+    player_id: Mapped[int]
+    name: Mapped[str]
+    level: Mapped[int]
+    active: Mapped[bool]
+
 class BotMessage():
     def __init__(self, message_id: str, channel_id: str, channel_name: str, title: str, content: str, **kwargs):
         self.message_id = message_id
@@ -57,7 +66,6 @@ class BotMessage():
         self.title = title
         self.pin = kwargs.get('pin', False)
         self.error = kwargs.get("error", "")
-
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):

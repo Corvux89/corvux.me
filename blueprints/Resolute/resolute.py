@@ -1,9 +1,10 @@
-from flask import Blueprint, Flask, abort, current_app, render_template, request, jsonify
+from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_, func
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
-from models.resolute import BotMessage, RefMessage, ResoluteGuild
+from models.resolute import BotMessage, Character, RefMessage, ResoluteGuild
 
 
 resolute_blueprint = Blueprint('resolute', __name__)
@@ -30,9 +31,21 @@ def upsert_guild():
     elif request.method == 'PATCH':
         update_guild = ResoluteGuild(**request.get_json())
 
+        # Validation        
+        if db.session.query(Character).filter(and_(Character.guild_id == DISCORD_GUILD_ID,
+                                                                              Character.active == True,
+                                                                              Character.level > update_guild.max_level)).count() > 0:
+            abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
+        elif db.session.query(Character.player_id,
+                              func.count(Character.player_id).label('count')).filter(and_(Character.guild_id == DISCORD_GUILD_ID, Character.active == True))\
+                              .group_by(Character.player_id).having(func.count(Character.player_id)>update_guild.max_characters).count() > 0:
+            abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
+
         guild.weekly_announcement = update_guild.weekly_announcement
         guild.ping_announcement = update_guild.ping_announcement
         guild.max_level = update_guild.max_level
+        guild.handicap_cc = update_guild.handicap_cc
+        guild.max_characters = update_guild.max_characters
         
         db.session.commit()
     

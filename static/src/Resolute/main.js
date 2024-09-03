@@ -77,7 +77,8 @@ $("#announcement-submit-button").on('click', function () {
 });
 $('#new-message-submit-button').on('click', function (e) {
     if ($('#message-title').val() == '' || $('#message-body').val() == '') {
-        return alert("Please fill out a title and a body");
+        ToastError("Please fill out a title and a body");
+        return;
     }
     var NewMessage = {};
     NewMessage.channel_id = $('#message-channel').find(':selected').val().toString();
@@ -99,6 +100,17 @@ $('#guild-settings-button').on('click', function () {
         $('#guild-max-level').val(`${guild.max_level}`);
         $('#guild-handicap-cc').val(`${guild.handicap_cc}`);
         $('#guild-max-characters').val(`${guild.max_characters}`);
+    });
+});
+$('#guild-settings-save-button').on('click', function () {
+    getGuild()
+        .then(guild => {
+        if (!$('#guild-max-level').val())
+            ToastError("Please enter in a max level");
+        guild.max_level = Number($('#guild-max-level').val());
+        guild.max_characters = $("#guild-max-characters").val() ? Number($("#guild-max-characters").val()) : 1;
+        guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0;
+        updateGuild(guild);
     });
 });
 function buildAnnouncementTable() {
@@ -201,4 +213,8 @@ function builTabContent(message) {
         </div>
     `);
     $("#messageContent").append(pane);
+}
+export function ToastError(message) {
+    $("#error-toast-message").html(message);
+    $("#error-toast").toast("show");
 }

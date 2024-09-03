@@ -13,6 +13,13 @@
             <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
+
+    <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="error-toast" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body" id="error-toast-message"></div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
 </div>
 
 <!-- Nav Tabs-->
@@ -26,8 +33,8 @@
             data-bs-target="#bot-messages-tab" type="button" role="tab" aria-selected="true"
             aria-controls="bot-messages-tab">Bot Posts</button>
 
-        <!-- <button class="nav-link resolute" id="guild-settings-button" data-bs-toggle="tab" data-bs-target="#guild-settings-tab"
-            type="button" role="tab" aria-selected="true" aria-controls="guild-settings-tab">Guild Settings</button> -->
+        <button class="nav-link resolute" id="guild-settings-button" data-bs-toggle="tab" data-bs-target="#guild-settings-tab"
+            type="button" role="tab" aria-selected="true" aria-controls="guild-settings-tab">Guild Settings</button>
     </div>
 </nav>
 
@@ -146,6 +153,10 @@
                     </div>
                 </div>
             </div>
+
+            <button type="button" id="guild-settings-save-button" class="btn btn-primary float-begin m-3">
+                Save
+            </button>
         </div>
     </div>
 </div>

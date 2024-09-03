@@ -1,3 +1,4 @@
+import { ToastError } from "./main.js"
 import { DiscordChannel, NewMessage, RefMessage, ResoluteGuild } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
@@ -23,6 +24,7 @@ export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
             if (request.status == 200){
                 resolve(this.response.responseText)
             } else {
+                ToastError(this.response)
                 resolve(null)
             }
         }
@@ -54,6 +56,7 @@ export function newMessage(message: NewMessage): Promise<RefMessage>{
             if (request.status == 200){
                 resolve(JSON.parse(this.responseText))
             } else {
+                ToastError(this.response)
                 resolve(null)
             }
         }
@@ -77,6 +80,7 @@ export function updateMessage(message: RefMessage): Promise<RefMessage>{
             if (request.status == 200){
                 resolve(this.response.responseText)
             } else {
+                ToastError(this.response)
                 resolve(null)
             }
         }

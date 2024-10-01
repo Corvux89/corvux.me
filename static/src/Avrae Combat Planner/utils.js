@@ -98,7 +98,7 @@ export function buildMapPreview() {
         }
     });
     if (battlemap.url != "" || battlemap.size != "" || monsterOnMap) {
-        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@${battlemap.csettings}` : ""}`;
+        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`;
         // Monster Placement
         monsters.forEach(monster => {
             for (let i = 0; i < monster.quantity; i++) {

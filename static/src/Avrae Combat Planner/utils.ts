@@ -124,7 +124,7 @@ export function buildMapPreview() :void {
     })
 
     if (battlemap.url != "" || battlemap.size != "" || monsterOnMap){
-        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@${battlemap.csettings}` : ""}`
+        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`
         
         // Monster Placement
         monsters.forEach(monster => {

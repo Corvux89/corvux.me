@@ -177,7 +177,7 @@ export class Monster {
                 if (monster.coords[i] == null || monster.coords[i] == "") {
                     continue;
                 }
-                let str = ` -t "${monster.combatID(i + 1)}|${monster.coords[i]}|${monster.size}|${monster.color}|${monster.token}"`;
+                let str = ` -t "${monster.combatID(i + 1)}|${monster.coords[i]}|${monster.size}|${monster.color}|$${monster.token}"`;
                 coords.push(str);
             }
         });

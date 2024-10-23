@@ -257,11 +257,11 @@ export class Monster{
             if (settings.notes){
                 monster.coords.forEach(coord =>  {
                     let notes: string[] = []
+                    if (coord) notes.push(`Location: ${coord}`)
+                    if (monster.size) notes.push(`Size: ${monster.size} (${MonsterSizes[monster.size]})`)
+                    if (monster.color) notes.push(`Color: ${monster.color} (${Colors[monster.color].toLowerCase()})`)
                     if (monster.token) notes.push(`Token: ${monster.token}`)
-                    if (monster.size) notes.push(`Size: ${monster.size}`)
-                    if (monster.color) notes.push(`Color: ${monster.color}`)
-                    if (coord) notes.push(`Location ${coord}`)
-                    if (notes.length > 0) commands.push(`${baseCommand}${name} -note "${notes.join('|')}"${args}`)
+                    if (notes.length > 0) commands.push(`${baseCommand}${name} -note "${notes.join(' | ')}"${args}`)
                 })
             } else {
                 let quantity = monster.quantity > 1 ? ` -n ${monster.quantity}` : ""

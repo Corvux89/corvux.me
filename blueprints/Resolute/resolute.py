@@ -161,11 +161,165 @@ def get_channels():
 
     return jsonify(clean_out)
 
+@resolute_blueprint.route('/api/players', methods=["GET"])
+def get_players():
+    db: SQLAlchemy = current_app.config.get('DB')
+    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+    members = get_members_from_cache()
+
+    players: list[Player] = (db.session.query(Player)
+                             .filter(Player.guild_id == DISCORD_GUILD_ID)
+                             .options(joinedload(Player.characters))
+                             .all())
+    
+    for p in players:
+        p.member = next((m for m in members if int(m["user"]["id"]) == p.id), None)
 
 
+    return jsonify(players)
+
+@resolute_blueprint.route('/api/logs', methods=["GET", "POST"])
+def get_logs():
+    db: SQLAlchemy = current_app.config.get('DB')
+    members = get_members_from_cache()
+
+    if request.method == "POST":
+        draw = int(request.json.get('draw', 1))
+        start = int(request.json.get('start', 0))
+        length = int(request.json.get('length', 10))
+        order = request.json.get('order', [])
+        search_value = request.json.get('search', {}).get('value', '')
+        column_index = int(order[0].get('column', 0))
+        column_dir = order[0].get('dir', 'asc')
+
+        member_filter = []
+        if search_value:
+            for member in members:
+                user = member.get('user', {})
+                nick = member.get('nick', '') or ''
+                global_name = user.get('global_name', '') or ''
+                username = user.get('username', '') or ''
+            
+                if (search_value.lower() in nick.lower() or
+                    search_value.lower() in global_name.lower() or
+                    search_value.lower() in username.lower()):
+                    member_filter.append(int(user.get('id')))
+
+        query = (db.session.query(Log)
+             .filter(Log.guild_id == DISCORD_GUILD_ID)
+             .options(
+                 joinedload(Log.activity_record), 
+                 joinedload(Log.faction_record),
+                 joinedload(Log.character_record)))
+        
+        recordsTotal = query.count()
+
+        # Apply search filter
+        search_filter = []
+        if search_value:
+            search_filter.append(cast(Log.id, String).like(f"%{search_value}%"))
+            search_filter.append(Log.notes.ilike(f"%{search_value}%"))
+            search_filter.append(func.to_char(Log.created_ts.cast(Date), "FMmm/FMdd/YYYY").like(f"%{search_value}%"))
+            search_filter.append(Log.character_record.has(Character.name.ilike(f"%{search_value}%")))
+            search_filter.append(Log.activity_record.has(Activity.value.ilike(f"%{search_value}%")))
+
+            # Filter by member IDs if any matched
+            if member_filter:
+                search_filter.append(Log.player_id.in_(member_filter))
+
+            query = query.filter(or_(*search_filter))
+
+        # Query Sorting
+        columns = [Log.id, Log.created_ts, None, None, None, None, Log.notes, Log.invalid]
+        column = columns[column_index]
+        if column:
+            query = query.order_by(desc(column)) if column_dir == 'desc' else query.order_by(asc(column))
+
+        # Finish out the query
+        filtered_records = query.count()
+        logs = query.all()
+
+        # Add in discord stuff
+        for log in logs:
+            log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
+            log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
+
+        # Post query sorting
+        if column_index == 2: #Author
+            logs = sorted(logs,
+                          key=lambda log: (log.author_record.get("nick") or log.author_record.get('user', {}).get("global_name") or log.author_record.get('user', {}).get("username") if log.author_record else "zzz"),
+                          reverse=(column_dir == "desc"))
+            
+        elif column_index == 3: # Player
+            logs = sorted(logs,
+                          key=lambda log: (log.member.get("nick") or log.member.get('user', {}).get("global_name") or log.member.get('user', {}).get("username") if log.member else "zzz"),
+                          reverse=(column_dir == "desc"))
+        
+        elif column_index == 4: # Character
+            logs = sorted(logs,
+                          key=lambda log: (log.character_record.name if log.character_record else 'zzz'),
+                          reverse=(column_dir == "desc"))
+            
+        elif column_index == 5: # Activity
+            logs = sorted(logs,
+                          key=lambda log: log.activity_record.value,
+                          reverse=(column_dir == "desc"))
 
 
+        # Limit
+        logs = logs[start:start+length]
+
+        response = {
+            'draw': draw,
+            'recordsTotal': recordsTotal,
+            'recordsFiltered': filtered_records,
+            'data': logs
+        }
+
+        return jsonify(response)
+        
 
 
+    logs: list[Log] = (db.session.query(Log)
+                    .filter(Log.guild_id == DISCORD_GUILD_ID)
+                    .options(
+                        joinedload(Log.activity_record),
+                        joinedload(Log.faction_record)
+                        )
+                        .order_by(desc(Log.id))
+                    .all()
+                    )
+    
+    for log in logs:
+        log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
+        log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
+    
+
+    return jsonify(logs)
+
+@resolute_blueprint.route('/api/activities', methods=['GET', 'PATCH'])
+def get_activites():
+    db: SQLAlchemy = current_app.config.get('DB')
+    activities: list[Activity] = (db.session.query(Activity)
+                                    .order_by(asc(Activity.id))
+                                    .all()
+                                    )
+
+    if request.method == "GET":
+        return jsonify(activities)   
+    
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        for act in update_data:
+            activity = next((a for a in activities if a.id == act["id"]), None)        
+            activity.cc = act["cc"]
+            activity.diversion = act["diversion"]
+            activity.points = act["points"]
+
+        db.session.commit()
+
+        return jsonify(200)
+        
 
 

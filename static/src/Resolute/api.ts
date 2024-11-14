@@ -1,9 +1,12 @@
 import { ToastError } from "./main.js"
-import { DiscordChannel, NewMessage, RefMessage, ResoluteGuild } from "./types.js"
+import { Activity, DiscordChannel, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
 const message_url = `${window.location.href}api/message`
 const channel_url = `${window.location.href}api/channels`
+const log_url = `${window.location.href}api/logs`
+const activity_url = `${window.location.href}api/activities`
+const player_url = `${window.location.href}api/players`
 
 export function getGuild(): Promise<ResoluteGuild>{
     return fetch(guild_url)
@@ -121,5 +124,58 @@ export function getChannels(): Promise<DiscordChannel[]>{
     .then(res => res.json())
     .then(res => {
         return res as DiscordChannel[]
+    })
+}
+
+export function getLogs(): Promise<Log[]>{
+    return fetch(log_url)
+    .then(res => res.json())
+    .then(res => {
+        res.forEach(log => {
+            log.created_ts = new Date(log.created_ts).toLocaleString()
+        })
+        
+        return res as Log[]
+    })
+    
+}
+
+export function getActivities(): Promise<Activity[]>{
+    return fetch(activity_url)
+    .then(res => res.json())
+    .then(res => {
+        return res as Activity[]
+    })
+}
+
+export function updateActivities(activities: Activity[]): Promise<Activity[]>{
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest()
+
+        request.open('PATCH', activity_url, true)
+        request.setRequestHeader('Content-Type', 'application/json')
+
+        request.onload = function () {
+            if (request.status == 200){
+                resolve(this.response.responseText)
+            } else {
+                ToastError(this.response)
+                resolve(null)
+            }
+        }
+
+        request.onerror = function () {
+            reject(new Error("Something went wrong"))
+        }
+
+        request.send(JSON.stringify(activities))
+    })
+}
+
+export function getPlayers(): Promise<Player[]>{
+    return fetch(player_url)
+    .then(res => res.json())
+    .then(res => {
+        return res as Player[]
     })
 }

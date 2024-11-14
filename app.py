@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, send_from_directory
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
@@ -65,8 +65,12 @@ def site_map():
 def not_found(e):
     return render_template("404.html")
 
-
 csp = get_csp()
+
+@app.route('/static/<path:filename>')
+def custom_static(filename):
+    print('here')
+    return send_from_directory('static', filename, mimetype='application/javascript')
 
 Bootstrap(app)
 talisman = Talisman(

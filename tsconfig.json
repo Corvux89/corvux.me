@@ -6,7 +6,8 @@
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "lib": ["DOM", "ESNext"]
   },
   "include": ["./static/src/**/*"]
 }

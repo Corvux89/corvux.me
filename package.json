@@ -9,6 +9,7 @@
   "devDependencies": {
     "@popperjs/core": "^2.11.8",
     "@types/bootstrap": "^5.2.10",
+    "@types/datatables.net": "^1.12.3",
     "@types/jquery": "^3.5.29",
     "@types/node": "^22.5.0",
     "mathjs": "^13.1.1",

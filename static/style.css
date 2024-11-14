@@ -26,7 +26,7 @@ body{
     color: #d5e0e7;
 }
 
-.nav-link.sw5ecalc, .nav-link.resolute, .nav-link.combat-planner{
+.nav-link.sw5ecalc, .nav-link.resolute, .nav-link.combat-planner, .nav-link.silver{
     background-color: silver;
 }
 
@@ -76,7 +76,7 @@ body{
     color: #ff0000;
 }
 
-.announcement-table{
+.announcement-table, .log-table, .activity-table, .selectable{
     cursor: pointer;
 }
 
@@ -88,4 +88,36 @@ body{
 
 .toasts{
     z-index: 3;
+}
+
+.dataTables_wrapper{
+    color: white !important;
+}
+
+.dataTables_filter, .dataTables_filter input{
+    color: white !important;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1050; 
+    display: none; 
+}
+
+body.busy .loading-overlay {
+    display: flex;
+    pointer-events: auto;
+}
+
+body:not(.busy) .loading-overlay {
+    display: none !important;
+}
+
+#player-modal .modal-content {
+    background-color: #2C2F33;
 }

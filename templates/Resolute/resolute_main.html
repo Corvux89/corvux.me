@@ -1,4 +1,8 @@
 {% extends "template.html" %} {% block body %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+
 <div class="container m-2 text-center">
     <h1>Resolute Management</h1>
 </div>
@@ -7,9 +11,7 @@
 <div class="toast-container position-fixed top-0 end-50 p-3">
     <div class="toast text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true" id="confirm-toast" data-bs-delay="3200">
         <div class="d-flex">
-            <div class="toast-body">
-                Message has been successfully updated!
-            </div>
+            <div class="toast-body"></div>
             <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
@@ -25,16 +27,24 @@
 <!-- Nav Tabs-->
 <nav>
     <div class="nav nav-pills m-2" id="resoluteTab" role="tablist">
-        <button class="nav-link active resolute" id="announcement-tab-button" data-bs-toggle="tab"
-            data-bs-target="#announcement-tab" type="button" role="tab" aria-selected="true"
-            aria-controls="announcement-tab">Weekly Announcements</button>
 
-        <button class="nav-link resolute" id="bot-messages-button" data-bs-toggle="tab"
-            data-bs-target="#bot-messages-tab" type="button" role="tab" aria-selected="true"
-            aria-controls="bot-messages-tab">Bot Posts</button>
+        <button-tab label-text="Weekly Announcements" controls="announcement-tab" 
+        custom-id="announcement-tab-button" active></button-tab>
 
-        <button class="nav-link resolute" id="guild-settings-button" data-bs-toggle="tab" data-bs-target="#guild-settings-tab"
-            type="button" role="tab" aria-selected="true" aria-controls="guild-settings-tab">Guild Settings</button>
+        <button-tab label-text="Bot Posts" controls="bot-messages-tab" 
+        custom-id="bot-messages-button"></button-tab>
+
+        <button-tab label-text="Guild Settings" controls="guild-settings-tab"
+        custom-id="guild-settings-button"></button-tab>
+
+        <button-tab label-text="Activities" controls="activity-settings-tab"
+        custom-id="activity-settings-button"></button-tab>
+
+        <button class="nav-link resolute" id="players-button" data-bs-toggle="tab" data-bs-target="#players-tab"
+            type="button" role="tab" aria-selected="true" aria-controls="players-tab">Players</button>
+
+        <button class="nav-link resolute" id="log-review-button" data-bs-toggle="tab" data-bs-target="#log-review-tab"
+            type="button" role="tab" aria-selected="true" aria-controls="log-review-tab">Log Review</button>
     </div>
 </nav>
 
@@ -90,11 +100,7 @@
                     aria-labelledby="new-message-tab" tabindex="0">
                     <div class="container-fluid m-2">
                         <div class="row mb-3 mt-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="message-title" name="message-title"
-                                    required>
-                                <label for="message-title">Post Title/Description</label>
-                            </div>
+                            <text-input label-text="Post Title/Description" custom-id="message-title" required></text-input>
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm">
@@ -133,30 +139,56 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-max-level">
-                        <label for="guild-max-level">Max Level</label>
-                    </div>
+                    <number-input label-text="Max Level" custom-id="guild-max-level"></number-input>
                 </div>
 
                 <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-max-characters">
-                        <label for="guild-max-characters">Max Characters</label>
-                    </div>
+                    <number-input label-text="Max Characters" custom-id="guild-max-characters"></number-input>
                 </div>
 
                 <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-handicap-cc">
-                        <label for="guild-handicap-cc">Handicap CC</label>
-                    </div>
+                    <number-input label-text="Handicap CC" custom-id="guild-handicap-cc"></number-input>
+                </div>
+
+                <div class="col-3">
+                    <number-input label-text="Diversion CC" custom-id="guild-div-cc"></number-input>
                 </div>
             </div>
 
             <button type="button" id="guild-settings-save-button" class="btn btn-primary float-begin m-3">
                 Save
             </button>
+        </div>
+    </div>
+
+    <!-- Activity Settings -->
+    <div class="tab-pane fade" id="activity-settings-tab" role="tabpanel" aria-labelledby="activity-settings-button" tabindex="0">
+        <div class="container-fluid">
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" id="activity-submit-button">Save Changes</button>
+                </div>
+            </div>
+            <table class="table table-striped table-dark table-condensed table-hover mb-0 log-table" id="activity-table"></table>
+        </div>
+    </div>
+
+    <!-- Players -->
+    <div class="tab-pane fade" id="players-tab" role="tabpanel" aria-labelledby="players-button" tabindex="0">
+        <div class="container-fluid">
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" id="player-submit-button">Save Changes</button>
+                </div>
+            </div>
+            <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable" id="player-table"></table>
+        </div>
+    </div>
+
+    <!-- Log Review -->
+    <div class="tab-pane fade" id="log-review-tab" role="tabpanel" aria-labelledby="log-review-button" tabindex="0">
+        <div class="container-fluid">
+            <table class="table table-striped table-dark table-condensed table-hover mb-0 log-table" id="log-table"></table>
         </div>
     </div>
 </div>
@@ -176,10 +208,7 @@
                 <div class="container">
                     <div class="row mb-2">
                         <div class="col-md">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="announcement-title" value="">
-                                <label for="announcement-title">Announcement Title</label>
-                            </div>
+                            <text-input label-text="Announcement Title" custom-id="announcement-title"></text-input>
                         </div>
                     </div>
                     <div class="row mb-2">
@@ -227,6 +256,92 @@
     </div>
 </div>
 
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
+<div class="modal fade" id="player-modal" tabindex="-1" role="dialog" aria-labelledby="playermodal" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-white">Player Information</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
+            <div class="modal-body">
+                <div class="nav nav-tabs resolute-tabs m-2" id="player-tabs" role="tablist">
+                    <button-tab label-text="Player Overview" controls="member-overview-tab"
+                    custom-id="member-overview-button" active></button-tab>
+
+                    <button-tab label-text="Characters" controls="character-overview-tab"
+                    custom-id="character-overview-button"></button-tab>
+                </div>
+
+                <div class="tab-content" id="player-content">
+                    <!-- Member Overview-->
+                    <div class="tab-pane fade show active" id="member-overview-tab" role="tabpanel" aria-labelledby="member-overview-button" tabindex="0">
+                        <div class="container-fluid">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <text-input label-text="Member ID" custom-id="member-id" disabled></text-input>
+                                </div>
+                                <div class="col">
+                                    <text-input label-text="Name" custom-id="member-name" disabled></text-input>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <number-input label-text="CC" custom-id="player-cc" disabled></number-input>
+                                </div>
+
+                                <div class="col">
+                                    <number-input label-text="Diversion CC" custom-id="player-div-cc" disabled></number-input>
+                                </div>
+
+                                <div class="col">
+                                    <number-input label-text="Activity Points" custom-id="player-act-points" disabled></number-input>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="nav nav-tabs resolute-tabs m-2" id="player-stats-tabs" role="tablist">
+                                    <button-tab label-text="Commands" controls="command-stats-tab"
+                                        custom-id="command-stats-button" active></button-tab>
+
+                                    <button-tab label-text="NPC" controls="npc-stats-tab"
+                                        custom-id="npc-stats-button"></button-tab>
+                                </div>
+
+                                <div class="tab-content" id="player-stats-content">
+                                    <div class="tab-pane fade show active" id="command-stats-tab" role="tabpanel" aria-labelledby="command-stats-button" tabindex="0">
+                                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable" id="stats-table"></table>
+                                    </div>
+
+                                    <div class="tab-pane fade show" id="npc-stats-tab" role="tabpanel" aria-labelledby="npc-stats-button" tabindex="0">
+                                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable" id="global-npc-table"></table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Characters -->
+                    <div class="tab-pane fade" id="character-overview-tab" role="tabpanel" aria-labelledby="character-overview-button" tabindex="0">
+                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable" id="character-table"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay d-flex justify-content-center align-items-center text-center">
+    <div class="spinner-border text-light" role="status" aria-hidden="true">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+
+
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
 {% endblock %}

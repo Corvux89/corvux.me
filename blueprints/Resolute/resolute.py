@@ -1,14 +1,12 @@
-import datetime
 import time
 from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Date, String, and_, case, cast, desc, func, asc, nulls_last, or_
+from sqlalchemy import Date, String, and_, cast, desc, func, asc, or_
 from constants import CACHE_TIMEOUT, DISCORD_GUILD_ID, LIMIT
 from helpers.auth_helper import is_admin
 from models.resolute import Activity, BotMessage, Character, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
-from sqlalchemy.dialects import postgresql
 
 
 resolute_blueprint = Blueprint('resolute', __name__)
@@ -255,12 +253,12 @@ def get_logs():
                           key=lambda log: (log.member.get("nick") or log.member.get('user', {}).get("global_name") or log.member.get('user', {}).get("username") if log.member else "zzz"),
                           reverse=(column_dir == "desc"))
         
-        elif column_index == 4: # Character
+        elif column_index == 4: # Character - Would be nice to get this pre-query
             logs = sorted(logs,
                           key=lambda log: (log.character_record.name if log.character_record else 'zzz'),
                           reverse=(column_dir == "desc"))
             
-        elif column_index == 5: # Activity
+        elif column_index == 5: # Activity - Would be nice to get this pre-query
             logs = sorted(logs,
                           key=lambda log: log.activity_record.value,
                           reverse=(column_dir == "desc"))

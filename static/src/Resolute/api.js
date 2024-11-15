@@ -1,4 +1,4 @@
-import { ToastError } from "./main.js";
+import { ToastError, ToastSuccess } from "./main.js";
 const guild_url = `${window.location.href}api/guild`;
 const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;
@@ -19,6 +19,7 @@ export function updateGuild(guild) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
+                ToastSuccess("Updated!");
                 resolve(this.response.responseText);
             }
             else {
@@ -66,6 +67,7 @@ export function updateMessage(message) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
+                ToastSuccess("Message has been successfully updated!");
                 resolve(this.response.responseText);
             }
             else {
@@ -89,6 +91,7 @@ export function deleteMessage(mesage_id) {
                 resolve(this.response.responseText);
             }
             else {
+                ToastError(this.response);
                 resolve(null);
             }
         };
@@ -129,6 +132,7 @@ export function updateActivities(activities) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
+                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
                 resolve(this.response.responseText);
             }
             else {

@@ -80,6 +80,7 @@ export interface Character{
     name: string,
     level: number,
     active: boolean
+    player_name?: string
 }
 
 export interface Player{

@@ -98,7 +98,7 @@ body{
     color: white !important;
 }
 
-.loading-overlay {
+.loading-overlay{
     position: fixed;
     top: 0;
     left: 0;
@@ -121,3 +121,21 @@ body:not(.busy) .loading-overlay {
 #player-modal .modal-content {
     background-color: #2C2F33;
 }
+
+.wide-table {
+    width: 100% !important;
+}
+
+.toast-container {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1060; 
+    pointer-events: none; 
+}
+
+.toast {
+    pointer-events: auto; 
+}
+

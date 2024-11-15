@@ -42,7 +42,6 @@ $(document).on('click', '.message-edit-button', function (e) {
     updateMessage(message)
         .then(() => {
         $(`#${message.message_id}-tab`).html(message.title);
-        ToastSuccess("Message has been successfully updated!");
     });
 });
 $(document).on("click", "#log-table tbody tr", function () {
@@ -107,10 +106,10 @@ $(document).on('click', '#player-table tbody tr', function () {
     $("#player-cc").val(data.cc);
     $("#player-div-cc").val(data.div_cc);
     $("#player-act-points").val(data.activity_points);
-    if ($.fn.DataTable.isDataTable("#character-table")) {
-        $("#character-table").DataTable().destroy();
+    if ($.fn.DataTable.isDataTable("#player-character-table")) {
+        $("#player-character-table").DataTable().destroy();
     }
-    $("#character-table").DataTable({
+    $("#player-character-table").DataTable({
         orderCellsTop: true,
         info: false,
         paging: false,
@@ -246,6 +245,8 @@ $(document).on('click', '#player-table tbody tr', function () {
         ]
     });
     $("#player-modal").modal("show");
+    $("#member-overview-button").tab("show");
+    $("#command-stats-button").tab("show");
 });
 $(document).on('click', '.message-delete', function () {
     var message_id = $(this).data('id');
@@ -263,9 +264,10 @@ $("#activity-settings-button").on('click', function () {
     $('body').addClass("busy");
     buildActivityTable();
 });
-$("#players-button").on('click', function () {
+$("#census-button").on('click', function () {
     $('body').addClass("busy");
-    buildPlayerTable();
+    $("#players-tab-button").tab("show");
+    buildCensusTable();
 });
 $("#log-review-button").on('click', function () {
     $('body').addClass("busy");
@@ -336,10 +338,7 @@ $('#guild-settings-save-button').on('click', function () {
         guild.max_characters = $("#guild-max-characters").val() ? Number($("#guild-max-characters").val()) : 1;
         guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0;
         guild.div_limit = $("#guild-div-cc").val() ? Number($("#guild-div-cc").val()) : 0;
-        console.log(guild);
-        updateGuild(guild).then(() => {
-            ToastSuccess("Updated!");
-        });
+        updateGuild(guild);
     });
 });
 $('#activity-submit-button').on('click', function () {
@@ -350,7 +349,7 @@ $('#activity-submit-button').on('click', function () {
             activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked');
             activity.points = parseInt($(`.points-input[data-id="${activity.id}"]`).val().toString());
         });
-        updateActivities(activities).then(() => ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot"));
+        updateActivities(activities);
     });
 });
 async function buildAnnouncementTable() {
@@ -432,8 +431,12 @@ async function buildActivityTable() {
         ]
     });
 }
-async function buildPlayerTable() {
+async function buildCensusTable() {
     const players = await getPlayers();
+    const characters = players.flatMap(player => player.characters.map(character => ({
+        ...character,
+        player_name: player.member ? player.member?.nick?.toString() ?? player.member?.user?.global_name?.toString() ?? player.member?.user?.username?.toString() : ""
+    })));
     $("body").removeClass("busy");
     if ($.fn.DataTable.isDataTable("#player-table")) {
         $("#player-table").DataTable().destroy();
@@ -467,6 +470,63 @@ async function buildPlayerTable() {
                 title: "# Characters",
                 render: function (data, type, row) {
                     return data.length;
+                }
+            }
+        ]
+    });
+    if ($.fn.DataTable.isDataTable("#characters-table")) {
+        $("#characters-table").DataTable().destroy();
+    }
+    $("#characters-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 50,
+        lengthChange: false,
+        data: characters,
+        columns: [
+            {
+                title: "Name",
+                data: "name"
+            },
+            {
+                title: "Level",
+                data: "level"
+            },
+            {
+                title: "Player",
+                data: "player_name"
+            },
+            {
+                title: "Species",
+                data: "species",
+                render: function (data, type, row) {
+                    return `${data != null ? data.value : "Not found"}`;
+                }
+            },
+            {
+                data: "classes",
+                title: `Class`,
+                width: "70%",
+                render: function (data, type, row) {
+                    return data.map(obj => `${obj.archetype?.value ? `${obj.archetype.value} ` : ''}${obj.primary_class.value}`).join('\n');
+                }
+            },
+            {
+                title: "Faction",
+                data: "faction",
+                render: function (data, type, row) {
+                    return `${data != null ? data.value : ""}`;
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        columnDefs: [
+            {
+                targets: [0, 3],
+                createdCell: function (td, cellData, rowData, row, col) {
+                    $(td).css({
+                        "white-space": "pre",
+                        "word-wrap": "normal"
+                    });
                 }
             }
         ]

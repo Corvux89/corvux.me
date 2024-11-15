@@ -1,4 +1,4 @@
-import { ToastError } from "./main.js"
+import { ToastError, ToastSuccess } from "./main.js"
 import { Activity, DiscordChannel, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
@@ -25,6 +25,7 @@ export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
 
         request.onload = function () {
             if (request.status == 200){
+                ToastSuccess("Updated!")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -81,6 +82,7 @@ export function updateMessage(message: RefMessage): Promise<RefMessage>{
 
         request.onload = function () {
             if (request.status == 200){
+                ToastSuccess("Message has been successfully updated!")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -107,6 +109,7 @@ export function deleteMessage(mesage_id: string): void{
             if (request.status == 200){
                 resolve(this.response.responseText)
             } else {
+                ToastError(this.response)
                 resolve(null)
             }
         }
@@ -157,6 +160,7 @@ export function updateActivities(activities: Activity[]): Promise<Activity[]>{
 
         request.onload = function () {
             if (request.status == 200){
+                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)

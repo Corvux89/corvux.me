@@ -1,31 +1,18 @@
-import time
 from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Date, String, and_, cast, desc, func, asc, or_
-from constants import CACHE_TIMEOUT, DISCORD_GUILD_ID, LIMIT
+from sqlalchemy.orm import aliased
+from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
-from models.resolute import Activity, BotMessage, Character, Log, Player, RefMessage, ResoluteGuild
+from helpers.general_helpers import get_members_from_cache
+from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, Faction, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
 
 
 resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
-MEMBER_CACHE = {
-    "members": None,
-    "timestamp": 0
-}
-
-def get_members_from_cache():
-    current_time = time.time()
-
-    if MEMBER_CACHE["members"] is None or (current_time - MEMBER_CACHE['timestamp'] > CACHE_TIMEOUT):
-        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-        members = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/members?limit={LIMIT}")
-        MEMBER_CACHE['members'] = members
-        MEMBER_CACHE['timestamp'] = current_time
-    return MEMBER_CACHE['members']
-
 
 @resolute_blueprint.before_request
 @is_admin
@@ -162,7 +149,6 @@ def get_channels():
 @resolute_blueprint.route('/api/players', methods=["GET"])
 def get_players():
     db: SQLAlchemy = current_app.config.get('DB')
-    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
     members = get_members_from_cache()
 
     players: list[Player] = (db.session.query(Player)
@@ -180,6 +166,16 @@ def get_players():
 def get_logs():
     db: SQLAlchemy = current_app.config.get('DB')
     members = get_members_from_cache()
+    query = (db.session.query(Log)
+             .filter(Log.guild_id == DISCORD_GUILD_ID)
+             .join(Activity)
+             .outerjoin(Faction)
+             .outerjoin(Character)
+             .options(
+                 joinedload(Log.activity_record),
+                 joinedload(Log.faction_record),
+                 joinedload(Log.character_record)
+             ))
 
     if request.method == "POST":
         draw = int(request.json.get('draw', 1))
@@ -189,46 +185,14 @@ def get_logs():
         search_value = request.json.get('search', {}).get('value', '')
         column_index = int(order[0].get('column', 0))
         column_dir = order[0].get('dir', 'asc')
-
-        member_filter = []
-        if search_value:
-            for member in members:
-                user = member.get('user', {})
-                nick = member.get('nick', '') or ''
-                global_name = user.get('global_name', '') or ''
-                username = user.get('username', '') or ''
-            
-                if (search_value.lower() in nick.lower() or
-                    search_value.lower() in global_name.lower() or
-                    search_value.lower() in username.lower()):
-                    member_filter.append(int(user.get('id')))
-
-        query = (db.session.query(Log)
-             .filter(Log.guild_id == DISCORD_GUILD_ID)
-             .options(
-                 joinedload(Log.activity_record), 
-                 joinedload(Log.faction_record),
-                 joinedload(Log.character_record)))
         
         recordsTotal = query.count()
 
-        # Apply search filter
-        search_filter = []
         if search_value:
-            search_filter.append(cast(Log.id, String).like(f"%{search_value}%"))
-            search_filter.append(Log.notes.ilike(f"%{search_value}%"))
-            search_filter.append(func.to_char(Log.created_ts.cast(Date), "FMmm/FMdd/YYYY").like(f"%{search_value}%"))
-            search_filter.append(Log.character_record.has(Character.name.ilike(f"%{search_value}%")))
-            search_filter.append(Log.activity_record.has(Activity.value.ilike(f"%{search_value}%")))
-
-            # Filter by member IDs if any matched
-            if member_filter:
-                search_filter.append(Log.player_id.in_(member_filter))
-
-            query = query.filter(or_(*search_filter))
+            query = query.filter(or_(*log_search_filter(search_value)))
 
         # Query Sorting
-        columns = [Log.id, Log.created_ts, None, None, None, None, Log.notes, Log.invalid]
+        columns = [Log.id, Log.created_ts, None, None, Character.name, Activity.value, Log.notes, Log.invalid]
         column = columns[column_index]
         if column:
             query = query.order_by(desc(column)) if column_dir == 'desc' else query.order_by(asc(column))
@@ -238,9 +202,7 @@ def get_logs():
         logs = query.all()
 
         # Add in discord stuff
-        for log in logs:
-            log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
-            log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
+        log_set_discord_attributes(logs)
 
         # Post query sorting
         if column_index == 2: #Author
@@ -253,15 +215,6 @@ def get_logs():
                           key=lambda log: (log.member.get("nick") or log.member.get('user', {}).get("global_name") or log.member.get('user', {}).get("username") if log.member else "zzz"),
                           reverse=(column_dir == "desc"))
         
-        elif column_index == 4: # Character - Would be nice to get this pre-query
-            logs = sorted(logs,
-                          key=lambda log: (log.character_record.name if log.character_record else 'zzz'),
-                          reverse=(column_dir == "desc"))
-            
-        elif column_index == 5: # Activity - Would be nice to get this pre-query
-            logs = sorted(logs,
-                          key=lambda log: log.activity_record.value,
-                          reverse=(column_dir == "desc"))
 
 
         # Limit
@@ -278,19 +231,9 @@ def get_logs():
         
 
 
-    logs: list[Log] = (db.session.query(Log)
-                    .filter(Log.guild_id == DISCORD_GUILD_ID)
-                    .options(
-                        joinedload(Log.activity_record),
-                        joinedload(Log.faction_record)
-                        )
-                        .order_by(desc(Log.id))
-                    .all()
-                    )
+    logs: list[Log] = query.all()
     
-    for log in logs:
-        log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
-        log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
+    log_set_discord_attributes(logs)
     
 
     return jsonify(logs)
@@ -313,6 +256,28 @@ def get_activites():
             activity = next((a for a in activities if a.id == act["id"]), None)        
             activity.cc = act["cc"]
             activity.diversion = act["diversion"]
+            activity.points = act["points"]
+
+        db.session.commit()
+
+        return jsonify(200)
+    
+@resolute_blueprint.route('/api/activity_points', methods=['GET', 'PATCH'])
+def get_activity_points():
+    db: SQLAlchemy = current_app.config.get('DB')
+    points: list[ActivityPoints] = (db.session.query(ActivityPoints)
+                                    .order_by(asc(ActivityPoints.id))
+                                    .all()
+                                    )
+
+    if request.method == "GET":
+        return jsonify(points)   
+    
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        for act in update_data:
+            activity = next((a for a in points if a.id == act["id"]), None)        
             activity.points = act["points"]
 
         db.session.commit()

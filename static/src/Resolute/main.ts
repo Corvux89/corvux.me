@@ -1,5 +1,6 @@
-import { deleteMessage, getActivities, getChannels, getGuild, getMessages, getPlayers, newMessage, updateActivities, updateGuild, updateMessage } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character } from './types.js'
+import { getActiveResourcesInfo } from 'node:process'
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getPlayers, newMessage, updateActivities, updateGuild, updateMessage } from './api.js'
+import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint } from './types.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()
@@ -87,10 +88,12 @@ $(document).on("click", "#log-table tbody tr", function(){
     $(this).after(additionalInfo);
 });
 
-$(document).on("click", "#character-table tbody tr", function(){
-    const table = $("#character-table").DataTable() 
+$(document).on("click", "#player-character-table tbody tr", function(){
+    const table = $("#player-character-table").DataTable() 
     const row = table.row(this);
     const rowData: Character = row.data();
+    const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
+
 
     // Check if a dropdown row already exists and remove it
     if ($(this).next().hasClass('dropdown-row')) {
@@ -107,7 +110,7 @@ $(document).on("click", "#character-table tbody tr", function(){
             <td colspan="${table.columns().count()}">
                 <div class="p-3">
                     <strong>Primary Faction:</strong> ${rowData.faction?.value ?? ''}<br>
-                    <strong>Credits:</strong> ${rowData.credits ?? '0'}<br>
+                    <strong>Credits:</strong> ${credits}<br>
                 </div>
             </td>
         </tr>
@@ -298,6 +301,7 @@ $("#bot-messages-button").on('click', function(){
 
 $("#activity-settings-button").on('click', function(){
     $('body').addClass("busy")
+    $("#activity-button").tab("show")
     buildActivityTable()
 })
 
@@ -327,10 +331,9 @@ $("#announcement-new-button").on('click', function(){
     $("#announcement-modal-edit-form").data('id', "new")
     $(".modal-body #announcement-title").val("")
     $(".modal-body #announcement-body").val("")
-
 })
 
-$("#announcement-submit-button").on('click', function() {
+$(document).on('click', '#announcement-submit-button', function(){
     var title = $("#announcement-title").val()
     var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : ""
     var index = $("#announcement-modal-edit-form").data("id") 
@@ -445,6 +448,7 @@ async function buildAnnouncementTable(){
 
 async function buildActivityTable(){
     const activities: Activity[] = await getActivities()
+    const activity_points: ActivityPoint[] = await getActivityPoints()
     $("body").removeClass("busy")
 
     if ($.fn.DataTable.isDataTable("#activity-table")) {
@@ -498,6 +502,35 @@ async function buildActivityTable(){
             }
         ]
     })
+
+    if ($.fn.DataTable.isDataTable("#activity-points-table")) {
+        $("#activity-points-table").DataTable().destroy();
+    }
+
+    $("#activity-points-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 10,
+        lengthChange: false,
+        info: false,
+        paging: false,
+        data: activity_points,
+        columns: [
+            {
+                data: "id",
+                searchable: false,
+                title: "ID"
+            },
+            {
+                data: "points",
+                title: "Points",
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row){
+                    return `<input type="number" class="form-control point-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
+                }
+            }
+        ]
+    })
 }
 
 async function buildCensusTable(){
@@ -527,13 +560,7 @@ async function buildCensusTable(){
                 data: "member",
                 title: "Name",
                 render: function(data, type, row){
-                    return `${data != null 
-                        ? data.nick != null 
-                            ? data.nick 
-                            : data.user.global_name != null 
-                                ? data.user.global_name 
-                                : data.user.username 
-                        : "Player not found"}`
+                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
                 }
             },
             {
@@ -641,18 +668,14 @@ async function buildLogTable(){
                 title: "Author",
                 data: "author_record",
                 render: (data) => {
-                    return `${data != null
-                        ? data.nick ?? data.user.global_name ?? data.user.username
-                        : "Player not found"}`
+                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
                 }
             },
             {
                 data: 'member',
                 title: "Player",
                 render: (data) => {
-                    return `${data != null
-                        ? data.nick ?? data.user.global_name ?? data.user.username
-                        : "Player not found"}`
+                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
                 }
             },
             {

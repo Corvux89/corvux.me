@@ -1,11 +1,12 @@
 import { ToastError, ToastSuccess } from "./main.js"
-import { Activity, DiscordChannel, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
+import { Activity, ActivityPoint, DiscordChannel, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
 const message_url = `${window.location.href}api/message`
 const channel_url = `${window.location.href}api/channels`
 const log_url = `${window.location.href}api/logs`
 const activity_url = `${window.location.href}api/activities`
+const activity_point_url = `${window.location.href}api/activity_points`
 const player_url = `${window.location.href}api/players`
 
 export function getGuild(): Promise<ResoluteGuild>{
@@ -181,5 +182,38 @@ export function getPlayers(): Promise<Player[]>{
     .then(res => res.json())
     .then(res => {
         return res as Player[]
+    })
+}
+
+export function getActivityPoints(): Promise<ActivityPoint[]>{
+    return fetch(activity_point_url)
+    .then(res => res.json())
+    .then(res => {
+        return res as ActivityPoint[]
+    })
+}
+
+export function updateActivityPoints(activities: ActivityPoint[]): Promise<ActivityPoint[]>{
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest()
+
+        request.open('PATCH', activity_url, true)
+        request.setRequestHeader('Content-Type', 'application/json')
+
+        request.onload = function () {
+            if (request.status == 200){
+                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                resolve(this.response.responseText)
+            } else {
+                ToastError(this.response)
+                resolve(null)
+            }
+        }
+
+        request.onerror = function () {
+            reject(new Error("Something went wrong"))
+        }
+
+        request.send(JSON.stringify(activities))
     })
 }

@@ -64,18 +64,15 @@ class NumberInput extends HTMLElement {
 
   // Method to render the input field with floating label
   render() {
-      this.innerHTML = `
+    this.innerHTML = `
       <div class="form-floating">
-          <input 
-            type="number" 
-            class="form-control" 
-            id="${this._id}" ${this.value ? `value="${this.value}"` : ""}
-            ${this.required == true ? ' required': ''}
-            ${this.disabled == true ? ' disabled': ''}
-            >
-          <label for="${this._id}">${this.label}</label>
+        <input type="number" class="form-control" id="${this._id}" value="${this.value ?? ''}"
+        ${this.required ? 'required' : ''}
+        ${this.disabled ? 'disabled': ''}
+        />
+        <label for="${this._id}">${this.label}</label>
       </div>
-      `;
+    `
   }
 }
 

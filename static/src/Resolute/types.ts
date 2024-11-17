@@ -41,6 +41,11 @@ export interface Activity{
     points: number
 }
 
+export interface ActivityPoint{
+    id: number
+    points: number
+}
+
 export interface Faction{
     id: number,
     value: string

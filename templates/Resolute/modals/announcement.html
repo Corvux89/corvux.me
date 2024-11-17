@@ -1,0 +1,40 @@
+<div class="modal fade" id="announcement-modal-edit-form" tabindex="-1" role="dialog"
+aria-labelledby="announcement-modal-edit-form" aria-hidden="true" data-id="">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black">Announcement</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row mb-2">
+                        <div class="col-md">
+                            <text-input label-text="Announcement Title" custom-id="announcement-title"></text-input>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="form-floating">
+                                <textarea id="announcement-body" value="" class="form-control big-edit-body"
+                                    required></textarea>
+                                <label for="announcement-body">Announcement Body</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col mb-3">
+                            <button type="button" class="btn btn-primary float-end" id="announcement-submit-button"
+                                data-bs-dismiss="modal">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

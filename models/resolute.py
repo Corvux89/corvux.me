@@ -1,3 +1,4 @@
+from enum import Enum
 import json
 import datetime
 
@@ -12,6 +13,32 @@ from constants import DISCORD_GUILD_ID
 
 
 db = SQLAlchemy()
+
+class Activity(db.Model):
+    __tablename__ = "c_activity"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str]
+    cc: Mapped[int]
+    diversion: Mapped[bool]
+    points: Mapped[int]
+
+    logs = relationship("Log", back_populates="activity_record")
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value')
+        self.cc = kwargs.get('cc', 0)
+        self.diversion = kwargs.get('diversion', False)
+        self.points = kwargs.get('points', 0)
+
+class ActivityPoints(db.Model):
+    __tablename__ = "c_activity_points"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    points: Mapped[int]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.points = kwargs.get('points', 0)
 
 class ResoluteGuild(db.Model):
     __tablename__ = "guilds"
@@ -167,7 +194,7 @@ class Log(db.Model):
     invalid: Mapped[bool]
     created_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
-    activity_record = relationship("Activity", back_populates="logs")
+    activity_record = relationship(Activity, back_populates="logs")
     faction_record = relationship("Faction")
     character_record = relationship("Character")
 
@@ -189,24 +216,6 @@ class Log(db.Model):
         self.invalid = kwargs.get('invalid')
         self.created_ts = kwargs.get('created_ts')
         self.member = kwargs.get('member')            
-
-
-class Activity(db.Model):
-    __tablename__ = "c_activity"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[str]
-    cc: Mapped[int]
-    diversion: Mapped[bool]
-    points: Mapped[int]
-
-    logs = relationship("Log", back_populates="activity_record")
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.value = kwargs.get('value')
-        self.cc = kwargs.get('cc', 0)
-        self.diversion = kwargs.get('diversion', False)
-        self.points = kwargs.get('points', 0)
 
 class Faction(db.Model):
     __tablename__ = "c_factions"
@@ -257,6 +266,34 @@ class BotMessage():
         self.pin = kwargs.get('pin', False)
         self.error = kwargs.get("error", "")
 
+class DiscordUser:
+    global_name: str = None
+    id: int = None
+    username: str = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+
+
+class DiscordMember:
+    nick: str = None
+    roles: [] = None
+    user: DiscordUser = None
+    bot: bool = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                if key == "user":
+                    self.user = DiscordUser(**kwargs[key] or {}).__dict__
+                else:
+                    setattr(self, key, kwargs[key])
+
+
+
+
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -281,13 +318,13 @@ class AlchemyEncoder(json.JSONEncoder):
             if isinstance(obj, Log):
                 fields["activity"] = obj.activity_record
                 fields["faction"] = obj.faction_record
-                fields["member"] = obj.member 
+                fields["member"] = DiscordMember(**obj.member or {}).__dict__
                 fields["character"] = obj.character_record
-                fields["author_record"] = obj.author_record
+                fields["author_record"] = DiscordMember(**obj.author_record or {}).__dict__
 
             if isinstance(obj, Player):
                 fields["characters"] = obj.characters
-                fields["member"] = obj.member
+                fields["member"] = DiscordMember(**obj.member or {}).__dict__
 
             if isinstance(obj, Character):
                 fields["classes"] = obj.classes

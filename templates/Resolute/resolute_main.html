@@ -6,350 +6,56 @@
 <div class="container m-2 text-center">
     <h1>Resolute Management</h1>
 </div>
-<!-- Spinner -->
-<div class="loading-overlay d-flex justify-content-center align-items-center text-center">
-    <div class="spinner-border text-light" role="status" aria-hidden="true">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-
-<!-- Toasts -->
-<!-- <div class="toast-container position-fixed top-0 end-50 p-3"> -->
-<div class="toast-container d-flex justify-content-center align-items-center">
-    <div class="toast text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true" id="confirm-toast" data-bs-delay="3200">
-        <div class="d-flex">
-            <div class="toast-body"></div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-
-    <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="error-toast" data-bs-delay="3000">
-        <div class="d-flex">
-            <div class="toast-body" id="error-toast-message"></div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
 
 <!-- Nav Tabs-->
 <nav>
-    <div class="nav nav-pills m-2" id="resoluteTab" role="tablist">
+    <div class="nav nav-tabs m-2" id="resoluteTab" role="tablist">
 
-        <button-tab label-text="Announcements" controls="announcement-tab" 
-        custom-id="announcement-tab-button" active></button-tab>
+        <button-tab label-text="Announcements" controls="announcement-tab" custom-id="announcement-tab-button"
+            active></button-tab>
 
-        <button-tab label-text="Posts" controls="bot-messages-tab" 
-        custom-id="bot-messages-button"></button-tab>
+        <button-tab label-text="Posts" controls="bot-messages-tab" custom-id="bot-messages-button"></button-tab>
 
-        <button-tab label-text="Settings" controls="guild-settings-tab"
-        custom-id="guild-settings-button"></button-tab>
+        <button-tab label-text="Settings" controls="guild-settings-tab" custom-id="guild-settings-button"></button-tab>
 
         <button-tab label-text="Activities" controls="activity-settings-tab"
-        custom-id="activity-settings-button"></button-tab>
+            custom-id="activity-settings-button"></button-tab>
 
-        <button-tab label-text="Census" controls="census-tab"
-        custom-id="census-button"></button-tab>
+        <button-tab label-text="Census" controls="census-tab" custom-id="census-button"></button-tab>
 
-        <button-tab label-text="Logs" controls="log-review-tab"
-        custom-id="log-review-button"></button-tab>
+        <button-tab label-text="Logs" controls="log-review-tab" custom-id="log-review-button"></button-tab>
+
+        <button-tab label-text="Shatterpoint" controls="shatterpoint-review-tab"
+            custom-id="shatterpoint-review-button"></button-tab>
     </div>
 </nav>
 
 <!-- Tab Content -->
 <div class="tab-content" id="resoluteContent">
+    {% include "/Resolute/tabs/announcements.html" %}
+    {% include "/Resolute/tabs/messages.html" %}
+    {% include "/Resolute/tabs/settings.html" %}
+    {% include "/Resolute/tabs/activities.html" %}
+    {% include "/Resolute/tabs/census.html" %}
+    {% include "/Resolute/tabs/logs.html" %}
 
-    <!-- Weekly Announcements -->
-    <div class="tab-pane fade show active" id="announcement-tab" role="tabpanel"
-        aria-labelledby="announcement-tab-button" tabindex="0">
-        <div class="container-fluid mb-2">
-            <div class="row border rounded border-success bg-light" id="announcement-header">
-                <div class="col">
-                    <div class="row border rounded border-success bg-light">
-                        <div class="col-auto mt-5 mb-4 settings">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="announcement-ping"
-                                    name="announcement-ping">
-                                <label class="form-check-label" for="announcement-ping">Ping with announcements?</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    
 
-        <div class="container-fluid mb-2">
-            <table class="table table-dark table-striped table-hover text-white border announcement-table">
-                <thead>
-                    <tr>
-                        <th scope="col" width="1%"></th>
-                        <th scope="col">Title</th>
-                    </tr>
-                </thead>
-                <tbody id="announcement-table-body"></tbody>
-            </table>
+    <div class="tab-pane fade" id="shatterpoint-review-tab" role="tabpanel" aria-labelledby="shatterpoint-review-button"
+        tabindex="0">
 
-            <button type="button" class="btn btn-success float-end" id="announcement-new-button" data-bs-toggle="modal"
-                data-bs-target="#announcement-modal-edit-form">New Announcement</button>
-        </div>
-    </div>
-
-    <!-- Bot Messages -->
-    <div class="tab-pane fade" id="bot-messages-tab" role="tabpanel" aria-labelledby="bot-messages-button" tabindex="0">
-        <div class="container-fluid mb-2 border border-light">
-            <div class="nav nav-tabs resolute-tabs m-2" id="messageTab" role="tablist">
-                <button class="nav-link active resolute" id="new-message-tab" data-bs-toggle="tab"
-                    data-bs-target="#new-message" type="button" role="tab" aria-selected="true"
-                    aria-controls="new-message">New Message</button>
-            </div>
-
-            <div class="tab-content" id="messageContent">
-                <div class="tab-pane fade show active" id="new-message" role="tabpanel"
-                    aria-labelledby="new-message-tab" tabindex="0">
-                    <div class="container-fluid m-2">
-                        <div class="row mb-3 mt-3">
-                            <text-input label-text="Post Title/Description" custom-id="message-title" required></text-input>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-sm">
-                                <div class="form-floating">
-                                    <select class="form-select" aria-label="Channel Select" id="message-channel"
-                                        name="message-channel"></select>
-                                    <label for="message-channel">Channel</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="message-pin" value="True"
-                                        name="message-pin">
-                                    <label class="form-check-label text-white" for="message-pin">Pin Message?</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="form-floating">
-                                <textarea id="message-body" value="" class="form-control big-edit-body"
-                                    required maxlength="2000"></textarea>
-                                <label for="message-body">Message</label>
-                            </div>
-                        </div>
-                        <button type="button" id="new-message-submit-button" class="btn btn-primary float-end m-3">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Guild Settings -->
-    <div class="tab-pane fade" id="guild-settings-tab" role="tabpanel" aria-labelledby="guild-settings-button" tabindex="0">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-3">
-                    <number-input label-text="Max Level" custom-id="guild-max-level"></number-input>
-                </div>
-
-                <div class="col-3">
-                    <number-input label-text="Max Characters" custom-id="guild-max-characters"></number-input>
-                </div>
-
-                <div class="col-3">
-                    <number-input label-text="Handicap CC" custom-id="guild-handicap-cc"></number-input>
-                </div>
-
-                <div class="col-3">
-                    <number-input label-text="Diversion CC" custom-id="guild-div-cc"></number-input>
-                </div>
-            </div>
-
-            <button type="button" id="guild-settings-save-button" class="btn btn-primary float-begin m-3">
-                Save
-            </button>
-        </div>
-    </div>
-
-    <!-- Activity Settings -->
-    <div class="tab-pane fade" id="activity-settings-tab" role="tabpanel" aria-labelledby="activity-settings-button" tabindex="0">
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" id="activity-submit-button">Save Changes</button>
-                </div>
-            </div>
-            <table class="table table-striped table-dark table-condensed table-hover mb-0 log-table" id="activity-table"></table>
-        </div>
-    </div>
-
-    <!-- Players -->
-    <div class="tab-pane fade" id="census-tab" role="tabpanel" aria-labelledby="census-button" tabindex="0">
-        <div class="container-fluid">
-            <div class="nav nav-tabs resolute-tabs m-2" id="census-tabs" role="tablist">
-                <button-tab label-text="Players" controls="players-tab" custom-id="players-tab-button" active></button-tab>
-
-                <button-tab label-text="Characters" controls="characters-tab" custom-id="characters-tab-button"></button-tab>
-            </div>
-            
-            <div class="tab-content" id="census-content">
-                <div class="tab-pane fade show active" id="players-tab" role="tabpanel" aria-labelledby="players-tab-button" tabindex="0">
-                    <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="player-table"></table>
-                </div>
-
-                <div class="tab-pane fade" id="characters-tab" role="tabpanel" aria-labelledby="characters-tab-button" tabindex="0">
-                    <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="characters-table"></table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Log Review -->
-    <div class="tab-pane fade" id="log-review-tab" role="tabpanel" aria-labelledby="log-review-button" tabindex="0">
-        <div class="container-fluid">
-            <table class="table table-striped table-dark table-condensed table-hover mb-0 log-table" id="log-table"></table>
-        </div>
     </div>
 </div>
 
-<div class="modal fade" id="announcement-modal-edit-form" tabindex="-1" role="dialog"
-    aria-labelledby="announcement-modal-edit-form" aria-hidden="true" data-id="">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black">Announcement</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
 
-            <div class="modal-body">
-                <div class="container">
-                    <div class="row mb-2">
-                        <div class="col-md">
-                            <text-input label-text="Announcement Title" custom-id="announcement-title"></text-input>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <div class="form-floating">
-                                <textarea id="announcement-body" value="" class="form-control big-edit-body"
-                                    required></textarea>
-                                <label for="announcement-body">Announcement Body</label>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row mb-2">
-                        <div class="col mb-3">
-                            <button type="button" class="btn btn-primary float-end" id="announcement-submit-button"
-                                data-bs-dismiss="modal">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="modal fade" id="message-modal-delete-form" tabindex="-1" role="dialog"
-    aria-labelledby="message-modal-delete-form" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black">Confirm</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+<!-- Modals -->
+{% include "/Resolute/modals/announcement.html" %}
+{% include "/Resolute/modals/message.html" %}
+{% include "/Resolute/modals/census.html" %}
 
-            <div class="modal-body">
-                Are you sure you want to delete this message?
-            </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" data-id="" id="message-delete-button">Delete</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="player-modal" tabindex="-1" role="dialog" aria-labelledby="playermodal" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-white">Player Information</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div class="nav nav-tabs resolute-tabs m-2" id="player-tabs" role="tablist">
-                    <button-tab label-text="Player Overview" controls="member-overview-tab"
-                    custom-id="member-overview-button" active></button-tab>
-
-                    <button-tab label-text="Characters" controls="character-overview-tab"
-                    custom-id="character-overview-button"></button-tab>
-                </div>
-
-                <div class="tab-content" id="player-content">
-                    <!-- Member Overview-->
-                    <div class="tab-pane fade show active" id="member-overview-tab" role="tabpanel" aria-labelledby="member-overview-button" tabindex="0">
-                        <div class="container-fluid">
-                            <div class="row mb-2">
-                                <div class="col">
-                                    <text-input label-text="Member ID" custom-id="member-id" disabled></text-input>
-                                </div>
-                                <div class="col">
-                                    <text-input label-text="Name" custom-id="member-name" disabled></text-input>
-                                </div>
-                            </div>
-
-                            <div class="row mb-2">
-                                <div class="col">
-                                    <number-input label-text="CC" custom-id="player-cc" disabled></number-input>
-                                </div>
-
-                                <div class="col">
-                                    <number-input label-text="Diversion CC" custom-id="player-div-cc" disabled></number-input>
-                                </div>
-
-                                <div class="col">
-                                    <number-input label-text="Activity Points" custom-id="player-act-points" disabled></number-input>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="nav nav-tabs resolute-tabs m-2" id="player-stats-tabs" role="tablist">
-                                    <button-tab label-text="Commands" controls="command-stats-tab"
-                                        custom-id="command-stats-button" active></button-tab>
-
-                                    <button-tab label-text="NPC" controls="npc-stats-tab"
-                                        custom-id="npc-stats-button"></button-tab>
-                                </div>
-
-                                <div class="tab-content" id="player-stats-content">
-                                    <div class="tab-pane fade show active" id="command-stats-tab" role="tabpanel" aria-labelledby="command-stats-button" tabindex="0">
-                                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="stats-table"></table>
-                                    </div>
-
-                                    <div class="tab-pane fade show" id="npc-stats-tab" role="tabpanel" aria-labelledby="npc-stats-button" tabindex="0">
-                                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="global-npc-table"></table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Characters -->
-                    <div class="tab-pane fade" id="character-overview-tab" role="tabpanel" aria-labelledby="character-overview-button" tabindex="0">
-                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable" id="player-character-table"></table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer"></div>
-        </div>
-    </div>
-</div>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
 {% endblock %}

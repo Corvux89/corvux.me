@@ -53,16 +53,13 @@ class NumberInput extends HTMLElement {
     render() {
         this.innerHTML = `
       <div class="form-floating">
-          <input 
-            type="number" 
-            class="form-control" 
-            id="${this._id}" ${this.value ? `value="${this.value}"` : ""}
-            ${this.required == true ? ' required' : ''}
-            ${this.disabled == true ? ' disabled' : ''}
-            >
-          <label for="${this._id}">${this.label}</label>
+        <input type="number" class="form-control" id="${this._id}" value="${this.value ?? ''}"
+        ${this.required ? 'required' : ''}
+        ${this.disabled ? 'disabled' : ''}
+        />
+        <label for="${this._id}">${this.label}</label>
       </div>
-      `;
+    `;
     }
 }
 class TextInput extends HTMLElement {

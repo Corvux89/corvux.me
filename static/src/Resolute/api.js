@@ -4,6 +4,7 @@ const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;
 const log_url = `${window.location.href}api/logs`;
 const activity_url = `${window.location.href}api/activities`;
+const activity_point_url = `${window.location.href}api/activity_points`;
 const player_url = `${window.location.href}api/players`;
 export function getGuild() {
     return fetch(guild_url)
@@ -151,5 +152,33 @@ export function getPlayers() {
         .then(res => res.json())
         .then(res => {
         return res;
+    });
+}
+export function getActivityPoints() {
+    return fetch(activity_point_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
+    });
+}
+export function updateActivityPoints(activities) {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('PATCH', activity_url, true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.onload = function () {
+            if (request.status == 200) {
+                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
+                resolve(this.response.responseText);
+            }
+            else {
+                ToastError(this.response);
+                resolve(null);
+            }
+        };
+        request.onerror = function () {
+            reject(new Error("Something went wrong"));
+        };
+        request.send(JSON.stringify(activities));
     });
 }

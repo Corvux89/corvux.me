@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app, redirect, request, url_for
+from flask import current_app, redirect, request, session, url_for
 from flask_discord import DiscordOAuth2Session
 
 from constants import DISCORD_ADMINS
@@ -17,7 +17,6 @@ def is_admin(f):
 
         if user.id not in DISCORD_ADMINS:
            return redirect(url_for('homepage')) 
-
         return f(*args, **kwargs)
     
     return decorated_function 

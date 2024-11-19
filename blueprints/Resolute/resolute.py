@@ -1,11 +1,12 @@
+import os
+
 from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Date, String, and_, cast, desc, func, asc, or_
-from sqlalchemy.orm import aliased
+from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
-from helpers.general_helpers import get_members_from_cache
+from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
 from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, Faction, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
@@ -21,7 +22,11 @@ def before_request():
 
 @resolute_blueprint.route('/')
 def resolute_main():
-    return render_template('Resolute/resolute_main.html')
+    tab_folder = "templates/Resolute/tabs"
+
+    tabs = [f"/Resolute/tabs/{file}" for file in os.listdir(tab_folder) if file.endswith(".html")]
+
+    return render_template('Resolute/resolute_main.html', tabs=tabs)
 
 
 @resolute_blueprint.route('/api/guild', methods=['GET', 'PATCH'])
@@ -138,7 +143,7 @@ def ref_messages():
 @resolute_blueprint.route('/api/channels', methods=['GET'])
 def get_channels():
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-    channels = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/channels")
+    channels = get_channels_from_cache()
     clean_out = []
     for c in channels:
         if 'parent_id' in c and c.get('parent_id') != "" and c.get('type',0) not in [4, 13, 15]:
@@ -204,7 +209,7 @@ def get_logs():
         # Add in discord stuff
         log_set_discord_attributes(logs)
 
-        # Post query sorting
+        # Post query sorting because they're discord attributes
         if column_index == 2: #Author
             logs = sorted(logs,
                           key=lambda log: (log.author_record.get("nick") or log.author_record.get('user', {}).get("global_name") or log.author_record.get('user', {}).get("username") if log.author_record else "zzz"),
@@ -282,7 +287,6 @@ def get_activity_points():
 
         db.session.commit()
 
-        return jsonify(200)
-        
+        return jsonify(200)    
 
 

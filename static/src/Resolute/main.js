@@ -1,4 +1,4 @@
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getPlayers, newMessage, updateActivities, updateGuild, updateMessage } from './api.js';
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getPlayers, newMessage, updateActivities, updateActivityPoints, updateGuild, updateMessage } from './api.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -303,6 +303,23 @@ $(document).on('click', '#announcement-submit-button', function () {
         });
     }
 });
+$(document).on('input', '.point-input', function () {
+    const currentInput = $(this);
+    const currentValue = parseFloat(currentInput.val());
+    const currentRow = currentInput.closest("tr");
+    const nextRow = currentRow.next();
+    const nextInput = nextRow.find(".point-input");
+    if (nextInput.length > 0) {
+        const nextValue = parseFloat(nextInput.val().toString());
+        if (!isNaN(nextValue) && currentValue >= nextValue) {
+            currentInput.addClass('is-invalid');
+            ToastError("Points must be less than the next value");
+        }
+        else {
+            currentInput.removeClass("is-invalid");
+        }
+    }
+});
 $('#new-message-submit-button').on('click', function (e) {
     if ($('#message-title').val() == '' || $('#message-body').val() == '') {
         ToastError("Please fill out a title and a body");
@@ -352,6 +369,18 @@ $('#activity-submit-button').on('click', function () {
             activity.points = parseInt($(`.points-input[data-id="${activity.id}"]`).val().toString());
         });
         updateActivities(activities);
+    });
+});
+$("#activity-points-submit-button").on('click', function () {
+    if ($(".point-input.is-invalid").length > 0) {
+        return ToastError("Please resolve erorrs before submitting");
+    }
+    getActivityPoints()
+        .then(activities => {
+        activities.forEach(activity => {
+            activity.points = parseInt($(`.point-input[data-id="${activity.id}"`).val().toString());
+        });
+        updateActivityPoints(activities);
     });
 });
 async function buildAnnouncementTable() {
@@ -440,6 +469,7 @@ async function buildActivityTable() {
         orderCellsTop: true,
         pageLength: 10,
         lengthChange: false,
+        searching: false,
         info: false,
         paging: false,
         data: activity_points,

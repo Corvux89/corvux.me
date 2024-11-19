@@ -40,6 +40,44 @@ class ActivityPoints(db.Model):
         self.id = kwargs.get('id')
         self.points = kwargs.get('points', 0)
 
+class Faction(db.Model):
+    __tablename__ = "c_factions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value')
+
+class PrimaryClass(db.Model):
+    __tablename__ = "c_character_class"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value')
+
+class Archetype(db.Model):
+    __tablename__ = "c_character_archetype"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str]
+    parent: Mapped[int]
+    
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value')
+        self.parent = kwargs.get('parent')
+
+class Species(db.Model):
+    __tablename__ = "c_character_species"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value')
+
 class ResoluteGuild(db.Model):
     __tablename__ = "guilds"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -215,45 +253,7 @@ class Log(db.Model):
         self.faction = kwargs.get('faction')
         self.invalid = kwargs.get('invalid')
         self.created_ts = kwargs.get('created_ts')
-        self.member = kwargs.get('member')            
-
-class Faction(db.Model):
-    __tablename__ = "c_factions"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[str]
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.value = kwargs.get('value')
-
-class PrimaryClass(db.Model):
-    __tablename__ = "c_character_class"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[str]
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.value = kwargs.get('value')
-
-class Archetype(db.Model):
-    __tablename__ = "c_character_archetype"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[str]
-    parent: Mapped[int]
-    
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.value = kwargs.get('value')
-        self.parent = kwargs.get('parent')
-
-class Species(db.Model):
-    __tablename__ = "c_character_species"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    value: Mapped[str]
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.value = kwargs.get('value')
+        self.member = kwargs.get('member')        
 
 
 class BotMessage():
@@ -291,7 +291,16 @@ class DiscordMember:
                 else:
                     setattr(self, key, kwargs[key])
 
+class DiscordChannel:
+    id: int = None
+    name: str = None
+    parent_id: int = None
+    type: int = None
 
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -322,16 +331,16 @@ class AlchemyEncoder(json.JSONEncoder):
                 fields["character"] = obj.character_record
                 fields["author_record"] = DiscordMember(**obj.author_record or {}).__dict__
 
-            if isinstance(obj, Player):
+            elif isinstance(obj, Player):
                 fields["characters"] = obj.characters
                 fields["member"] = DiscordMember(**obj.member or {}).__dict__
 
-            if isinstance(obj, Character):
+            elif isinstance(obj, Character):
                 fields["classes"] = obj.classes
                 fields["species"] = obj.species_record
                 fields["faction"] = obj.faction_record
 
-            if isinstance(obj, CharacterClass):
+            elif isinstance(obj, CharacterClass):
                 fields['primary_class'] = obj.primary_class_record
                 fields["archetype"] = obj.archetype_record
 

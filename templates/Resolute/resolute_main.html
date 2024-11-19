@@ -24,38 +24,15 @@
         <button-tab label-text="Census" controls="census-tab" custom-id="census-button"></button-tab>
 
         <button-tab label-text="Logs" controls="log-review-tab" custom-id="log-review-button"></button-tab>
-
-        <button-tab label-text="Shatterpoint" controls="shatterpoint-review-tab"
-            custom-id="shatterpoint-review-button"></button-tab>
     </div>
 </nav>
 
 <!-- Tab Content -->
 <div class="tab-content" id="resoluteContent">
-    {% include "/Resolute/tabs/announcements.html" %}
-    {% include "/Resolute/tabs/messages.html" %}
-    {% include "/Resolute/tabs/settings.html" %}
-    {% include "/Resolute/tabs/activities.html" %}
-    {% include "/Resolute/tabs/census.html" %}
-    {% include "/Resolute/tabs/logs.html" %}
-
-    
-
-    <div class="tab-pane fade" id="shatterpoint-review-tab" role="tabpanel" aria-labelledby="shatterpoint-review-button"
-        tabindex="0">
-
-    </div>
+    {% for tab in tabs %}
+        {% include tab %}
+    {% endfor %}
 </div>
-
-
-
-
-<!-- Modals -->
-{% include "/Resolute/modals/announcement.html" %}
-{% include "/Resolute/modals/message.html" %}
-{% include "/Resolute/modals/census.html" %}
-
-
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
 {% endblock %}

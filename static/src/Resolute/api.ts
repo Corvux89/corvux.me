@@ -197,7 +197,7 @@ export function updateActivityPoints(activities: ActivityPoint[]): Promise<Activ
     return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest()
 
-        request.open('PATCH', activity_url, true)
+        request.open('PATCH', activity_point_url, true)
         request.setRequestHeader('Content-Type', 'application/json')
 
         request.onload = function () {

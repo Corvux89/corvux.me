@@ -4,12 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
-from flask import Flask, current_app, render_template, request, make_response, send_from_directory
+from flask import Flask, render_template, request, make_response
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
 from blueprints.combat_planner import combat_planner_blueprint
-from blueprints.sw5e_weapon_calculator import weapon_calc
 from blueprints.auth import auth_blueprint
 from blueprints.Resolute.resolute import resolute_blueprint
 from constants import DB_URI, DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
@@ -75,7 +74,6 @@ talisman = Talisman(
 )
 
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
-app.register_blueprint(weapon_calc, url_prefix="/SW5E_Weapon_Calculator")
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 app.register_blueprint(resolute_blueprint,url_prefix='/resolute')
 

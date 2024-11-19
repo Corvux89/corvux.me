@@ -23,12 +23,6 @@
     "tags": ["py", "js", "html"]
   },
   {
-    "name": "SW5E Weapon Calculator",
-    "desc": "Web bassed calculator to get away from a GSheet calculator. Allows for more flexibility, and sharing",
-    "webLink": "https://www.corvux.me/SW5E_Weapon_Calculator/",
-    "tags": ["py", "js", "html"]
-  },
-  {
     "name": "ProphetBot",
     "image": "images/BP-icon.png",
     "desc": "Discord bot for Broken Prophecy D&D 5e Server. Logs player transactions and tracks player xp/gold progress. Helps facilitate mini-campaigns, player managed channels, shops, and server moderation.",
@@ -48,13 +42,6 @@
     "desc": "Avrae collection of Aliases and Snippets to help facilitate playing Star Wars 5E with Avrae bot in Discord, from class features, powers (spells), and monsters.",
     "github": "https://github.com/Corvux89/Corvux-Avrae-Aliases/tree/master/Collections/SW5E%20Things",
     "webLink": "https://avrae.io/dashboard/workshop/63e066ecd6596a5e18f1604f",
-    "tags": ["py"]
-  },
-  {
-    "name": "Avrae-Pycharm",
-    "image": "images/AvraeLogo.svg",
-    "desc": "Small python utility to help with Avrae management in Pycarm",
-    "github": "https://github.com/Corvux89/Avrae-Pycharm",
     "tags": ["py"]
   }
 ]

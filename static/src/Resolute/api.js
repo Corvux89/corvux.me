@@ -2,10 +2,12 @@ import { ToastError, ToastSuccess } from "./main.js";
 const guild_url = `${window.location.href}api/guild`;
 const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;
+const adventure_url = `${window.location.href}api/adventures`;
 const log_url = `${window.location.href}api/logs`;
 const activity_url = `${window.location.href}api/activities`;
 const activity_point_url = `${window.location.href}api/activity_points`;
 const player_url = `${window.location.href}api/players`;
+const npc_url = `${window.location.href}api/npcs`;
 export function getGuild() {
     return fetch(guild_url)
         .then(res => res.json())
@@ -180,5 +182,19 @@ export function updateActivityPoints(activities) {
             reject(new Error("Something went wrong"));
         };
         request.send(JSON.stringify(activities));
+    });
+}
+export function getNPCs() {
+    return fetch(npc_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
+    });
+}
+export function getAdventures() {
+    return fetch(adventure_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
     });
 }

@@ -253,7 +253,32 @@ class Log(db.Model):
         self.faction = kwargs.get('faction')
         self.invalid = kwargs.get('invalid')
         self.created_ts = kwargs.get('created_ts')
-        self.member = kwargs.get('member')        
+        self.member = kwargs.get('member')
+
+class NPC(db.Model):
+    __tablename__ = "ref_npc"
+    key: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    avatar_url: Mapped[str]
+    roles: Mapped[int]
+    guild_id: Mapped[int] = mapped_column(primary_key=True)
+    adventure_id: Mapped[int] = mapped_column(ForeignKey("adventures.id"), nullable=True)
+
+    adventure = relationship("Adventure")
+
+    discord_role = None
+
+    __table_args__ = (
+        db.PrimaryKeyConstraint("key", "guild_id"),
+    )
+
+class Adventure(db.Model):
+    __tablename__ = "adventures"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    guild_id: Mapped[int]
+    created_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
+    end_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
 
 class BotMessage():
@@ -302,6 +327,15 @@ class DiscordChannel:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
 
+class DiscordRole:
+    id: int = None
+    name: str = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -343,6 +377,10 @@ class AlchemyEncoder(json.JSONEncoder):
             elif isinstance(obj, CharacterClass):
                 fields['primary_class'] = obj.primary_class_record
                 fields["archetype"] = obj.archetype_record
+
+            elif isinstance(obj, NPC):
+                fields["adventure"] = obj.adventure
+                fields["roles"] = [DiscordRole(**r or {}).__dict__ for r in obj.discord_role]
 
             return fields
         return json.JSONEncoder.default(self, obj)

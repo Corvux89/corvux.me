@@ -7,8 +7,8 @@ from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
-from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, Faction, Log, Player, RefMessage, ResoluteGuild
+from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, npc_set_discord_attributes
+from models.resolute import NPC, Activity, ActivityPoints, Adventure, BotMessage, Character, Faction, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
 
 
@@ -289,4 +289,29 @@ def get_activity_points():
 
         return jsonify(200)    
 
+@resolute_blueprint.route('/api/npcs', methods=['GET', 'PATCH'])
+def get_npcs():
+    db: SQLAlchemy = current_app.config.get('DB')
+    npcs: list[NPC] = (db.session.query(NPC)
+                       .filter(NPC.guild_id == DISCORD_GUILD_ID)
+                        .all()
+                        )
+    npc_set_discord_attributes(npcs)
 
+    if request.method == "GET":
+        return jsonify(npcs)   
+    
+    elif request.method == "PATCH":
+        return jsonify(200)
+
+@resolute_blueprint.route('/api/adventures', methods=['GET'])
+def get_adventures():
+    db: SQLAlchemy = current_app.config.get('DB')
+    adventures: list[Adventure] = (db.session.query(Adventure)
+                       .filter(and_(Adventure.guild_id == DISCORD_GUILD_ID, Adventure.end_ts.is_(None)))
+                        .all()
+                        )
+
+    if request.method == "GET":
+        return jsonify(adventures)   
+    

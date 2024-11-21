@@ -15,6 +15,11 @@ CHANNEL_CACHE = {
     "timestamp": 0
 }
 
+ROLE_CACHE = {
+    "roles": None,
+    "timestamp": 0
+}
+
 def get_members_from_cache():
     current_time = time.time()
 
@@ -34,3 +39,13 @@ def get_channels_from_cache():
         CHANNEL_CACHE['channels'] = channels
         CHANNEL_CACHE['timestamp'] = current_time
     return CHANNEL_CACHE['channels']
+
+def get_roles_from_cache():
+    current_time = time.time()
+
+    if ROLE_CACHE['roles'] is None or (current_time - ROLE_CACHE['timestamp'] > CACHE_TIMEOUT):
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        roles = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/roles")
+        ROLE_CACHE['roles'] = roles
+        ROLE_CACHE['timestamp'] = current_time
+    return ROLE_CACHE['roles']

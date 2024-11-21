@@ -1,6 +1,5 @@
-import { getActiveResourcesInfo } from 'node:process'
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getPlayers, newMessage, updateActivities, updateActivityPoints, updateGuild, updateMessage } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint } from './types.js'
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getNPCs, getPlayers, newMessage, updateActivities, updateActivityPoints, updateGuild, updateMessage } from './api.js'
+import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint, NPC } from './types.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()
@@ -13,21 +12,8 @@ $("#announcement-ping").on("change", function (){
     })
 })
 
-$(document).on('click', '.open-edit', function(){
-    getGuild()
-    .then(guild => {
-        var announcement = guild.weekly_announcement[$(this).data('id')]
-        var parts = announcement.split("|")
-        var title = parts.length > 1 ? parts[0] : ""
-        var body = parts.length > 1 ? parts[1] : parts[0]
-
-        $("#announcement-modal-edit-form").data("id", $(this).data('id'))
-        $(".modal-body #announcement-title").val(title)
-        $(".modal-body #announcement-body").val(body)
-    })
-})
-
-$(document).on('click', '.announcement-delete', function(){
+$(document).on('click', '.announcement-delete', function(e){
+    e.stopPropagation()
     getGuild()
     .then(guild => {
         guild.weekly_announcement.splice($(this).data('id'),1)
@@ -54,6 +40,29 @@ $(document).on('click', '.message-edit-button', function(e){
     .then(() => {
         $(`#${message.message_id}-tab`).html(message.title)
     })
+})
+
+$(document).on("click", "#announcement-table tbody tr", function(){
+    const table = $("#announcement-table").DataTable() 
+    const row = table.row(this);
+    const modal = $("#announcement-modal-edit-form")
+    const announcement = row.data()
+
+    if (announcement == undefined){
+        return
+    }
+
+    const parts = announcement.split("|")
+    const title = parts.length > 1 ? parts[0] : ""
+    const body = parts.length > 1 ? parts[1] : parts[0]
+
+    $(".modal-body #announcement-title").val(title)
+    $(".modal-body #announcement-body").val(body)
+
+    console.log(row.data())
+
+    modal.data("id", row.index())
+    .modal("show")
 })
 
 $(document).on("click", "#log-table tbody tr", function(){
@@ -284,7 +293,8 @@ $(document).on('click', '#player-table tbody tr', function(){
     $("#command-stats-button").tab("show")
 })
 
-$(document).on('click', '.message-delete', function() {
+$(document).on('click', '.message-delete', function(e) {
+    e.stopPropagation()
     var message_id = $(this).data('id')
     $("#message-delete-button").data("id", message_id)
 })
@@ -303,6 +313,11 @@ $("#activity-settings-button").on('click', function(){
     $('body').addClass("busy")
     $("#activity-button").tab("show")
     buildActivityTable()
+})
+
+$("#npc-review-button").on('click', function(){
+    $('body').addClass("busy")
+    buildNPCTable()
 })
 
 $("#census-button").on('click', function(){
@@ -454,29 +469,39 @@ async function buildAnnouncementTable(){
     $("#announcement-table-body").html('')
     $("#announcement-ping").prop("checked", guild.ping_announcement)
 
-    guild.weekly_announcement.forEach((announcement, index) => {
-        let parts = announcement.split("|")
-        let title = parts.length > 1 ? parts[0] : "None"
+    if ($.fn.DataTable.isDataTable("#announcement-table")) {
+        $("#announcement-table").DataTable().destroy();
+    }
 
-        let button = jQuery("<button>")
-            .addClass("btn fa-solid fa-trash text-white announcement-delete")
-            .data("id", `${index}`)
-
-        let col1 = jQuery("<td>")
-            .append(button)
-
-
-        let col2 = jQuery("<td>")
-            .addClass("open-edit")
-            .attr("data-bs-toggle", "modal")
-            .attr("data-bs-target", "#announcement-modal-edit-form")
-            .data("id", `${index}`)
-            .html(title)
-
-        let row = jQuery("<tr>")
-            .append(col1)
-            .append(col2)
-        $("#announcement-table-body").append(row)
+    $("#announcement-table").DataTable({
+        orderCellsTop: true,
+        searching: false,
+        info: false,
+        paging: false,
+        ordering: false,
+        pageLength: 10,
+        language: {
+            emptyTable: "No announcements this week!"
+        },
+        data: guild.weekly_announcement,
+        columns: [
+            {
+                width: "5%",
+                render: function(data, type, row){
+                    return `
+                    <button class="btn fa-solid fa-trash text-white announcement-delete" data-id=${row.id}></button>
+                    `
+                }
+            },
+            {
+                title: "Title",
+                render: function(data, type, row){
+                    const parts = row.split("|")
+                    const title = parts.length > 1 ? parts[0] : "None"
+                    return title
+                }
+            }
+        ]
     })
 }
 
@@ -740,6 +765,51 @@ async function buildLogTable(){
     });
     
     $("body").removeClass("busy")
+}
+
+async function buildNPCTable(){
+    const npcs: NPC[] = await getNPCs()
+    $("body").removeClass("busy")
+
+    if ($.fn.DataTable.isDataTable("#npc-table")) {
+        $("#npc-table").DataTable().destroy()
+    }
+
+    $("#npc-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 10,
+        data: npcs,
+        columns: [
+            {
+                width: "5%",
+                orderable: false,
+                render: function(data, type, row){
+                    return `<button class="btn fa-solid fa-trash text-white delete-npc" data-id=${row.id}></button>`
+                }
+            },
+            {
+                width: "5%",
+                orderable: false,
+                render: function(data, type, row){
+                    return `<button class="btn fas fa-pencil-alt text-white edit-npc" data-id=${row.id}></button>`
+                }
+            },
+            {
+                title: "Key",
+                data: "key",
+                render: function(data, type, row){
+                    return `<input type="text" class="form-control npc-key" data-id="${row.id}" value="${data != null ? data : ''}" />`;
+                }
+            },
+            {
+                title: "Name",
+                data: "name",
+                render: function(data, type, row){
+                    return `<input type="text" class="form-control npc-name" data-id="${row.id}" value="${data != null ? data : ''}" />`;
+                }
+            }
+        ]
+    })
 }
 
 async function buildMessageTab(){

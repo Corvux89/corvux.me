@@ -40,6 +40,33 @@ class ActivityPoints(db.Model):
         self.id = kwargs.get('id')
         self.points = kwargs.get('points', 0)
 
+class CodeConversion(db.Model):
+    __tablename__ = "c_code_conversion"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[int]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.value = kwargs.get('value', 0)
+
+class LevelCost(db.Model):
+    __tablename__ = "c_level_costs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cc: Mapped[int]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.cc = kwargs.get('cc', 0)
+
+class LevelCap(db.Model):
+    __tablename__ = "c_level_caps"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    max_cc: Mapped[int]
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.max_cc = kwargs.get('max_cc', 0)
+
 class Faction(db.Model):
     __tablename__ = "c_factions"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -255,32 +282,6 @@ class Log(db.Model):
         self.created_ts = kwargs.get('created_ts')
         self.member = kwargs.get('member')
 
-class NPC(db.Model):
-    __tablename__ = "ref_npc"
-    key: Mapped[str] = mapped_column(primary_key=True)
-    name: Mapped[str]
-    avatar_url: Mapped[str]
-    roles: Mapped[int]
-    guild_id: Mapped[int] = mapped_column(primary_key=True)
-    adventure_id: Mapped[int] = mapped_column(ForeignKey("adventures.id"), nullable=True)
-
-    adventure = relationship("Adventure")
-
-    discord_role = None
-
-    __table_args__ = (
-        db.PrimaryKeyConstraint("key", "guild_id"),
-    )
-
-class Adventure(db.Model):
-    __tablename__ = "adventures"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
-    guild_id: Mapped[int]
-    created_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
-    end_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
-
-
 class BotMessage():
     def __init__(self, message_id: str, channel_id: str, channel_name: str, title: str, content: str, **kwargs):
         self.message_id = message_id
@@ -377,10 +378,6 @@ class AlchemyEncoder(json.JSONEncoder):
             elif isinstance(obj, CharacterClass):
                 fields['primary_class'] = obj.primary_class_record
                 fields["archetype"] = obj.archetype_record
-
-            elif isinstance(obj, NPC):
-                fields["adventure"] = obj.adventure
-                fields["roles"] = [DiscordRole(**r or {}).__dict__ for r in obj.discord_role]
 
             return fields
         return json.JSONEncoder.default(self, obj)

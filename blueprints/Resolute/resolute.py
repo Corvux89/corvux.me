@@ -7,9 +7,11 @@ from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
-from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, npc_set_discord_attributes
-from models.resolute import NPC, Activity, ActivityPoints, Adventure, BotMessage, Character, Faction, Log, Player, RefMessage, ResoluteGuild
+from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCap, LevelCost, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
+
+# TODO: Level Caps
 
 
 resolute_blueprint = Blueprint('resolute', __name__)
@@ -287,31 +289,70 @@ def get_activity_points():
 
         db.session.commit()
 
-        return jsonify(200)    
-
-@resolute_blueprint.route('/api/npcs', methods=['GET', 'PATCH'])
-def get_npcs():
-    db: SQLAlchemy = current_app.config.get('DB')
-    npcs: list[NPC] = (db.session.query(NPC)
-                       .filter(NPC.guild_id == DISCORD_GUILD_ID)
-                        .all()
-                        )
-    npc_set_discord_attributes(npcs)
-
-    if request.method == "GET":
-        return jsonify(npcs)   
-    
-    elif request.method == "PATCH":
         return jsonify(200)
 
-@resolute_blueprint.route('/api/adventures', methods=['GET'])
-def get_adventures():
+@resolute_blueprint.route('/api/code_conversion', methods=['GET', 'PATCH'])
+def get_code_conversion():
     db: SQLAlchemy = current_app.config.get('DB')
-    adventures: list[Adventure] = (db.session.query(Adventure)
-                       .filter(and_(Adventure.guild_id == DISCORD_GUILD_ID, Adventure.end_ts.is_(None)))
-                        .all()
-                        )
+    points: list[CodeConversion] = (db.session.query(CodeConversion)
+                                    .order_by(asc(CodeConversion.id))
+                                    .all()
+                                    )
 
     if request.method == "GET":
-        return jsonify(adventures)   
+        return jsonify(points)   
     
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        for d in update_data:
+            conversion = next((c for c in points if c.id == d["id"]), None)
+            conversion.value = d["value"]
+
+        db.session.commit()
+
+        return jsonify(200)
+
+@resolute_blueprint.route('/api/level_costs', methods=['GET', 'PATCH'])
+def get_level_costs():
+    db: SQLAlchemy = current_app.config.get('DB')
+    costs: list[LevelCost] = (db.session.query(LevelCost)
+                                    .order_by(asc(LevelCost.id))
+                                    .all()
+                                    )
+
+    if request.method == "GET":
+        return jsonify(costs)   
+    
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        for d in update_data:
+            cost = next((c for c in costs if c.id == d["id"]), None)
+            cost.cc = d["cc"]
+
+        db.session.commit()
+
+        return jsonify(200)
+
+@resolute_blueprint.route('/api/level_caps', methods=['GET', 'PATCH'])
+def get_level_caps():
+    db: SQLAlchemy = current_app.config.get('DB')
+    caps: list[LevelCap] = (db.session.query(LevelCap)
+                                    .order_by(asc(LevelCap.id))
+                                    .all()
+                                    )
+
+    if request.method == "GET":
+        return jsonify(caps)   
+    
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        for d in update_data:
+            cap = next((c for c in caps if c.id == d["id"]), None)
+            cap.max_cc = d["max_cc"]
+
+        db.session.commit()
+
+        return jsonify(200) 

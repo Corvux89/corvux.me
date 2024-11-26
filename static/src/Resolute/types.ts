@@ -46,6 +46,21 @@ export interface ActivityPoint{
     points: number
 }
 
+export interface CodeConversion{
+    id: number
+    value: number
+}
+
+export interface LevelCost{
+    id: number
+    cc: number
+}
+
+export interface LevelCap{
+    id: number
+    max_cc: number
+}
+
 export interface Faction{
     id: number,
     value: string
@@ -115,24 +130,6 @@ export interface Log{
     invalid: boolean,
     created_ts: Date
     character: Character
-}
-
-export interface Adventure{
-    id: number
-    name: string
-    guild_id: number
-    created_ts: Date
-    end_ts: Date
-}
-
-export interface NPC{
-    key: string
-    name: string
-    avatar_url: string
-    roles: GenericDict[]
-    guild_id: number
-    adventure_id: number
-    adventure: Adventure
 }
 
 export interface DataTableRequest {

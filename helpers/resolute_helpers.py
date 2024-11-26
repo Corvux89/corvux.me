@@ -1,6 +1,6 @@
 from sqlalchemy import Date, String, cast, func
-from helpers.general_helpers import get_members_from_cache, get_roles_from_cache
-from models.resolute import NPC, Activity, Character, Log
+from helpers.general_helpers import get_members_from_cache
+from models.resolute import Activity, Character, Log
 
 
 def log_search_filter(search_value: str) -> []:
@@ -36,11 +36,5 @@ def log_set_discord_attributes(logs: list[Log]):
     for log in logs:
         log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
         log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
-
-def npc_set_discord_attributes(npcs: list[NPC]):
-    roles = get_roles_from_cache()
-
-    for npc in npcs:
-        npc.discord_role = [r for r in roles if int(r["id"]) in npc.roles]
 
     

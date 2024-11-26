@@ -1,4 +1,4 @@
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getGuild, getMessages, getNPCs, getPlayers, newMessage, updateActivities, updateActivityPoints, updateGuild, updateMessage } from './api.js';
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getGuild, getLevelCaps, getLevelCosts, getMessages, getPlayers, newMessage, udpateCodeConversion, udpateLevelCaps, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -264,6 +264,10 @@ $("#announcement-tab-button").on('click', function () {
     $('body').addClass("busy");
     buildAnnouncementTable();
 });
+$("#price-settings-button").on('click', function () {
+    $('body').addClass("busy");
+    buildPricingTab();
+});
 $("#bot-messages-button").on('click', function () {
     $('body').addClass("busy");
     buildMessageTab();
@@ -272,10 +276,6 @@ $("#activity-settings-button").on('click', function () {
     $('body').addClass("busy");
     $("#activity-button").tab("show");
     buildActivityTable();
-});
-$("#npc-review-button").on('click', function () {
-    $('body').addClass("busy");
-    buildNPCTable();
 });
 $("#census-button").on('click', function () {
     $('body').addClass("busy");
@@ -380,6 +380,33 @@ $('#activity-submit-button').on('click', function () {
             activity.points = parseInt($(`.points-input[data-id="${activity.id}"]`).val().toString());
         });
         updateActivities(activities);
+    });
+});
+$("#conversion-submit-button").on('click', function () {
+    getCodeconversions()
+        .then(conversions => {
+        conversions.forEach(conversion => {
+            conversion.value = parseInt($(`.credit-input[data-id="${conversion.id}"]`).val().toString());
+        });
+        udpateCodeConversion(conversions);
+    });
+});
+$("#level-cost-submit-button").on('click', function () {
+    getLevelCosts()
+        .then(costs => {
+        costs.forEach(cost => {
+            cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString());
+        });
+        updateLevelCosts(costs);
+    });
+});
+$("#level-cap-submit-button").on('click', function () {
+    getLevelCaps()
+        .then(caps => {
+        caps.forEach(cap => {
+            cap.max_cc = parseInt($(`.level-cap-input[data-id="${cap.id}"]`).val().toString());
+        });
+        udpateLevelCaps(caps);
     });
 });
 $("#activity-points-submit-button").on('click', function () {
@@ -683,48 +710,6 @@ async function buildLogTable() {
     });
     $("body").removeClass("busy");
 }
-async function buildNPCTable() {
-    const npcs = await getNPCs();
-    $("body").removeClass("busy");
-    if ($.fn.DataTable.isDataTable("#npc-table")) {
-        $("#npc-table").DataTable().destroy();
-    }
-    $("#npc-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 10,
-        data: npcs,
-        columns: [
-            {
-                width: "5%",
-                orderable: false,
-                render: function (data, type, row) {
-                    return `<button class="btn fa-solid fa-trash text-white delete-npc" data-id=${row.id}></button>`;
-                }
-            },
-            {
-                width: "5%",
-                orderable: false,
-                render: function (data, type, row) {
-                    return `<button class="btn fas fa-pencil-alt text-white edit-npc" data-id=${row.id}></button>`;
-                }
-            },
-            {
-                title: "Key",
-                data: "key",
-                render: function (data, type, row) {
-                    return `<input type="text" class="form-control npc-key" data-id="${row.id}" value="${data != null ? data : ''}" />`;
-                }
-            },
-            {
-                title: "Name",
-                data: "name",
-                render: function (data, type, row) {
-                    return `<input type="text" class="form-control npc-name" data-id="${row.id}" value="${data != null ? data : ''}" />`;
-                }
-            }
-        ]
-    });
-}
 async function buildMessageTab() {
     const messages = await getMessages();
     const channels = await getChannels();
@@ -736,6 +721,96 @@ async function buildMessageTab() {
         $("#message-channel").append(`<option value="${channel.id}">${channel.name}</option>`);
     });
     $("#new-message-tab").trigger('click');
+}
+async function buildPricingTab() {
+    const conversions = await getCodeconversions();
+    const costs = await getLevelCosts();
+    const caps = await getLevelCaps();
+    $("body").removeClass("busy");
+    if ($.fn.DataTable.isDataTable("#conversion-table")) {
+        $("#conversion-table").DataTable().destroy();
+    }
+    $("#conversion-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 10,
+        lengthChange: false,
+        searching: false,
+        info: false,
+        paging: false,
+        data: conversions,
+        columns: [
+            {
+                data: "id",
+                searchable: false,
+                title: "Level"
+            },
+            {
+                data: "value",
+                title: "# Credits / Chain Code",
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return `<input type="number" class="form-control credit-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
+                }
+            }
+        ]
+    });
+    if ($.fn.DataTable.isDataTable("#level-cost-table")) {
+        $("#level-cost-table").DataTable().destroy();
+    }
+    $("#level-cost-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 10,
+        lengthChange: false,
+        searching: false,
+        info: false,
+        paging: false,
+        data: costs,
+        columns: [
+            {
+                data: "id",
+                searchable: false,
+                title: "Level"
+            },
+            {
+                data: "cc",
+                title: "Chain Codes",
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
+                }
+            }
+        ]
+    });
+    if ($.fn.DataTable.isDataTable("#level-cap-table")) {
+        $("#level-cap-table").DataTable().destroy();
+    }
+    $("#level-cap-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 10,
+        lengthChange: false,
+        searching: false,
+        info: false,
+        paging: false,
+        data: caps,
+        columns: [
+            {
+                data: "id",
+                searchable: false,
+                title: "Level"
+            },
+            {
+                data: "max_cc",
+                title: "Diversion Chain Codes",
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return `<input type="number" class="form-control level-cap-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
+                }
+            }
+        ]
+    });
 }
 function builTabContent(message) {
     let button = jQuery("<button>")

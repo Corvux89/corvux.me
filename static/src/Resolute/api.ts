@@ -164,7 +164,7 @@ export function updateActivities(activities: Activity[]): Promise<Activity[]>{
 
         request.onload = function () {
             if (request.status == 200){
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -205,7 +205,7 @@ export function updateActivityPoints(activities: ActivityPoint[]): Promise<Activ
 
         request.onload = function () {
             if (request.status == 200){
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -238,7 +238,7 @@ export function udpateCodeConversion(conversions: CodeConversion[]): Promise<Cod
 
         request.onload = function () {
             if (request.status == 200){
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -271,7 +271,7 @@ export function updateLevelCosts(costs: LevelCost[]): Promise<LevelCost[]>{
 
         request.onload = function () {
             if (request.status == 200){
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)
@@ -304,7 +304,7 @@ export function udpateLevelCaps(caps: LevelCap[]): Promise<LevelCap[]>{
 
         request.onload = function () {
             if (request.status == 200){
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot")
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)

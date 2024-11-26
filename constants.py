@@ -15,5 +15,7 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "")
 DISCORD_ADMINS = json.loads(os.environ.get('DISCORD_ADMIN_USERS', []))
 DISCORD_GUILD_ID = os.environ.get("DISCORD_GUILD_ID")
 
+ERROR_CHANNEL_ID = os.environ.get("ERROR_CHANNEL_ID")
+
 if WEB_DEBUG:
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "true"

@@ -1,4 +1,7 @@
+from flask import current_app
+from flask_discord import DiscordOAuth2Session
 from sqlalchemy import Date, String, cast, func
+from constants import ERROR_CHANNEL_ID
 from helpers.general_helpers import get_members_from_cache
 from models.resolute import Activity, Character, Log
 
@@ -36,5 +39,14 @@ def log_set_discord_attributes(logs: list[Log]):
     for log in logs:
         log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
         log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
+
+def trigger_compendium_reload():
+    if ERROR_CHANNEL_ID:
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        current_user = discord_session.fetch_user()
+
+        message = f"{current_user.name} [{current_user.id}] - Update from website. Reload compendium."
+
+        msg = discord_session.bot_request(f"/channels/{ERROR_CHANNEL_ID}/messages", "POST", json={"content": message})
 
     

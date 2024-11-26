@@ -7,7 +7,7 @@ from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
-from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes
+from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCap, LevelCost, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
 
@@ -266,6 +266,7 @@ def get_activites():
             activity.points = act["points"]
 
         db.session.commit()
+        trigger_compendium_reload()
 
         return jsonify(200)
     
@@ -288,6 +289,7 @@ def get_activity_points():
             activity.points = act["points"]
 
         db.session.commit()
+        trigger_compendium_reload()
 
         return jsonify(200)
 
@@ -310,6 +312,7 @@ def get_code_conversion():
             conversion.value = d["value"]
 
         db.session.commit()
+        trigger_compendium_reload()
 
         return jsonify(200)
 
@@ -332,6 +335,7 @@ def get_level_costs():
             cost.cc = d["cc"]
 
         db.session.commit()
+        trigger_compendium_reload()
 
         return jsonify(200)
 
@@ -354,5 +358,6 @@ def get_level_caps():
             cap.max_cc = d["max_cc"]
 
         db.session.commit()
+        trigger_compendium_reload()
 
         return jsonify(200) 

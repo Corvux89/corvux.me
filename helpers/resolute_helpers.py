@@ -1,7 +1,8 @@
 from flask import current_app
 from flask_discord import DiscordOAuth2Session
+import requests
 from sqlalchemy import Date, String, cast, func
-from constants import ERROR_CHANNEL_ID
+from constants import BOT_API_AUTH_TOKEN, BOT_API_URL
 from helpers.general_helpers import get_members_from_cache
 from models.resolute import Activity, Character, Log
 
@@ -41,12 +42,17 @@ def log_set_discord_attributes(logs: list[Log]):
         log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
 
 def trigger_compendium_reload():
-    if ERROR_CHANNEL_ID:
-        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-        current_user = discord_session.fetch_user()
+    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+    current_user = discord_session.fetch_user()
+    url = f"{BOT_API_URL}/reload"
+    headers = {
+        'auth-token': BOT_API_AUTH_TOKEN,
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        "text": f"{current_user.name} [{current_user.id}] - Compendium reloaded from website"
+    }
 
-        message = f"{current_user.name} [{current_user.id}] - Update from website. Reload compendium."
-
-        msg = discord_session.bot_request(f"/channels/{ERROR_CHANNEL_ID}/messages", "POST", json={"content": message})
+    requests.request("POST", url, headers=headers, data=payload)
 
     

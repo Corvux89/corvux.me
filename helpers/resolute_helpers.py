@@ -5,6 +5,7 @@ from sqlalchemy import Date, String, cast, func
 from constants import BOT_API_AUTH_TOKEN, BOT_API_URL
 from helpers.general_helpers import get_members_from_cache
 from models.resolute import Activity, Character, Log
+import json
 
 
 def log_search_filter(search_value: str) -> []:
@@ -50,9 +51,9 @@ def trigger_compendium_reload():
         'Content-Type': 'application/json'
     }
     payload = {
-        "text": f"{current_user.name} [{current_user.id}] - Compendium reloaded from website"
+        'text': f'{current_user.name} [{current_user.id}] - Compendium reloaded from website'
     }
 
-    requests.request("POST", url, headers=headers, data=payload)
+    requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
     

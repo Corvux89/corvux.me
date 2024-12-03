@@ -136,7 +136,7 @@ export function updateActivities(activities) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.");
                 resolve(this.response.responseText);
             }
             else {
@@ -171,7 +171,7 @@ export function updateActivityPoints(activities) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.");
                 resolve(this.response.responseText);
             }
             else {
@@ -199,7 +199,7 @@ export function udpateCodeConversion(conversions) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.");
                 resolve(this.response.responseText);
             }
             else {
@@ -227,7 +227,7 @@ export function updateLevelCosts(costs) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
+                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.");
                 resolve(this.response.responseText);
             }
             else {
@@ -239,33 +239,5 @@ export function updateLevelCosts(costs) {
             reject(new Error("Something went wrong"));
         };
         request.send(JSON.stringify(costs));
-    });
-}
-export function getLevelCaps() {
-    return fetch(level_cap_url)
-        .then(res => res.json())
-        .then(res => {
-        return res;
-    });
-}
-export function udpateLevelCaps(caps) {
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('PATCH', level_cap_url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                ToastSuccess("Successfully updated!<br> Use <span class='fst-italic'>/admin reload compendium</span> to load changes into the bot");
-                resolve(this.response.responseText);
-            }
-            else {
-                ToastError(this.response);
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(caps));
     });
 }

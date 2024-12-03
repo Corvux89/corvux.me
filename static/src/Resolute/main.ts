@@ -1,4 +1,4 @@
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getGuild, getLevelCaps, getLevelCosts, getMessages, getPlayers, newMessage, udpateCodeConversion, udpateLevelCaps, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js'
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getGuild, getLevelCosts, getMessages, getPlayers, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js'
 import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint } from './types.js'
 
 $('body').addClass("busy")
@@ -470,17 +470,6 @@ $("#level-cost-submit-button").on('click', function(){
     })
 })
 
-$("#level-cap-submit-button").on('click', function(){
-    getLevelCaps()
-    .then(caps => {
-        caps.forEach(cap => {
-            cap.max_cc = parseInt($(`.level-cap-input[data-id="${cap.id}"]`).val().toString())
-        })
-
-        udpateLevelCaps(caps)
-    })
-})
-
 $("#activity-points-submit-button").on('click', function(){
     if ($(".point-input.is-invalid").length > 0){
         return ToastError("Please resolve erorrs before submitting")
@@ -824,7 +813,6 @@ async function buildMessageTab(){
 async function buildPricingTab(){
     const conversions = await getCodeconversions()
     const costs = await getLevelCosts()
-    const caps = await getLevelCaps()
     $("body").removeClass("busy")
 
     if ($.fn.DataTable.isDataTable("#conversion-table")) {
@@ -882,36 +870,6 @@ async function buildPricingTab(){
                 searchable: false,
                 render: function(data, type, row){
                     return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
-                }
-            }
-        ]
-    })
-
-    if ($.fn.DataTable.isDataTable("#level-cap-table")) {
-        $("#level-cap-table").DataTable().destroy();
-    }
-
-    $("#level-cap-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 10,
-        lengthChange: false,
-        searching: false,
-        info: false,
-        paging: false,
-        data: caps,
-        columns: [
-            {
-                data: "id",
-                searchable: false,
-                title: "Level"
-            },
-            {
-                data: "max_cc",
-                title: "Diversion Chain Codes",
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row){
-                    return `<input type="number" class="form-control level-cap-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
                 }
             }
         ]

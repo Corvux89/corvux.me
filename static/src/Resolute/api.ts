@@ -1,5 +1,5 @@
 import { ToastError, ToastSuccess } from "./main.js"
-import { Activity, ActivityPoint, CodeConversion, DiscordChannel, LevelCap, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
+import { Activity, ActivityPoint, CodeConversion, DiscordChannel, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
 const message_url = `${window.location.href}api/message`
@@ -286,37 +286,3 @@ export function updateLevelCosts(costs: LevelCost[]): Promise<LevelCost[]>{
         request.send(JSON.stringify(costs))
     })
 }
-
-export function getLevelCaps(): Promise<LevelCap[]>{
-    return fetch(level_cap_url)
-    .then(res => res.json())
-    .then(res => {
-        return res as LevelCap[]
-    })
-}
-
-export function udpateLevelCaps(caps: LevelCap[]): Promise<LevelCap[]>{
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest()
-
-        request.open('PATCH', level_cap_url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                ToastSuccess("Successfully updated! Ensure the compendium has reloaded for the updates to take effect.")
-                resolve(this.response.responseText)
-            } else {
-                ToastError(this.response)
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(caps))
-    })
-}
-

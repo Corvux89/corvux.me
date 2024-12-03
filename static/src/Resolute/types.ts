@@ -56,11 +56,6 @@ export interface LevelCost{
     cc: number
 }
 
-export interface LevelCap{
-    id: number
-    max_cc: number
-}
-
 export interface Faction{
     id: number,
     value: string

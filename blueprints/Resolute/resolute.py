@@ -8,11 +8,8 @@ from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
 from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCap, LevelCost, Log, Player, RefMessage, ResoluteGuild
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCost, Log, Player, RefMessage, ResoluteGuild
 from sqlalchemy.orm import joinedload
-
-# TODO: Level Caps
-
 
 resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
@@ -338,26 +335,3 @@ def get_level_costs():
         trigger_compendium_reload()
 
         return jsonify(200)
-
-@resolute_blueprint.route('/api/level_caps', methods=['GET', 'PATCH'])
-def get_level_caps():
-    db: SQLAlchemy = current_app.config.get('DB')
-    caps: list[LevelCap] = (db.session.query(LevelCap)
-                                    .order_by(asc(LevelCap.id))
-                                    .all()
-                                    )
-
-    if request.method == "GET":
-        return jsonify(caps)   
-    
-    elif request.method == "PATCH":
-        update_data = request.get_json()
-
-        for d in update_data:
-            cap = next((c for c in caps if c.id == d["id"]), None)
-            cap.max_cc = d["max_cc"]
-
-        db.session.commit()
-        trigger_compendium_reload()
-
-        return jsonify(200) 

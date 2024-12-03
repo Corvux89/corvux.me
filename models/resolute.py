@@ -58,15 +58,6 @@ class LevelCost(db.Model):
         self.id = kwargs.get('id')
         self.cc = kwargs.get('cc', 0)
 
-class LevelCap(db.Model):
-    __tablename__ = "c_level_caps"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    max_cc: Mapped[int]
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.max_cc = kwargs.get('max_cc', 0)
-
 class Faction(db.Model):
     __tablename__ = "c_factions"
     id: Mapped[int] = mapped_column(primary_key=True)

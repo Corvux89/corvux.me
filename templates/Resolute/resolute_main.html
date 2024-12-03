@@ -1,232 +1,41 @@
 {% extends "template.html" %} {% block body %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+
 <div class="container m-2 text-center">
     <h1>Resolute Management</h1>
 </div>
 
-<!-- Toasts -->
-<div class="toast-container position-fixed top-0 end-50 p-3">
-    <div class="toast text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true" id="confirm-toast" data-bs-delay="3200">
-        <div class="d-flex">
-            <div class="toast-body">
-                Message has been successfully updated!
-            </div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-
-    <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="error-toast" data-bs-delay="3000">
-        <div class="d-flex">
-            <div class="toast-body" id="error-toast-message"></div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-
 <!-- Nav Tabs-->
 <nav>
-    <div class="nav nav-pills m-2" id="resoluteTab" role="tablist">
-        <button class="nav-link active resolute" id="announcement-tab-button" data-bs-toggle="tab"
-            data-bs-target="#announcement-tab" type="button" role="tab" aria-selected="true"
-            aria-controls="announcement-tab">Weekly Announcements</button>
+    <div class="nav nav-tabs m-2" id="resoluteTab" role="tablist">
 
-        <button class="nav-link resolute" id="bot-messages-button" data-bs-toggle="tab"
-            data-bs-target="#bot-messages-tab" type="button" role="tab" aria-selected="true"
-            aria-controls="bot-messages-tab">Bot Posts</button>
+        <button-tab label-text="Announcements" controls="announcement-tab" custom-id="announcement-tab-button"
+            active></button-tab>
 
-        <button class="nav-link resolute" id="guild-settings-button" data-bs-toggle="tab" data-bs-target="#guild-settings-tab"
-            type="button" role="tab" aria-selected="true" aria-controls="guild-settings-tab">Guild Settings</button>
+        <button-tab label-text="Posts" controls="bot-messages-tab" custom-id="bot-messages-button"></button-tab>
+
+        <button-tab label-text="Settings" controls="guild-settings-tab" custom-id="guild-settings-button"></button-tab>
+
+        <button-tab label-text="Activities" controls="activity-settings-tab"
+            custom-id="activity-settings-button"></button-tab>
+
+        <button-tab label-text="Pricing" controls="price-settings-tab"
+            custom-id="price-settings-button"></button-tab>
+
+        <button-tab label-text="Census" controls="census-tab" custom-id="census-button"></button-tab>
+
+        <button-tab label-text="Logs" controls="log-review-tab" custom-id="log-review-button"></button-tab>
     </div>
 </nav>
 
 <!-- Tab Content -->
 <div class="tab-content" id="resoluteContent">
-
-    <!-- Weekly Announcements -->
-    <div class="tab-pane fade show active" id="announcement-tab" role="tabpanel"
-        aria-labelledby="announcement-tab-button" tabindex="0">
-        <div class="container-fluid mb-2">
-            <div class="row border rounded border-success bg-light" id="announcement-header">
-                <div class="col">
-                    <div class="row border rounded border-success bg-light">
-                        <div class="col-auto mt-5 mb-4 settings">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="announcement-ping"
-                                    name="announcement-ping">
-                                <label class="form-check-label" for="announcement-ping">Ping with announcements?</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container-fluid mb-2">
-            <table class="table table-dark table-striped table-hover text-white border announcement-table">
-                <thead>
-                    <tr>
-                        <th scope="col" width="1%"></th>
-                        <th scope="col">Title</th>
-                    </tr>
-                </thead>
-                <tbody id="announcement-table-body"></tbody>
-            </table>
-
-            <button type="button" class="btn btn-success float-end" id="announcement-new-button" data-bs-toggle="modal"
-                data-bs-target="#announcement-modal-edit-form">New Announcement</button>
-        </div>
-    </div>
-
-    <!-- Bot Messages -->
-    <div class="tab-pane fade" id="bot-messages-tab" role="tabpanel" aria-labelledby="bot-messages-button" tabindex="0">
-        <div class="container-fluid mb-2 border border-light">
-            <div class="nav nav-tabs resolute-tabs m-2" id="messageTab" role="tablist">
-                <button class="nav-link active resolute" id="new-message-tab" data-bs-toggle="tab"
-                    data-bs-target="#new-message" type="button" role="tab" aria-selected="true"
-                    aria-controls="new-message">New Message</button>
-            </div>
-
-            <div class="tab-content" id="messageContent">
-                <div class="tab-pane fade show active" id="new-message" role="tabpanel"
-                    aria-labelledby="new-message-tab" tabindex="0">
-                    <div class="container-fluid m-2">
-                        <div class="row mb-3 mt-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="message-title" name="message-title"
-                                    required>
-                                <label for="message-title">Post Title/Description</label>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-sm">
-                                <div class="form-floating">
-                                    <select class="form-select" aria-label="Channel Select" id="message-channel"
-                                        name="message-channel"></select>
-                                    <label for="message-channel">Channel</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="message-pin" value="True"
-                                        name="message-pin">
-                                    <label class="form-check-label text-white" for="message-pin">Pin Message?</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="form-floating">
-                                <textarea id="message-body" value="" class="form-control big-edit-body"
-                                    required maxlength="2000"></textarea>
-                                <label for="message-body">Message</label>
-                            </div>
-                        </div>
-                        <button type="button" id="new-message-submit-button" class="btn btn-primary float-end m-3">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Guild Settings -->
-    <div class="tab-pane fade" id="guild-settings-tab" role="tabpanel" aria-labelledby="guild-settings-button" tabindex="0">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-max-level">
-                        <label for="guild-max-level">Max Level</label>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-max-characters">
-                        <label for="guild-max-characters">Max Characters</label>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="guild-handicap-cc">
-                        <label for="guild-handicap-cc">Handicap CC</label>
-                    </div>
-                </div>
-            </div>
-
-            <button type="button" id="guild-settings-save-button" class="btn btn-primary float-begin m-3">
-                Save
-            </button>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="announcement-modal-edit-form" tabindex="-1" role="dialog"
-    aria-labelledby="announcement-modal-edit-form" aria-hidden="true" data-id="">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black">Announcement</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div class="container">
-                    <div class="row mb-2">
-                        <div class="col-md">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="announcement-title" value="">
-                                <label for="announcement-title">Announcement Title</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <div class="form-floating">
-                                <textarea id="announcement-body" value="" class="form-control big-edit-body"
-                                    required></textarea>
-                                <label for="announcement-body">Announcement Body</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col mb-3">
-                            <button type="button" class="btn btn-primary float-end" id="announcement-submit-button"
-                                data-bs-dismiss="modal">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="message-modal-delete-form" tabindex="-1" role="dialog"
-    aria-labelledby="message-modal-delete-form" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold text-black">Confirm</h4>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                Are you sure you want to delete this message?
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" data-id="" id="message-delete-button">Delete</button>
-            </div>
-        </div>
-    </div>
+    {% for tab in tabs %}
+        {% include tab %}
+    {% endfor %}
 </div>
 
 <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
-
 {% endblock %}

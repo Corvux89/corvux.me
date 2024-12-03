@@ -708,6 +708,7 @@ async function buildMessageTab() {
     $("#message-channel").html('');
     $(".message-edit").remove();
     messages.forEach(message => builTabContent(message));
+    channels.sort((a, b) => a.name.localeCompare(b.name));
     channels.forEach(channel => {
         $("#message-channel").append(`<option value="${channel.id}">${channel.name}</option>`);
     });

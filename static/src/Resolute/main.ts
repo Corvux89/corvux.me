@@ -801,6 +801,8 @@ async function buildMessageTab(){
         builTabContent(message)
     )
 
+    channels.sort((a, b) => a.name.localeCompare(b.name))
+
     channels.forEach(channel => {
         $("#message-channel").append(
             `<option value="${channel.id}">${channel.name}</option>`

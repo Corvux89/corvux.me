@@ -467,11 +467,6 @@ async function buildActivityTable() {
         data: activities,
         columns: [
             {
-                data: "id",
-                searchable: false,
-                title: "ID"
-            },
-            {
                 data: "value",
                 title: "Name"
             },
@@ -520,7 +515,7 @@ async function buildActivityTable() {
             {
                 data: "id",
                 searchable: false,
-                title: "ID"
+                title: "Activity Level"
             },
             {
                 data: "points",
@@ -637,6 +632,9 @@ async function buildLogTable() {
         stateSave: true,
         processing: true,
         serverSide: true,
+        language: {
+            emptyTable: "No logs to display."
+        },
         ajax: {
             url: 'api/logs',
             type: 'POST',

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, send_from_directory
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
@@ -59,6 +59,10 @@ def site_map():
     response = make_response(response)
     response.headers["Content-Type"] = "application/xml"
     return response
+
+@app.route('/.well-known/discord')
+def known_discord():
+    return send_from_directory(app.static_folder, 'discord.txt')
 
 @app.errorhandler(404)
 def not_found(e):

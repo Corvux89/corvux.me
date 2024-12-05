@@ -1,11 +1,10 @@
 import os
 
-from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
+from flask import Blueprint, Flask, Response, abort, current_app, redirect, render_template, request, jsonify, url_for
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
-from constants import DISCORD_GUILD_ID
-from helpers.auth_helper import is_admin
+from constants import DISCORD_ADMINS, DISCORD_GUILD_ID
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
 from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCost, Log, Player, RefMessage, ResoluteGuild
@@ -16,9 +15,19 @@ resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
 
 @resolute_blueprint.before_request
-@is_admin
 def before_request():
-    pass
+    exclusions = ['/resolute/terms', '/resolute/privacy']
+    if request.path in exclusions:
+        return None
+    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+    
+    if not discord_session or not discord_session.authorized:
+        return redirect(url_for('auth.login', next=request.endpoint))
+    
+    user = discord_session.fetch_user()
+
+    if user.id not in DISCORD_ADMINS:
+        return redirect(url_for('homepage')) 
 
 @resolute_blueprint.route('/')
 def resolute_main():
@@ -28,6 +37,13 @@ def resolute_main():
 
     return render_template('Resolute/resolute_main.html', tabs=tabs)
 
+@resolute_blueprint.route('/terms')
+def terms():
+    return render_template('Resolute/terms.html')
+
+@resolute_blueprint.route('/privacy')
+def privacy():
+    return render_template('Resolute/privacy.html')
 
 @resolute_blueprint.route('/api/guild', methods=['GET', 'PATCH'])
 def upsert_guild():

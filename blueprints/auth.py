@@ -4,7 +4,6 @@ from flask import Blueprint, current_app, redirect, request, session, url_for
 from flask_discord import DiscordOAuth2Session
 
 from constants import DISCORD_ADMINS
-from helpers.auth_helper import is_admin
 
 
 auth_blueprint = Blueprint("auth", __name__)

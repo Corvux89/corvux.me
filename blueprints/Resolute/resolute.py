@@ -7,7 +7,7 @@ from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_ADMINS, DISCORD_GUILD_ID
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
 from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, LevelCost, Log, Player, RefMessage, ResoluteGuild
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
 from sqlalchemy.orm import joinedload
 
 
@@ -352,3 +352,46 @@ def get_level_costs():
         trigger_compendium_reload()
 
         return jsonify(200)
+    
+@resolute_blueprint.route('/api/financial', methods=['GET', 'PATCH'])
+def get_financial():
+    db: SQLAlchemy = current_app.config.get('DB')
+    fin: Financial = (db.session.query(Financial)
+                      .first()
+                                    )
+
+    if request.method == "GET":
+        return jsonify(fin)   
+    
+    elif request.method == "PATCH":
+        update_data = request.get_json()
+
+        fin.monthly_goal = update_data['monthly_goal']
+        fin.monthly_total = update_data['monthly_total']
+        fin.reserve = update_data['reserve']
+        fin.month_count = update_data['month_count']
+
+        db.session.commit()
+
+        return jsonify(200)
+    
+@resolute_blueprint.route('/api/store', methods=['GET', 'PATCH'])
+def get_store():
+    db: SQLAlchemy = current_app.config.get('DB')
+    store: list[Store] = (db.session.query(Store)
+                          .order_by(asc(Store.sku))
+                          .all())
+    
+    if request.method == "GET":
+        return jsonify(store)
+    elif request.method == "PATH":
+        update_data = request.get_json()
+
+        for s in update_data:
+            sku = next((x for x in store if sku.sku == x['sku']), None)
+            sku.user_cost = s['user_cost']
+
+        db.session.commit()
+        return jsonify(200)
+
+    

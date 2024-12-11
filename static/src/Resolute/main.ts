@@ -1,4 +1,4 @@
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getGuild, getLevelCosts, getMessages, getPlayers, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js'
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js'
 import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint } from './types.js'
 
 $('body').addClass("busy")
@@ -419,6 +419,15 @@ $('#guild-settings-button').on('click', function() {
         $('#guild-max-characters').val(`${guild.max_characters}`)
         $('#guild-div-cc').val(`${guild.div_limit}`)
     })
+})
+
+$('#financial-settings-button').on('click', async function(){
+    $('body').addClass("busy")
+    const fin = await getFinancial()
+    const store = await getStores()
+    $("body").removeClass("busy")
+
+    $('#monthly-goal').val(`${fin.monthly_goal}`)
 })
 
 $('#guild-settings-save-button').on('click', function(){

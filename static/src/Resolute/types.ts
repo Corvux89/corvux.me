@@ -127,6 +127,19 @@ export interface Log{
     character: Character
 }
 
+export interface Financial{
+    monthly_goal: number
+    monthly_total: number
+    reserve: number
+    month_count: number
+    last_reset?: Date
+}
+
+export interface Store{
+    sku: number
+    user_cost: number
+}
+
 export interface DataTableRequest {
     draw: number;
     start: number;

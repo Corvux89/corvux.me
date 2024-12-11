@@ -62,7 +62,7 @@ class NumberInput extends HTMLElement {
     }
     // Observe changes to 'label-text' and 'custom-id' attributes
     static get observedAttributes() {
-        return ['label-text', 'custom-id', 'value', 'required', 'disabled'];
+        return ['label-text', 'custom-id', 'value', 'required', 'disabled', 'step'];
     }
     // Called when the element is connected to the DOM
     connectedCallback() {
@@ -79,6 +79,9 @@ class NumberInput extends HTMLElement {
         if (name === 'custom-id') {
             this._id = newValue || '';
         }
+        if (name == 'step') {
+            this.step = Number(newValue);
+        }
         if (name === 'value') {
             this.value = Number(newValue);
         }
@@ -91,11 +94,15 @@ class NumberInput extends HTMLElement {
         const labelText = this.getAttribute('label-text');
         const customId = this.getAttribute('custom-id');
         const value = this.getAttribute('value');
+        const step = this.getAttribute('step');
         if (labelText) {
             this.label = labelText;
         }
         if (customId) {
             this._id = customId;
+        }
+        if (this.step) {
+            this.step = Number(step);
         }
         if (value) {
             this.value = Number(value);
@@ -107,7 +114,8 @@ class NumberInput extends HTMLElement {
     render() {
         this.innerHTML = `
       <div class="form-floating">
-        <input type="number" class="form-control" id="${this._id}" value="${this.value ?? ''}"
+        <input type="number" class="form-control" id="${this._id}" value="${this.value ?? ''}" 
+        step="${this.step ?? 1}"
         ${this.required ? 'required' : ''}
         ${this.disabled ? 'disabled' : ''}
         />

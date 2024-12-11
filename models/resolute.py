@@ -96,6 +96,31 @@ class Species(db.Model):
         self.id = kwargs.get('id')
         self.value = kwargs.get('value')
 
+class Store(db.Model):
+    __tablename__ = "store"
+    sku: Mapped[int] = mapped_column(primary_key=True)
+    user_cost: Mapped[float]
+
+    def __init__(self, **kwargs):
+        self.sku = kwargs.get('sku')
+        self.user_cost = kwargs.get('user_cost', 0)
+
+class Financial(db.Model):
+    __tablename__ = "financial"
+    monthly_goal: Mapped[float] = mapped_column(primary_key=True)
+    monthly_total: Mapped[float] = mapped_column(primary_key=True)
+    reserve: Mapped[float] = mapped_column(primary_key=True)
+    month_count: Mapped[int] = mapped_column(primary_key=True)
+    last_reset: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
+
+    def __init__(self, **kwargs):
+        self.monthly_goal = kwargs.get('monthly_goal', 0)
+        self.monthly_total = kwargs.get('monthly_total', 0)
+        self.reserve = kwargs.get('reserve', 0)
+        self.month_count = kwargs.get('month_count', 0)
+        self.last_reset = kwargs.get('last_reset')
+
+
 class ResoluteGuild(db.Model):
     __tablename__ = "guilds"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -103,8 +128,7 @@ class ResoluteGuild(db.Model):
     weeks: Mapped[int]
     last_reset: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
     max_characters: Mapped[int]
-    div_limit: Mapped[int]
-    weekly_announcement: Mapped[list[str]] = mapped_column(ARRAY(String))
+    div_limit: Mapped[int] 
     ping_announcement: Mapped[bool]
     handicap_cc: Mapped[int]
 

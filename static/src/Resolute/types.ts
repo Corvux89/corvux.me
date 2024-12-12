@@ -136,7 +136,7 @@ export interface Financial{
 }
 
 export interface Store{
-    sku: number
+    sku: string
     user_cost: number
 }
 

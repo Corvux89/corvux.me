@@ -1,11 +1,9 @@
-from enum import Enum
 import json
 import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy import Date, ForeignKey, String, DateTime
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -393,6 +391,9 @@ class AlchemyEncoder(json.JSONEncoder):
             elif isinstance(obj, CharacterClass):
                 fields['primary_class'] = obj.primary_class_record
                 fields["archetype"] = obj.archetype_record
+            
+            elif isinstance(obj, Store):
+                fields['sku'] = f"{obj.sku}"
 
             return fields
         return json.JSONEncoder.default(self, obj)

@@ -384,12 +384,12 @@ def get_store():
     
     if request.method == "GET":
         return jsonify(store)
-    elif request.method == "PATH":
+    elif request.method == "PATCH":
         update_data = request.get_json()
 
         for s in update_data:
-            sku = next((x for x in store if sku.sku == x['sku']), None)
-            sku.user_cost = s['user_cost']
+            if sku := next((x for x in store if x.sku == int(s['sku'])), None):
+                sku.user_cost = s['user_cost']
 
         db.session.commit()
         return jsonify(200)

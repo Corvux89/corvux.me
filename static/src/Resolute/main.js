@@ -1,4 +1,4 @@
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getGuild, getLevelCosts, getMessages, getPlayers, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateGuild, updateLevelCosts, updateMessage } from './api.js';
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -27,7 +27,6 @@ $(document).on('click', '.message-edit-button', function (e) {
     message.title = $(`#${message.message_id}-title`).val().toString();
     message.content = $(`#${message.message_id}-body`).val().toString();
     message.pin = $(`#${message.message_id}-pin`).prop("checked");
-    console.log(message);
     updateMessage(message)
         .then(() => {
         $(`#${message.message_id}-tab`).html(message.title);
@@ -46,7 +45,6 @@ $(document).on("click", "#announcement-table tbody tr", function () {
     const body = parts.length > 1 ? parts[1] : parts[0];
     $(".modal-body #announcement-title").val(title);
     $(".modal-body #announcement-body").val(body);
-    console.log(row.data());
     modal.data("id", row.index())
         .modal("show");
 });
@@ -357,6 +355,57 @@ $('#guild-settings-button').on('click', function () {
         $('#guild-handicap-cc').val(`${guild.handicap_cc}`);
         $('#guild-max-characters').val(`${guild.max_characters}`);
         $('#guild-div-cc').val(`${guild.div_limit}`);
+    });
+});
+$('#financial-settings-button').on('click', async function () {
+    $('body').addClass("busy");
+    const fin = await getFinancial();
+    const store = await getStores();
+    $("body").removeClass("busy");
+    $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`);
+    $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`);
+    $('#reserve').val(`${fin.reserve.toFixed(2)}`);
+    if ($.fn.DataTable.isDataTable("#sku-table")) {
+        $("#sku-table").DataTable().destroy();
+    }
+    $("#sku-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 25,
+        lengthChange: false,
+        info: false,
+        paging: false,
+        data: store,
+        columns: [
+            {
+                title: "SKU",
+                data: "sku"
+            },
+            {
+                title: "Cost",
+                data: "user_cost",
+                render: function (data, type, row) {
+                    return `<input type="number" class="form-control sku-cost-input" step="0.01" data-id="${row.sku}" value="${data != null ? data : ''}"/>`;
+                }
+            }
+        ]
+    });
+});
+$('#financial-submit-button').on('click', function () {
+    getFinancial()
+        .then(fin => {
+        fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0;
+        fin.monthly_total = Number($('#monthly-total').val()) ?? 0;
+        fin.reserve = Number($('#reserve').val()) ?? 0;
+        updateFinancial(fin);
+    });
+});
+$('#sku-submit-button').on('click', function () {
+    getStores()
+        .then(stores => {
+        stores.forEach(sku => {
+            sku.user_cost = parseFloat($(`.sku-cost-input[data-id="${sku.sku}"]`).val().toString());
+        });
+        updateStores(stores);
     });
 });
 $('#guild-settings-save-button').on('click', function () {

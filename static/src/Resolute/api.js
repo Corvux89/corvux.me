@@ -8,7 +8,8 @@ const activity_point_url = `${window.location.href}api/activity_points`;
 const player_url = `${window.location.href}api/players`;
 const code_conversion_url = `${window.location.href}api/code_conversion`;
 const level_cost_url = `${window.location.href}api/level_costs`;
-const level_cap_url = `${window.location.href}api/level_caps`;
+const financial_url = `${window.location.href}api/financial`;
+const store_url = `${window.location.href}api/store`;
 export function getGuild() {
     return fetch(guild_url)
         .then(res => res.json())
@@ -239,5 +240,61 @@ export function updateLevelCosts(costs) {
             reject(new Error("Something went wrong"));
         };
         request.send(JSON.stringify(costs));
+    });
+}
+export function getFinancial() {
+    return fetch(financial_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
+    });
+}
+export function updateFinancial(fin) {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('PATCH', financial_url, true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.onload = function () {
+            if (request.status == 200) {
+                ToastSuccess("Successfully updated!");
+                resolve(this.response.responseText);
+            }
+            else {
+                ToastError(this.response);
+                resolve(null);
+            }
+        };
+        request.onerror = function () {
+            reject(new Error("Something went wrong"));
+        };
+        request.send(JSON.stringify(fin));
+    });
+}
+export function getStores() {
+    return fetch(store_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
+    });
+}
+export function updateStores(store) {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('PATCH', store_url, true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.onload = function () {
+            if (request.status == 200) {
+                ToastSuccess("Successfully updated!");
+                resolve(this.response.responseText);
+            }
+            else {
+                ToastError(this.response);
+                resolve(null);
+            }
+        };
+        request.onerror = function () {
+            reject(new Error("Something went wrong"));
+        };
+        request.send(JSON.stringify(store));
     });
 }

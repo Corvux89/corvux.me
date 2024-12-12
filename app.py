@@ -60,10 +60,6 @@ def site_map():
     response.headers["Content-Type"] = "application/xml"
     return response
 
-@app.route('/.well-known/discord')
-def known_discord():
-    return send_from_directory(app.static_folder, 'discord.txt')
-
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html")

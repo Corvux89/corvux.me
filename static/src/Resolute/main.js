@@ -19,6 +19,9 @@ $(document).on('click', '.announcement-delete', function (e) {
         });
     });
 });
+$(document).on('click', '.message-delete', function (e) {
+    e.stopPropagation();
+});
 $(document).on('click', '.message-edit-button', function (e) {
     var message = {};
     message.message_id = $(this).data('id');
@@ -287,9 +290,6 @@ $("#log-review-button").on('click', function () {
 $("#message-delete-button").on('click', function () {
     var message_id = $(this).data('id');
     deleteMessage(message_id);
-    $(`#${message_id}-tab`).remove();
-    $(`#edit-${message_id}`).remove();
-    $("#new-message-tab").tab("show");
 });
 $("#announcement-new-button").on('click', function () {
     $("#announcement-modal-edit-form").data('id', "new");
@@ -340,13 +340,7 @@ $('#new-message-submit-button').on('click', function (e) {
     NewMessage.message = $("#message-body").val().toString();
     NewMessage.pin = $("#message-pin").prop('checked');
     NewMessage.title = $("#message-title").val().toString();
-    newMessage(NewMessage)
-        .then(message => {
-        $("#message-title").val("");
-        $("#message-pin").prop('checked', false);
-        $("#message-body").val("");
-        builTabContent(message);
-    });
+    newMessage(NewMessage);
 });
 $('#guild-settings-button').on('click', function () {
     getGuild()
@@ -681,6 +675,8 @@ async function buildLogTable() {
         stateSave: true,
         processing: true,
         serverSide: true,
+        // @ts-ignore   
+        responsive: true,
         language: {
             emptyTable: "No logs to display."
         },
@@ -752,14 +748,42 @@ async function buildMessageTab() {
     const messages = await getMessages();
     const channels = await getChannels();
     $("body").removeClass("busy");
-    $("#message-channel").html('');
-    $(".message-edit").remove();
-    messages.forEach(message => builTabContent(message));
-    channels.sort((a, b) => a.name.localeCompare(b.name));
-    channels.forEach(channel => {
-        $("#message-channel").append(`<option value="${channel.id}">${channel.name}</option>`);
+    // $("#message-channel").html('')
+    // $(".message-edit").remove()
+    // messages.forEach(message => 
+    //     builTabContent(message)
+    // )
+    // channels.sort((a, b) => a.name.localeCompare(b.name))
+    // channels.forEach(channel => {
+    //     $("#message-channel").append(
+    //         `<option value="${channel.id}">${channel.name}</option>`
+    //     )
+    // });
+    // $("#new-message-tab").trigger('click')
+    if ($.fn.DataTable.isDataTable("#message-table")) {
+        $("#message-table").DataTable().destroy();
+    }
+    $("#message-table").DataTable({
+        data: messages,
+        columns: [
+            {
+                width: "5%",
+                render: function (data, type, row) {
+                    return `
+                    <button class="btn fa-solid fa-trash text-white message-delete" data-id=${row.message_id}></button>
+                    `;
+                }
+            },
+            {
+                title: "Title",
+                data: "title"
+            },
+            {
+                title: "Channel",
+                data: "channel_name"
+            }
+        ]
     });
-    $("#new-message-tab").trigger('click');
 }
 async function buildPricingTab() {
     const conversions = await getCodeconversions();

@@ -16,7 +16,7 @@ def get_csp():
             'https://cdn.jsdelivr.net/',
             'https://www.googletagmanager.com/',
             'https://ajax.googleapis.com',
-            'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js'
+            'https://cdn.datatables.net/'
         ],
         'img-src': [
             '*',
@@ -27,7 +27,7 @@ def get_csp():
             '\'self\'',
             'https://use.fontawesome.com',
             'https://cdn.jsdelivr.net/',
-            'https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css'
+            'https://cdn.datatables.net/'
         ],
         'font-src': [
             '\'self\'',

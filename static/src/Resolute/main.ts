@@ -25,19 +25,31 @@ $(document).on('click', '.announcement-delete', function(e){
     })
 })
 
-$(document).on('click', '.message-edit-button', function(e){
-    var message = {} as RefMessage
-    message.message_id = $(this).data('id')
-    message.channel_id = $(`#${message.message_id}-channel`).find(":selected").val().toString()
-    message.channel_name = $(`#${message.message_id}-channel`).find(":selected").text()
-    message.title = $(`#${message.message_id}-title`).val().toString()
-    message.content = $(`#${message.message_id}-body`).val().toString()
-    message.pin = $(`#${message.message_id}-pin`).prop("checked")
+$(document).on('click', '.message-delete', function(e){
+    e.stopPropagation()
+    const message_id = $(this).data('id')
+    $("#message-modal-delete-form").data('id', message_id)
+    .modal("show")
+})
 
-    updateMessage(message)
-    .then(() => {
-        $(`#${message.message_id}-tab`).html(message.title)
-    })
+$(document).on('click', '#message-table tbody tr', function(e){
+    const table = $("#message-table").DataTable()
+    const row = table.row(this)
+    const modal = $("#message-modal-edit-form")
+    const message: RefMessage = row.data()
+    console.log(message)
+    
+    $("#message-title").val(message.title)
+    $("#message-channel").html('')
+        .prop("disabled", true)
+        .append(`
+            <option selected value="${message.channel_id}">${message.channel_name}</option>
+            `)
+    $("#message-pin").prop("checked", message.pin)
+    $("#message-body").val(message.content)
+
+    modal.data("id", message.message_id)
+    .modal("show")
 })
 
 $(document).on("click", "#announcement-table tbody tr", function(){
@@ -329,19 +341,39 @@ $("#log-review-button").on('click', function(){
 
 $("#message-delete-button").on('click', function(){
     var message_id = $(this).data('id')
+    $('body').addClass("busy")
     deleteMessage(message_id)
-
-    $(`#${message_id}-tab`).remove()
-    $(`#edit-${message_id}`).remove()
-
-    $("#new-message-tab").tab("show")
-    
+    buildMessageTab()
 })
 
 $("#announcement-new-button").on('click', function(){
     $("#announcement-modal-edit-form").data('id', "new")
     $(".modal-body #announcement-title").val("")
     $(".modal-body #announcement-body").val("")
+})
+
+$("#message-new-button").on('click', async function(){
+    $('body').addClass("busy")
+    const channels = await getChannels()
+    channels.sort((a, b) => a.name.localeCompare(b.name))
+    $('body').removeClass("busy")
+    $(".modal-body #message-title").val("")
+    $(".modal-body #message-pin").prop('checked', false)
+    $(".modal-body #message-body").val("")
+    
+    $(".modal-body #message-channel")
+        .html('')
+        .prop("disabled", false)
+
+    channels.forEach(c => {
+        $(".modal-body #message-channel").append(
+            `<option value="${c.id}">${c.name}</option>`
+        )
+    })
+
+    $("#message-modal-edit-form")
+        .data('id', "new")
+        .modal("show")
 })
 
 $(document).on('click', '#announcement-submit-button', function(){
@@ -383,27 +415,40 @@ $(document).on('input', '.point-input', function(){
     }
 })
 
-$('#new-message-submit-button').on('click', function(e){
+$('#message-save-button').on('click', function(e){
     if ($('#message-title').val() == '' || $('#message-body').val() == ''){
         ToastError("Please fill out a title and a body")
         return
     }
+    const modal = $("#message-modal-edit-form")
+    const message_id = $(modal).data('id')
 
-    var NewMessage = {} as NewMessage
+    if (message_id == 'new'){
+        var NewMessage = {} as NewMessage
 
-    NewMessage.channel_id = $('#message-channel').find(':selected').val().toString()
-    NewMessage.channel_name = $('#message-channel').find(':selected').text()
-    NewMessage.message = $("#message-body").val().toString()
-    NewMessage.pin = $("#message-pin").prop('checked')
-    NewMessage.title = $("#message-title").val().toString()
+        NewMessage.channel_id = $('#message-channel').find(':selected').val().toString()
+        NewMessage.channel_name = $('#message-channel').find(':selected').text()
+        NewMessage.message = $("#message-body").val().toString()
+        NewMessage.pin = $("#message-pin").prop('checked')
+        NewMessage.title = $("#message-title").val().toString()
+        
+        $('body').addClass("busy")
+        newMessage(NewMessage)
+        .then(()=> buildMessageTab())
+    } else {
+        var UpdateMessage = {
+            "message_id": message_id,
+            "channel_id": $('#message-channel').find(':selected').val().toString(),
+            "channel_name": $('#message-channel').find(':selected').text(),
+            "content": $("#message-body").val().toString(),
+            "pin": $("#message-pin").prop('checked'),
+            "title": $("#message-title").val().toString() 
+        } as RefMessage
 
-    newMessage(NewMessage)
-    .then(message => {
-        $("#message-title").val("")
-        $("#message-pin").prop('checked', false)
-        $("#message-body").val("")
-        builTabContent(message)
-    })
+        $('body').addClass("busy")
+        updateMessage(UpdateMessage)
+        .then(() => buildMessageTab())
+    }
 })
 
 
@@ -774,6 +819,8 @@ async function buildLogTable(){
         stateSave: true,
         processing: true,
         serverSide: true,
+        // @ts-ignore   
+        responsive: true,
         language: {
             emptyTable: "No logs to display."
         },
@@ -844,25 +891,44 @@ async function buildLogTable(){
 
 async function buildMessageTab(){
     const messages = await getMessages()
-    const channels = await getChannels()
     $("body").removeClass("busy")
-    $("#message-channel").html('')
-    $(".message-edit").remove()
 
 
-    messages.forEach(message => 
-        builTabContent(message)
-    )
 
-    channels.sort((a, b) => a.name.localeCompare(b.name))
+    if ($.fn.DataTable.isDataTable("#message-table")) {
+        $("#message-table").DataTable().destroy();
+    }
 
-    channels.forEach(channel => {
-        $("#message-channel").append(
-            `<option value="${channel.id}">${channel.name}</option>`
-        )
-    });
-
-    $("#new-message-tab").trigger('click')
+    $("#message-table").DataTable({
+        data: messages,
+        columns: [
+            {
+                width: "5%",
+                render: function(data, type, row){
+                    return `
+                    <button class="btn fa-solid fa-trash text-white message-delete" data-id=${row.message_id}></button>
+                    `
+                }
+            },
+            {
+                title: "Title",
+                data: "title"
+            },
+            {
+                title: "Channel",
+                data: "channel_name"
+            },
+            {
+                title: "Pinned?",
+                data: "pin",
+                render: (data) => {
+                    return data
+                        ? `<i class="fa-solid fa-check"></i>`
+                        : ``
+                }
+            }
+        ]
+    })
 }
 
 async function buildPricingTab(){
@@ -929,65 +995,6 @@ async function buildPricingTab(){
             }
         ]
     })
-}
-
-function builTabContent(message: RefMessage): void{
-    let button = jQuery("<button>")
-        .addClass("nav-link resolute message-edit")
-        .attr("id", `${message.message_id}-tab`)
-        .attr("type", "button")
-        .attr("role", "tab")
-        .attr("aria-controls", `edit-${message.message_id}`)
-        .attr("aria-selected", "false")
-        .attr("data-bs-toggle", "tab")
-        .attr("data-bs-target", `#edit-${message.message_id}`)
-        .html(message.title)
-    
-    $("#messageTab").append(button)
-
-    let pane = jQuery("<div>")
-        .addClass("tab-pane fade message-edit")
-        .attr("id", `edit-${message.message_id}`)
-        .attr("role", "tabpanel")
-        .attr("aria-labelledby", `${message.message_id}-tab`)
-        .attr("tabIndex", 0)
-        .html(`
-        <div class="container-fluid m-2">
-            <div class="row mb-3">
-                <text-input label-text="Post Title/Description" custom-id="${message.message_id}-title" value="${message.title}"></text-input>
-            </div>
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <div class="form-floating">
-                        <select class="form-select" arial-label="Channel Select" id="${message.message_id}-channel" name="${message.message_id}-channel" disabled>
-                            <option value="${message.channel_id}" selected>${message.channel_name}</option>
-                        </select>
-                        <label for="${message.message_id}-channel">Channel</label>
-                    </div>
-                </div>
-
-                <div class="col-sm">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="${message.message_id}-pin" name="${message.message_id}-pin" ${message.pin == true ? 'checked':''}>
-                        <label class="form-check-label text-white" for="${message.message_id}-pin">Pin Message?</label> 
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="form-floating">
-                    <textarea id="${message.message_id}-body" class="form-control big-edit-body" required maxlength="2000">${message.content}</textarea>
-                    <label for="${message.message_id}-body">Message</label>
-                </div>
-            </div>
-            <div class="col-auto">
-                <button type="button" id="${message.message_id}-delete-button" data-id="${message.message_id}" class="btn btn-danger float-end m-3 message-delete" data-bs-target="#message-modal-delete-form" data-bs-toggle="modal">Delete</button>
-                <button type="button" id="${message.message_id}-edit-button" data-id="${message.message_id}" class="btn btn-primary float-end m-3 message-edit-button">Update</button>
-            </div>
-        </div>
-    `)
-   
-    $("#messageContent").append(pane)
 }
 
 export function ToastError(message: string): void{

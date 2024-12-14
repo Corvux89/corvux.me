@@ -93,6 +93,7 @@ export function deleteMessage(mesage_id) {
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
+                ToastSuccess(`Message successfully deleted!`);
                 resolve(this.response.responseText);
             }
             else {

@@ -94,8 +94,12 @@ body{
     color: white !important;
 }
 
-.dataTables_filter, .dataTables_filter input{
+.dataTables_filter, .dataTables_filter input, .dt-layout-row{
     color: white !important;
+}
+
+.dt-input option{
+    color: black!important;
 }
 
 .loading-overlay{

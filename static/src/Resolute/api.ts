@@ -113,6 +113,7 @@ export function deleteMessage(mesage_id: string): void{
 
         request.onload = function () {
             if (request.status == 200){
+                ToastSuccess(`Message successfully deleted!`)
                 resolve(this.response.responseText)
             } else {
                 ToastError(this.response)

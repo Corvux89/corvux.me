@@ -410,6 +410,8 @@ $('#financial-settings-button').on('click', async function () {
     }
     $("#sku-table").DataTable({
         orderCellsTop: true,
+        // @ts-ignore
+        responsive: true,
         pageLength: 25,
         lengthChange: false,
         info: false,
@@ -511,6 +513,8 @@ async function buildAnnouncementTable() {
     }
     $("#announcement-table").DataTable({
         orderCellsTop: true,
+        //@ts-ignore
+        responsive: true,
         searching: false,
         info: false,
         paging: false,
@@ -551,6 +555,8 @@ async function buildActivityTable() {
         orderCellsTop: true,
         pageLength: 50,
         lengthChange: false,
+        //@ts-ignore
+        responsive: true,
         info: false,
         paging: false,
         data: activities,
@@ -594,6 +600,8 @@ async function buildActivityTable() {
     }
     $("#activity-points-table").DataTable({
         orderCellsTop: true,
+        // @ts-ignore
+        responsive: true,
         pageLength: 10,
         lengthChange: false,
         searching: false,
@@ -721,8 +729,6 @@ async function buildLogTable() {
         stateSave: true,
         processing: true,
         serverSide: true,
-        // @ts-ignore   
-        responsive: true,
         language: {
             emptyTable: "No logs to display."
         },
@@ -836,6 +842,8 @@ async function buildPricingTab() {
     }
     $("#conversion-table").DataTable({
         orderCellsTop: true,
+        // @ts-ignore
+        responsive: true,
         pageLength: 10,
         lengthChange: false,
         searching: false,
@@ -864,6 +872,8 @@ async function buildPricingTab() {
     }
     $("#level-cost-table").DataTable({
         orderCellsTop: true,
+        // @ts-ignore
+        responsive: true,
         pageLength: 10,
         lengthChange: false,
         searching: false,

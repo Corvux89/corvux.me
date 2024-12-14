@@ -94,7 +94,7 @@ body{
     color: white !important;
 }
 
-.dataTables_filter, .dataTables_filter input, .dt-layout-row{
+.dt-bootstrap5{
     color: white !important;
 }
 

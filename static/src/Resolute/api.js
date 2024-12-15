@@ -1,4 +1,4 @@
-import { ToastError, ToastSuccess } from "./main.js";
+import { ToastError, ToastSuccess } from "../General/main.js";
 const guild_url = `${window.location.href}api/guild`;
 const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;

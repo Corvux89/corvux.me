@@ -1,3 +1,4 @@
+import { ToastError } from '../General/main.js';
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
@@ -899,12 +900,4 @@ async function buildPricingTab() {
             }
         ]
     });
-}
-export function ToastError(message) {
-    $("#error-toast .toast-body").html(message);
-    $("#error-toast").toast("show");
-}
-export function ToastSuccess(message) {
-    $("#confirm-toast .toast-body").html(message);
-    $("#confirm-toast").toast("show");
 }

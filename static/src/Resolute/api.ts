@@ -1,4 +1,4 @@
-import { ToastError, ToastSuccess } from "./main.js"
+import { ToastError, ToastSuccess } from "../General/main.js"
 import { Activity, ActivityPoint, CodeConversion, DiscordChannel, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`

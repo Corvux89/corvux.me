@@ -387,6 +387,7 @@ $('#message-save-button').on('click', function (e) {
         updateMessage(UpdateMessage)
             .then(() => buildMessageTab());
     }
+    modal.modal("hide");
 });
 $('#guild-settings-button').on('click', function () {
     getGuild()
@@ -804,6 +805,7 @@ async function buildMessageTab() {
     }
     $("#message-table").DataTable({
         data: messages,
+        pageLength: 50,
         columns: [
             {
                 width: "5%",

@@ -449,6 +449,8 @@ $('#message-save-button').on('click', function(e){
         updateMessage(UpdateMessage)
         .then(() => buildMessageTab())
     }
+
+    modal.modal("hide")
 })
 
 
@@ -907,6 +909,7 @@ async function buildMessageTab(){
 
     $("#message-table").DataTable({
         data: messages,
+        pageLength: 50,
         columns: [
             {
                 width: "5%",

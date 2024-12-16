@@ -439,7 +439,11 @@ class AlchemyEncoder(json.JSONEncoder):
                 fields["archetype"] = obj.archetype_record
             
             elif isinstance(obj, Store):
-                fields['sku'] = f"{obj.sku}"
+                fields['sku'] = str(obj.sku)
+
+            elif isinstance(obj, ResoluteGuild):
+                fields['entry_role'] = str(obj.entry_role)
+                fields['help_channel'] = str(obj.help_channel)
 
             return fields
         return json.JSONEncoder.default(self, obj)

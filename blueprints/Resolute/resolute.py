@@ -65,6 +65,12 @@ def upsert_guild():
                               func.count(Character.player_id).label('count')).filter(and_(Character.guild_id == DISCORD_GUILD_ID, Character.active == True))\
                               .group_by(Character.player_id).having(func.count(Character.player_id)>update_guild.max_characters).count() > 0:
             return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
+        
+        def validateNumericInput(value):
+            try:
+                return int(value)
+            except:
+                return None
 
         guild.weekly_announcement = update_guild.weekly_announcement
         guild.ping_announcement = update_guild.ping_announcement
@@ -73,27 +79,28 @@ def upsert_guild():
         guild.max_characters = update_guild.max_characters
         guild.div_limit = update_guild.div_limit
         guild.reward_threshold = update_guild.reward_threshold
-        guild.entry_role = update_guild.entry_role
-        guild.member_role = update_guild.member_role
-        guild.admin_role = update_guild.admin_role
-        guild.staff_role = update_guild.staff_role
-        guild.bot_role = update_guild.bot_role
-        guild.quest_role = update_guild.quest_role
 
-        guild.tier_2_role = update_guild.tier_2_role
-        guild.tier_3_role = update_guild.tier_3_role
-        guild.tier_4_role = update_guild.tier_4_role
-        guild.tier_5_role = update_guild.tier_5_role
-        guild.tier_6_role = update_guild.tier_6_role
+        guild.entry_role = validateNumericInput(update_guild.entry_role)
+        guild.member_role = validateNumericInput(update_guild.member_role)
+        guild.admin_role = validateNumericInput(update_guild.admin_role) 
+        guild.staff_role = validateNumericInput(update_guild.staff_role) 
+        guild.bot_role = validateNumericInput(update_guild.bot_role)
+        guild.quest_role = validateNumericInput(update_guild.quest_role)
 
-        guild.application_channel = update_guild.application_channel
-        guild.market_channel = update_guild.market_channel
-        guild.announcement_channel = update_guild.announcement_channel
-        guild.staff_channel = update_guild.staff_channel
-        guild.help_channel = update_guild.help_channel
-        guild.arena_board_channel = update_guild.arena_board_channel
-        guild.exit_channel = update_guild.exit_channel
-        guild.entrance_channel = update_guild.entrance_channel
+        guild.tier_2_role = validateNumericInput(update_guild.tier_2_role)
+        guild.tier_3_role = validateNumericInput(update_guild.tier_3_role)
+        guild.tier_4_role = validateNumericInput(update_guild.tier_4_role)
+        guild.tier_5_role = validateNumericInput(update_guild.tier_5_role)
+        guild.tier_6_role = validateNumericInput(update_guild.tier_6_role)
+
+        guild.application_channel = validateNumericInput(update_guild.application_channel)
+        guild.market_channel = validateNumericInput(update_guild.market_channel)
+        guild.announcement_channel = validateNumericInput(update_guild.announcement_channel)
+        guild.staff_channel = validateNumericInput(update_guild.staff_channel)
+        guild.help_channel = validateNumericInput(update_guild.help_channel)
+        guild.arena_board_channel = validateNumericInput(update_guild.arena_board_channel)
+        guild.exit_channel = validateNumericInput(update_guild.exit_channel)
+        guild.entrance_channel = validateNumericInput(update_guild.entrance_channel)
         
         db.session.commit()
         trigger_guild_reload(guild.id)

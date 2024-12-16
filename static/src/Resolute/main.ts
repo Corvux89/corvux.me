@@ -495,47 +495,47 @@ $('#guild-settings-button').on('click', async function() {
 
     roles.forEach(role => {
         $('#guild-entry-role').append(`
-            <option value="${role.id}" ${guild.entry_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.entry_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#guild-member-role').append(`
-            <option value="${role.id}" ${guild.member_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.member_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#guild-admin-role').append(`
-            <option value="${role.id}" ${guild.admin_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.admin_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#guild-staff-role').append(`
-            <option value="${role.id}" ${guild.staff_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.staff_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#guild-bot-role').append(`
-            <option value="${role.id}" ${guild.bot_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.bot_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#guild-quest-role').append(`
-            <option value="${role.id}" ${guild.quest_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.quest_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#tier-2-role').append(`
-            <option value="${role.id}" ${guild.tier_2_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.tier_2_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#tier-3-role').append(`
-            <option value="${role.id}" ${guild.tier_3_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.tier_3_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#tier-4-role').append(`
-            <option value="${role.id}" ${guild.tier_4_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.tier_4_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#tier-5-role').append(`
-            <option value="${role.id}" ${guild.tier_5_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.tier_5_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
 
         $('#tier-6-role').append(`
-            <option value="${role.id}" ${guild.tier_6_role == Number(role.id) ? 'selected': ''}>${role.name}</option>
+            <option value="${role.id}" ${guild.tier_6_role == role.id.toString() ? 'selected': ''}>${role.name}</option>
         `)
     })
 
@@ -560,35 +560,35 @@ $('#guild-settings-button').on('click', async function() {
 
     channels.forEach(channel => {
         $('#guild-application-channel').append(`
-            <option value="${channel.id}" ${guild.application_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.application_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-market-channel').append(`
-            <option value="${channel.id}" ${guild.market_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.market_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-announcement-channel').append(`
-            <option value="${channel.id}" ${guild.announcement_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.announcement_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-staff-channel').append(`
-            <option value="${channel.id}" ${guild.staff_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.staff_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-help-channel').append(`
-            <option value="${channel.id}" ${guild.help_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.help_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-arena-board-channel').append(`
-            <option value="${channel.id}" ${guild.arena_board_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.arena_board_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-exit-channel').append(`
-            <option value="${channel.id}" ${guild.exit_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.exit_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-entrance-channel').append(`
-            <option value="${channel.id}" ${guild.entrance_channel == Number(channel.id) ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.entrance_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
     })
     
@@ -665,25 +665,25 @@ $('#guild-settings-save-button').on('click', function(){
         guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0
         guild.div_limit = $("#guild-div-cc").val() ? Number($("#guild-div-cc").val()) : 0
         guild.reward_threshold = $("#guild-reward-threshold").val() ? Number($("#guild-reward-threshold").val()) : 0
-        guild.entry_role = Number($('#guild-entry-role').find(':selected').val())
-        guild.member_role = Number($('#guild-member-role').find(':selected').val())
-        guild.admin_role = Number($('#guild-admin-role').find(':selected').val())
-        guild.staff_role = Number($('#guild-staff-role').find(':selected').val())
-        guild.bot_role = Number($('#guild-bot-role').find(':selected').val())
-        guild.quest_role = Number($('#guild-quest-role').find(':selected').val())
-        guild.tier_2_role = Number($('#tier-2-role').find(':selected').val())
-        guild.tier_3_role = Number($('#tier-3-role').find(':selected').val())
-        guild.tier_4_role = Number($('#tier-4-role').find(':selected').val())
-        guild.tier_5_role = Number($('#tier-5-role').find(':selected').val())
-        guild.tier_6_role = Number($('#tier-6-role').find(':selected').val())
-        guild.application_channel = Number($('#guild-application-channel').find(':selected').val())
-        guild.market_channel = Number($('#guild-market-channel').find(':selected').val())
-        guild.announcement_channel = Number($('#guild-announcement-channel').find(':selected').val())
-        guild.staff_channel = Number($('#guild-staff-channel').find(':selected').val())
-        guild.help_channel = Number($('#guild-help-channel').find(':selected').val())
-        guild.arena_board_channel = Number($('#guild-arena-board-channel').find(':selected').val())
-        guild.exit_channel = Number($('#guild-exit-channel').find(':selected').val())
-        guild.entrance_channel = Number($('#guild-entrance-channel').find(':selected').val())
+        guild.entry_role = $('#guild-entry-role').find(':selected').val().toString()
+        guild.member_role = $('#guild-member-role').find(':selected').val().toString()
+        guild.admin_role = $('#guild-admin-role').find(':selected').val().toString()
+        guild.staff_role = $('#guild-staff-role').find(':selected').val().toString()
+        guild.bot_role = $('#guild-bot-role').find(':selected').val().toString()
+        guild.quest_role = $('#guild-quest-role').find(':selected').val().toString()
+        guild.tier_2_role = $('#tier-2-role').find(':selected').val().toString()
+        guild.tier_3_role = $('#tier-3-role').find(':selected').val().toString()
+        guild.tier_4_role = $('#tier-4-role').find(':selected').val().toString()
+        guild.tier_5_role = $('#tier-5-role').find(':selected').val().toString()
+        guild.tier_6_role = $('#tier-6-role').find(':selected').val().toString()
+        guild.application_channel = $('#guild-application-channel').find(':selected').val().toString()
+        guild.market_channel = $('#guild-market-channel').find(':selected').val().toString()
+        guild.announcement_channel = $('#guild-announcement-channel').find(':selected').val().toString()
+        guild.staff_channel = $('#guild-staff-channel').find(':selected').val().toString()
+        guild.help_channel = $('#guild-help-channel').find(':selected').val().toString()
+        guild.arena_board_channel = $('#guild-arena-board-channel').find(':selected').val().toString()
+        guild.exit_channel = $('#guild-exit-channel').find(':selected').val().toString()
+        guild.entrance_channel = $('#guild-entrance-channel').find(':selected').val().toString()
         updateGuild(guild)
     })
 })

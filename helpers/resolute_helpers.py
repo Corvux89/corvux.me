@@ -56,4 +56,19 @@ def trigger_compendium_reload():
 
     requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
+def trigger_guild_reload(guild_id: int):
+    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+    current_user = discord_session.fetch_user()
+    url = f"{BOT_API_URL}/guild_update"
+    headers = {
+        'auth-token': BOT_API_AUTH_TOKEN,
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        'text': f'{current_user.name} [{current_user.id}] - Guild Cache reloaded from website',
+        'guild_id': guild_id
+    }
+
+    requests.request("POST", url, headers=headers, data=json.dumps(payload))
+
     

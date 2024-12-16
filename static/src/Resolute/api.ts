@@ -1,9 +1,10 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
-import { Activity, ActivityPoint, CodeConversion, DiscordChannel, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
+import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
 const guild_url = `${window.location.href}api/guild`
 const message_url = `${window.location.href}api/message`
 const channel_url = `${window.location.href}api/channels`
+const role_url = `${window.location.href}api/roles`
 const log_url = `${window.location.href}api/logs`
 const activity_url = `${window.location.href}api/activities`
 const activity_point_url = `${window.location.href}api/activity_points`
@@ -134,6 +135,14 @@ export function getChannels(): Promise<DiscordChannel[]>{
     .then(res => res.json())
     .then(res => {
         return res as DiscordChannel[]
+    })
+}
+
+export function getRoles(): Promise<DiscordRole[]>{
+    return fetch(role_url)
+    .then(res => res.json())
+    .then(res => {
+        return res as DiscordRole[]
     })
 }
 

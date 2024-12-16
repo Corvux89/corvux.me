@@ -129,6 +129,30 @@ class ResoluteGuild(db.Model):
     div_limit: Mapped[int] 
     ping_announcement: Mapped[bool]
     handicap_cc: Mapped[int]
+    reward_threshold: Mapped[int]
+
+    # User Roles
+    entry_role: Mapped[int]
+    member_role: Mapped[int]
+    tier_2_role: Mapped[int]
+    tier_3_role: Mapped[int]
+    tier_4_role: Mapped[int]
+    tier_5_role: Mapped[int]
+    tier_6_role: Mapped[int]
+    admin_role: Mapped[int]
+    staff_role: Mapped[int]
+    bot_role: Mapped[int]
+    quest_role: Mapped[int]
+
+    # Channels
+    application_channel: Mapped[int]
+    market_channel: Mapped[int]
+    announcement_channel: Mapped[int]
+    staff_channel: Mapped[int]
+    help_channel: Mapped[int]
+    arena_board_channel: Mapped[int]
+    exit_channel: Mapped[int]
+    entrance_channel: Mapped[int]
 
     def __init__(self, **kwargs):
         self.id = DISCORD_GUILD_ID
@@ -140,6 +164,28 @@ class ResoluteGuild(db.Model):
         self.weekly_announcement = kwargs.get('weekly_announcement')
         self.ping_announcement = kwargs.get('ping_announcement')
         self.handicap_cc = kwargs.get('handicap_cc')
+        self.reward_threshold = kwargs.get('reward_threshold')
+
+        self.entry_role = kwargs.get('entry_role')
+        self.member_role = kwargs.get('member_role')
+        self.tier_2_role = kwargs.get('tier_2_role')
+        self.tier_3_role = kwargs.get('tier_3_role')
+        self.tier_4_role = kwargs.get('tier_4_role')
+        self.tier_5_role = kwargs.get('tier_5_role')
+        self.tier_6_role = kwargs.get('tier_6_role')
+        self.admin_role = kwargs.get('admin_role')
+        self.staff_role = kwargs.get('staff_role')
+        self.bot_role = kwargs.get('bot_role')
+        self.quest_role = kwargs.get('quest_role')
+
+        self.application_channel = kwargs.get('application_channel')
+        self.market_channel = kwargs.get('market_channel')
+        self.announcement_channel = kwargs.get('announcement_channel')
+        self.staff_channel = kwargs.get('staff_channel')
+        self.help_channel = kwargs.get('help_channel')
+        self.arena_board_channel = kwargs.get('arena_board_channel')
+        self.exit_channel = kwargs.get('exit_channel')
+        self.entrance_channel = kwargs.get('entrance_channel')
 
 class RefMessage(db.Model):
     __tablename__ = "ref_messages"

@@ -1,5 +1,5 @@
 import { ToastError } from '../General/main.js';
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -390,13 +390,119 @@ $('#message-save-button').on('click', function (e) {
     }
     modal.modal("hide");
 });
-$('#guild-settings-button').on('click', function () {
-    getGuild()
-        .then(guild => {
-        $('#guild-max-level').val(`${guild.max_level}`);
-        $('#guild-handicap-cc').val(`${guild.handicap_cc}`);
-        $('#guild-max-characters').val(`${guild.max_characters}`);
-        $('#guild-div-cc').val(`${guild.div_limit}`);
+$('#guild-settings-button').on('click', async function () {
+    $('body').addClass("busy");
+    const guild = await getGuild();
+    const roles = await getRoles();
+    const channels = await getChannels();
+    roles.sort((a, b) => a.name.localeCompare(b.name));
+    channels.sort((a, b) => a.name.localeCompare(b.name));
+    $('body').removeClass("busy");
+    $('#guild-max-level').val(guild.max_level.toString());
+    $('#guild-handicap-cc').val(guild.handicap_cc.toString());
+    $('#guild-max-characters').val(guild.max_characters.toString());
+    $('#guild-div-cc').val(guild.div_limit.toString());
+    $('#guild-reward-threshold').val(guild.reward_threshold.toString());
+    $('#guild-entry-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-member-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-admin-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-staff-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-bot-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-quest-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#tier-2-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#tier-3-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#tier-4-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#tier-5-role').html('')
+        .append(`<option>Select a role</option>`);
+    $('#tier-6-role').html('')
+        .append(`<option>Select a role</option>`);
+    roles.forEach(role => {
+        $('#guild-entry-role').append(`
+            <option value="${role.id}" ${guild.entry_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#guild-member-role').append(`
+            <option value="${role.id}" ${guild.member_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#guild-admin-role').append(`
+            <option value="${role.id}" ${guild.admin_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#guild-staff-role').append(`
+            <option value="${role.id}" ${guild.staff_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#guild-bot-role').append(`
+            <option value="${role.id}" ${guild.bot_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#guild-quest-role').append(`
+            <option value="${role.id}" ${guild.quest_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#tier-2-role').append(`
+            <option value="${role.id}" ${guild.tier_2_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#tier-3-role').append(`
+            <option value="${role.id}" ${guild.tier_3_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#tier-4-role').append(`
+            <option value="${role.id}" ${guild.tier_4_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#tier-5-role').append(`
+            <option value="${role.id}" ${guild.tier_5_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+        $('#tier-6-role').append(`
+            <option value="${role.id}" ${guild.tier_6_role == Number(role.id) ? 'selected' : ''}>${role.name}</option>
+        `);
+    });
+    $('#guild-application-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-market-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-announcement-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-staff-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-help-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-arena-board-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-exit-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-exit-channel').html('')
+        .append(`<option>Select a role</option>`);
+    $('#guild-entrance-channel').html('')
+        .append(`<option>Select a role</option>`);
+    channels.forEach(channel => {
+        $('#guild-application-channel').append(`
+            <option value="${channel.id}" ${guild.application_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-market-channel').append(`
+            <option value="${channel.id}" ${guild.market_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-announcement-channel').append(`
+            <option value="${channel.id}" ${guild.announcement_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-staff-channel').append(`
+            <option value="${channel.id}" ${guild.staff_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-help-channel').append(`
+            <option value="${channel.id}" ${guild.help_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-arena-board-channel').append(`
+            <option value="${channel.id}" ${guild.arena_board_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-exit-channel').append(`
+            <option value="${channel.id}" ${guild.exit_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
+        $('#guild-entrance-channel').append(`
+            <option value="${channel.id}" ${guild.entrance_channel == Number(channel.id) ? 'selected' : ''}>${channel.name}</option>
+        `);
     });
 });
 $('#financial-settings-button').on('click', async function () {
@@ -461,6 +567,13 @@ $('#guild-settings-save-button').on('click', function () {
         guild.max_characters = $("#guild-max-characters").val() ? Number($("#guild-max-characters").val()) : 1;
         guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0;
         guild.div_limit = $("#guild-div-cc").val() ? Number($("#guild-div-cc").val()) : 0;
+        guild.reward_threshold = $("#guild-reward-threshold").val() ? Number($("#guild-reward-threshold").val()) : 0;
+        guild.entry_role = Number($('#guild-entry-role').find(':selected').val());
+        guild.member_role = Number($('#guild-member-role').find(':selected').val());
+        guild.admin_role = Number($('#guild-admin-role').find(':selected').val());
+        guild.staff_role = Number($('#guild-staff-role').find(':selected').val());
+        guild.bot_role = Number($('#guild-bot-role').find(':selected').val());
+        guild.quest_role = Number($('#guild-quest-role').find(':selected').val());
         updateGuild(guild);
     });
 });

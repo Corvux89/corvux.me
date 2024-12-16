@@ -2,6 +2,7 @@ import { ToastError, ToastSuccess } from "../General/main.js";
 const guild_url = `${window.location.href}api/guild`;
 const message_url = `${window.location.href}api/message`;
 const channel_url = `${window.location.href}api/channels`;
+const role_url = `${window.location.href}api/roles`;
 const log_url = `${window.location.href}api/logs`;
 const activity_url = `${window.location.href}api/activities`;
 const activity_point_url = `${window.location.href}api/activity_points`;
@@ -109,6 +110,13 @@ export function deleteMessage(mesage_id) {
 }
 export function getChannels() {
     return fetch(channel_url)
+        .then(res => res.json())
+        .then(res => {
+        return res;
+    });
+}
+export function getRoles() {
+    return fetch(role_url)
         .then(res => res.json())
         .then(res => {
         return res;

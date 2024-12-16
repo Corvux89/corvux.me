@@ -8,6 +8,26 @@ export interface ResoluteGuild {
     weekly_announcement: string[]
     ping_announcement: boolean
     div_limit: number
+    reward_threshold: number
+    entry_role: number
+    member_role: number
+    tier_2_role: number
+    tier_3_role: number
+    tier_4_role: number
+    tier_5_role: number
+    tier_6_role: number
+    admin_role: number
+    staff_role: number
+    bot_role: number
+    quest_role: number
+    application_channel: number
+    market_channel: number
+    announcement_channel: number
+    staff_channel: number
+    help_channel: number
+    arena_board_channel: number
+    exit_channel: number
+    entrance_channel: number
 }
 
 export interface RefMessage {
@@ -29,6 +49,11 @@ export interface NewMessage{
 }
 
 export interface DiscordChannel {
+    id: bigint,
+    name: string   
+}
+
+export interface DiscordRole {
     id: bigint,
     name: string   
 }

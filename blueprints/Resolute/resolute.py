@@ -5,9 +5,9 @@ from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_ADMINS, DISCORD_GUILD_ID
-from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
-from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
+from helpers.general_helpers import get_channels_from_cache, get_members_from_cache, get_roles_from_cache
+from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload, trigger_guild_reload
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
 from sqlalchemy.orm import joinedload
 
 
@@ -60,11 +60,11 @@ def upsert_guild():
         if db.session.query(Character).filter(and_(Character.guild_id == DISCORD_GUILD_ID,
                                                                               Character.active == True,
                                                                               Character.level > update_guild.max_level)).count() > 0:
-            abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
+            return abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
         elif db.session.query(Character.player_id,
                               func.count(Character.player_id).label('count')).filter(and_(Character.guild_id == DISCORD_GUILD_ID, Character.active == True))\
                               .group_by(Character.player_id).having(func.count(Character.player_id)>update_guild.max_characters).count() > 0:
-            abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
+            return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
 
         guild.weekly_announcement = update_guild.weekly_announcement
         guild.ping_announcement = update_guild.ping_announcement
@@ -72,8 +72,31 @@ def upsert_guild():
         guild.handicap_cc = update_guild.handicap_cc
         guild.max_characters = update_guild.max_characters
         guild.div_limit = update_guild.div_limit
+        guild.reward_threshold = update_guild.reward_threshold
+        guild.entry_role = update_guild.entry_role
+        guild.member_role = update_guild.member_role
+        guild.admin_role = update_guild.admin_role
+        guild.staff_role = update_guild.staff_role
+        guild.bot_role = update_guild.bot_role
+        guild.quest_role = update_guild.quest_role
+
+        guild.tier_2_role = update_guild.tier_2_role
+        guild.tier_3_role = update_guild.tier_3_role
+        guild.tier_4_role = update_guild.tier_4_role
+        guild.tier_5_role = update_guild.tier_5_role
+        guild.tier_6_role = update_guild.tier_6_role
+
+        guild.application_channel = update_guild.application_channel
+        guild.market_channel = update_guild.market_channel
+        guild.announcement_channel = update_guild.announcement_channel
+        guild.staff_channel = update_guild.staff_channel
+        guild.help_channel = update_guild.help_channel
+        guild.arena_board_channel = update_guild.arena_board_channel
+        guild.exit_channel = update_guild.exit_channel
+        guild.entrance_channel = update_guild.entrance_channel
         
         db.session.commit()
+        trigger_guild_reload(guild.id)
     
     return abort(404)
 
@@ -158,13 +181,18 @@ def ref_messages():
     
 @resolute_blueprint.route('/api/channels', methods=['GET'])
 def get_channels():
-    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
     channels = get_channels_from_cache()
     clean_out = []
     for c in channels:
         if 'parent_id' in c and c.get('parent_id') != "" and c.get('type',0) not in [4, 13, 15]:
             clean_out.append({"id": c.get('id'), "name": c.get('name')})
 
+    return jsonify(clean_out)
+
+@resolute_blueprint.route('/api/roles', methods=['GET'])
+def get_roles():
+    roles = get_roles_from_cache()
+    clean_out = [DiscordRole(id=r.get('id'), name=r.get('name')).__dict__ for r in roles]
     return jsonify(clean_out)
 
 @resolute_blueprint.route('/api/players', methods=["GET"])

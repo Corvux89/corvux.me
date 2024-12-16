@@ -304,8 +304,103 @@ class ButtonTab extends HTMLElement{
   }
 }
 
+class SelectTab extends HTMLElement {
+  private _id: string = '';
+  private label: string = '';
+  private options: { value: string; label: string }[] = [];
+  private selectedValue: string = '';
+
+  constructor() {
+    super();
+  }
+
+  static get observedAttributes() {
+    return ['options', 'selected', 'custom-id', 'custom-label'];
+  }
+
+  connectedCallback() {
+    this.updateFromAttributes();
+    this.render();
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'custom-id') {
+      this._id = newValue;
+    }
+
+    if (name == 'custom-label'){
+      this.label = newValue
+    }
+
+    if (name === 'options') {
+      try {
+        this.options = JSON.parse(newValue);
+      } catch (e) {
+        console.error('Invalid JSON for options attribute', e);
+      }
+    }
+
+    if (name === 'selected') {
+      this.selectedValue = newValue;
+    }
+
+    this.render();
+  }
+
+  private updateFromAttributes() {
+    const id = this.getAttribute('custom-id');
+    const label = this.getAttribute('custom-label');
+    const options = this.getAttribute('options');
+    const selected = this.getAttribute('selected');
+
+    if (id) {
+      this._id = id;
+    }
+
+    if (label){
+      this.label = label;
+    }
+
+    if (options) {
+      try {
+        this.options = JSON.parse(options);
+      } catch (e) {
+        console.error('Invalid JSON for options attribute', e);
+      }
+    }
+
+    if (selected) {
+      this.selectedValue = selected;
+    }
+  }
+
+  private renderOptions() {
+    return this.options
+      .map(
+        (option) =>
+          `<option value="${option.value}" ${
+            option.value === this.selectedValue ? 'selected' : ''
+          }>${option.label}</option>`
+      )
+      .join('');
+  }
+
+  render() {
+    this.innerHTML = `
+      <div class="form-floating">
+        <select class="form-select" id="${this._id}">
+          ${this.renderOptions()}
+        </select>
+        <label for="${this._id}">${this.label}
+      </div>
+    `;
+  }
+}
+
+
 // Define the custom element
 customElements.define('number-input', NumberInput);
 customElements.define('text-input', TextInput);
 customElements.define('button-tab', ButtonTab)
 customElements.define('custom-modal', CustomModal)
+customElements.define('select-tab', SelectTab);

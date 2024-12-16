@@ -468,7 +468,7 @@ $('#guild-settings-button').on('click', async function() {
     $('#guild-handicap-cc').val(guild.handicap_cc.toString())
     $('#guild-max-characters').val(guild.max_characters.toString())
     $('#guild-div-cc').val(guild.div_limit.toString())
-    $('#guild-reward-threshold').val(guild.reward_threshold.toString() || "")
+    $('#guild-reward-threshold').val(guild.reward_threshold ? guild.reward_threshold.toString() : "")
 
     $('#guild-entry-role').html('')
         .append(`<option>Select a role</option>`)

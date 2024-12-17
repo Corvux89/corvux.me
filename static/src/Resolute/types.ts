@@ -1,7 +1,7 @@
 export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 
 export interface ResoluteGuild {
-    id: bigint
+    id: string
     max_level: number
     handicap_cc: number
     max_characters: number
@@ -49,12 +49,12 @@ export interface NewMessage{
 }
 
 export interface DiscordChannel {
-    id: bigint,
+    id: string,
     name: string   
 }
 
 export interface DiscordRole {
-    id: bigint,
+    id: string,
     name: string   
 }
 
@@ -104,7 +104,7 @@ export interface Species{
 
 export interface CharacterClass{
     id: number,
-    character_id: number,
+    character_id: string,
     primary_class: PrimaryClass,
     archetype: Archetype,
     active: boolean
@@ -112,8 +112,8 @@ export interface CharacterClass{
 
 export interface Character{
     id: number,
-    guild_id: number,
-    player_id: number,
+    guild_id: string,
+    player_id: string,
     species: Species,
     credits: number,
     faction: Faction,
@@ -124,10 +124,10 @@ export interface Character{
 }
 
 export interface Player{
-    id: number,
+    id: string,
     cc: number,
     div_cc: number,
-    guild_id: number,
+    guild_id: string,
     points: number,
     activity_points: number,
     handicap_amount: number,

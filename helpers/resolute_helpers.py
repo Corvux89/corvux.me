@@ -29,18 +29,12 @@ def log_search_filter(search_value: str) -> []:
     search_filter.append(cast(Log.id, String).like(f"%{search_value}%"))
     search_filter.append(Log.notes.ilike(f"%{search_value}%"))
     search_filter.append(func.to_char(Log.created_ts.cast(Date), "FMmm/FMdd/YYYY").like(f"%{search_value}%"))
-    search_filter.append(Log.character_record.has(Character.name.ilike(f"%{search_value}%")))
-    search_filter.append(Log.activity_record.has(Activity.value.ilike(f"%{search_value}%")))
-    search_filter.append(Log.player_id.in_(member_filter))
+    search_filter.append(Log._character_record.has(Character.name.ilike(f"%{search_value}%")))
+    search_filter.append(Log._activity_record.has(Activity.value.ilike(f"%{search_value}%")))
+    search_filter.append(Log._player_id.in_(member_filter))
 
     return search_filter
 
-def log_set_discord_attributes(logs: list[Log]):
-    members = get_members_from_cache()
-
-    for log in logs:
-        log.member = next((m for m in members if int(m["user"]["id"]) == log.player_id), None)
-        log.author_record = next((m for m in members if int(m["user"]["id"]) == log.author), None)
 
 def trigger_compendium_reload():
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
@@ -53,8 +47,10 @@ def trigger_compendium_reload():
     payload = {
         'text': f'{current_user.name} [{current_user.id}] - Compendium reloaded from website'
     }
-
-    requests.request("POST", url, headers=headers, data=json.dumps(payload))
+    try:
+        requests.request("POST", url, headers=headers, data=json.dumps(payload))
+    except:
+        pass
 
 def trigger_guild_reload(guild_id: int):
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
@@ -68,7 +64,9 @@ def trigger_guild_reload(guild_id: int):
         'text': f'{current_user.name} [{current_user.id}] - Guild Cache reloaded from website',
         'guild_id': guild_id
     }
-
-    requests.request("POST", url, headers=headers, data=json.dumps(payload))
+    try:
+        requests.request("POST", url, headers=headers, data=json.dumps(payload))
+    except:
+        pass
 
     

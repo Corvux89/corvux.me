@@ -464,6 +464,8 @@ $('#guild-settings-button').on('click', async function() {
     channels.sort((a, b) => a.name.localeCompare(b.name))
     $('body').removeClass("busy")
 
+    console.log(guild.id)
+
     $('#guild-max-level').val(guild.max_level.toString()) 
     $('#guild-handicap-cc').val(guild.handicap_cc.toString())
     $('#guild-max-characters').val(guild.max_characters.toString())
@@ -620,7 +622,8 @@ $('#financial-settings-button').on('click', async function(){
         columns: [
             {
                 title: "SKU",
-                data: "sku"
+                data: "sku",
+                width: "5%"
             },
             {
                 title: "Cost",
@@ -891,13 +894,14 @@ async function buildCensusTable(){
         columns: [
             {
                 data: "id",
-                title: "ID"
+                title: "ID",
+                width: "5%"
             },
             {
                 data: "member",
                 title: "Name",
                 render: function(data, type, row){
-                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
+                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`
                 }
             },
             {
@@ -1006,16 +1010,16 @@ async function buildLogTable(){
             },
             {
                 title: "Author",
-                data: "author_record",
+                data: "author",
                 render: (data) => {
-                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
+                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`
                 }
             },
             {
                 data: 'member',
                 title: "Player",
                 render: (data) => {
-                    return `${data.nick ?? data.user?.global_name ?? data.user?.username ?? "Player not found"}`
+                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`
                 }
             },
             {

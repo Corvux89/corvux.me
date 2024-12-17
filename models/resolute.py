@@ -2,15 +2,156 @@ import json
 import datetime
 
 from flask_sqlalchemy import SQLAlchemy
+from flask.json.provider import JSONProvider
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from constants import DISCORD_GUILD_ID
-
+from helpers.general_helpers import get_members_from_cache
 
 db = SQLAlchemy()
+
+class DiscordUser:
+    global_name: str = None
+    _id: int = None
+    username: str = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+                
+    def to_dict(self):
+        result = {}
+        for attr in dir(self):
+            if attr.startswith("_") or callable(getattr(self, attr)):
+                continue
+            try:
+                value = getattr(self, attr)
+                result[attr] = value
+            except AttributeError:
+                continue
+        return result
+    
+    @property
+    def id(self):
+        return str(self._id)
+
+    @id.setter
+    def id(self, value):
+        try:
+            self._id = int(value)
+        except:
+            self._id = None
+
+class DiscordMember:
+    nick: str = None
+    roles: [] = None
+    user: DiscordUser = None
+    bot: bool = None
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            if key in self.__annotations__:
+                if key == 'user' and isinstance(value, dict):
+                    setattr(self, key, DiscordUser(**value))
+                else:
+                    setattr(self, key, value)
+
+    def to_dict(self):
+        result = {}
+        for attr in dir(self):
+            if attr.startswith("_") or callable(getattr(self, attr)):
+                continue
+            try:
+                value = getattr(self, attr)
+                if isinstance(value, DiscordUser):  
+                    result[attr] = value.to_dict()
+                else:
+                    result[attr] = value
+            except AttributeError:
+                continue
+        return result
+    
+
+class DiscordChannel:
+    _id: int = None
+    name: str = None
+    _parent_id: int = None
+    type: int = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+
+    def to_dict(self):
+        result = {}
+        for attr in dir(self):
+            if attr.startswith("_") or callable(getattr(self, attr)):
+                continue
+            try:
+                value = getattr(self, attr)
+                result[attr] = value
+            except AttributeError:
+                continue
+        return result
+    
+    @property
+    def id(self):
+        return str(self._id)
+
+    @id.setter
+    def id(self, value):
+        try:
+            self._id = int(value)
+        except:
+            self._id = None
+    
+    @property
+    def parent_id(self):
+        return str(self._parent_id)
+    
+    @parent_id.setter
+    def parent_id(self, value):
+        try:
+            self._parent_id = int(value)
+        except:
+            self._parent_id = ""
+
+class DiscordRole:
+    _id: int = None
+    name: str = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+
+    def to_dict(self):
+        result = {}
+        for attr in dir(self):
+            if attr.startswith("_") or callable(getattr(self, attr)):
+                continue
+            try:
+                value = getattr(self, attr)
+                result[attr] = value
+            except AttributeError:
+                continue
+        return result
+    
+    @property
+    def id(self):
+        return str(self._id)
+
+    @id.setter
+    def id(self, value):
+        try:
+            self._id = int(value)
+        except:
+            self._id = None
 
 class Activity(db.Model):
     __tablename__ = "c_activity"
@@ -20,7 +161,7 @@ class Activity(db.Model):
     diversion: Mapped[bool]
     points: Mapped[int]
 
-    logs = relationship("Log", back_populates="activity_record")
+    logs = relationship("Log", back_populates="_activity_record")
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
@@ -96,12 +237,23 @@ class Species(db.Model):
 
 class Store(db.Model):
     __tablename__ = "store"
-    sku: Mapped[int] = mapped_column(primary_key=True)
+    _sku: Mapped[int] = mapped_column("sku", primary_key=True)
     user_cost: Mapped[float]
 
     def __init__(self, **kwargs):
-        self.sku = kwargs.get('sku')
+        self._sku = kwargs.get('sku')
         self.user_cost = kwargs.get('user_cost', 0)
+
+    @property
+    def sku(self):
+        return str(self._sku)
+    
+    @sku.setter
+    def sku(self, value):
+        try:
+            self.sku = int(value)
+        except:
+            self.sku = None
 
 class Financial(db.Model):
     __tablename__ = "financial"
@@ -121,7 +273,7 @@ class Financial(db.Model):
 
 class ResoluteGuild(db.Model):
     __tablename__ = "guilds"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    _id: Mapped[int] = mapped_column("id", primary_key=True)
     max_level: Mapped[int]
     weeks: Mapped[int]
     last_reset: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
@@ -132,30 +284,30 @@ class ResoluteGuild(db.Model):
     reward_threshold: Mapped[int]
 
     # User Roles
-    entry_role: Mapped[int]
-    member_role: Mapped[int]
-    tier_2_role: Mapped[int]
-    tier_3_role: Mapped[int]
-    tier_4_role: Mapped[int]
-    tier_5_role: Mapped[int]
-    tier_6_role: Mapped[int]
-    admin_role: Mapped[int]
-    staff_role: Mapped[int]
-    bot_role: Mapped[int]
-    quest_role: Mapped[int]
+    _entry_role: Mapped[int] = mapped_column("entry_role")
+    _member_role: Mapped[int] = mapped_column("member_role")
+    _tier_2_role: Mapped[int] = mapped_column("tier_2_role")
+    _tier_3_role: Mapped[int] = mapped_column("tier_3_role")
+    _tier_4_role: Mapped[int] = mapped_column("tier_4_role")
+    _tier_5_role: Mapped[int] = mapped_column("tier_5_role")
+    _tier_6_role: Mapped[int] = mapped_column("tier_6_role")
+    _admin_role: Mapped[int] = mapped_column("admin_role")
+    _staff_role: Mapped[int] = mapped_column("staff_role")
+    _bot_role: Mapped[int] = mapped_column("bot_role")
+    _quest_role: Mapped[int] = mapped_column("quest_role")
 
     # Channels
-    application_channel: Mapped[int]
-    market_channel: Mapped[int]
-    announcement_channel: Mapped[int]
-    staff_channel: Mapped[int]
-    help_channel: Mapped[int]
-    arena_board_channel: Mapped[int]
-    exit_channel: Mapped[int]
-    entrance_channel: Mapped[int]
+    _application_channel: Mapped[int] = mapped_column("application_channel")
+    _market_channel: Mapped[int] = mapped_column("market_channel")
+    _announcement_channel: Mapped[int] = mapped_column("announcement_channel")
+    _staff_channel: Mapped[int] = mapped_column("staff_channel")
+    _help_channel: Mapped[int] = mapped_column("help_channel")
+    _arena_board_channel: Mapped[int] = mapped_column("arena_board_channel")
+    _exit_channel: Mapped[int] = mapped_column("exit_channel")
+    _entrance_channel: Mapped[int] = mapped_column("entrance_channel")
 
     def __init__(self, **kwargs):
-        self.id = DISCORD_GUILD_ID
+        self._id = DISCORD_GUILD_ID
         self.max_level = kwargs.get('max_level')
         self.weeks = kwargs.get('weeks')
         self.last_reset = datetime.datetime.fromisoformat(kwargs.get('last_reset'))
@@ -166,26 +318,239 @@ class ResoluteGuild(db.Model):
         self.handicap_cc = kwargs.get('handicap_cc')
         self.reward_threshold = kwargs.get('reward_threshold')
 
-        self.entry_role = kwargs.get('entry_role')
-        self.member_role = kwargs.get('member_role')
-        self.tier_2_role = kwargs.get('tier_2_role')
-        self.tier_3_role = kwargs.get('tier_3_role')
-        self.tier_4_role = kwargs.get('tier_4_role')
-        self.tier_5_role = kwargs.get('tier_5_role')
-        self.tier_6_role = kwargs.get('tier_6_role')
-        self.admin_role = kwargs.get('admin_role')
-        self.staff_role = kwargs.get('staff_role')
-        self.bot_role = kwargs.get('bot_role')
-        self.quest_role = kwargs.get('quest_role')
+        self._entry_role = kwargs.get('entry_role')
+        self._member_role = kwargs.get('member_role')
+        self._tier_2_role = kwargs.get('tier_2_role')
+        self._tier_3_role = kwargs.get('tier_3_role')
+        self._tier_4_role = kwargs.get('tier_4_role')
+        self._tier_5_role = kwargs.get('tier_5_role')
+        self._tier_6_role = kwargs.get('tier_6_role')
+        self._admin_role = kwargs.get('admin_role')
+        self._staff_role = kwargs.get('staff_role')
+        self._bot_role = kwargs.get('bot_role')
+        self._quest_role = kwargs.get('quest_role')
 
-        self.application_channel = kwargs.get('application_channel')
-        self.market_channel = kwargs.get('market_channel')
-        self.announcement_channel = kwargs.get('announcement_channel')
-        self.staff_channel = kwargs.get('staff_channel')
-        self.help_channel = kwargs.get('help_channel')
-        self.arena_board_channel = kwargs.get('arena_board_channel')
-        self.exit_channel = kwargs.get('exit_channel')
-        self.entrance_channel = kwargs.get('entrance_channel')
+        self._application_channel = kwargs.get('application_channel')
+        self._market_channel = kwargs.get('market_channel')
+        self._announcement_channel = kwargs.get('announcement_channel')
+        self._staff_channel = kwargs.get('staff_channel')
+        self._help_channel = kwargs.get('help_channel')
+        self._arena_board_channel = kwargs.get('arena_board_channel')
+        self._exit_channel = kwargs.get('exit_channel')
+        self._entrance_channel = kwargs.get('entrance_channel')
+    
+    @property
+    def id(self) -> str:
+        return str(self._id)
+    
+    @property
+    def entry_role(self) -> str:
+        return str(self._entry_role)
+    
+    @entry_role.setter
+    def entry_role(self, value):
+        try:
+            self._entry_role = int(value)
+        except:
+            self._entry_role = None
+
+    @property
+    def admin_role(self) -> str:
+        return str(self._admin_role)
+    
+    @admin_role.setter
+    def entry_role(self, value):
+        try:
+            self._admin_role = int(value)
+        except:
+            self._admin_role = None
+
+    @property
+    def staff_role(self) -> str:
+        return str(self._staff_role)
+    
+    @staff_role.setter
+    def staff_role(self, value):
+        try:
+            self._staff_role = int(value)
+        except:
+            self._staff_role = None
+
+    @property
+    def bot_role(self) -> str:
+        return str(self._bot_role)
+    
+    @bot_role.setter
+    def bot_role(self, value):
+        try:
+            self._bot_role = int(value)
+        except:
+            self._bot_role = None
+
+    @property
+    def quest_role(self) -> str:
+        return str(self._quest_role)
+    
+    @quest_role.setter
+    def quest_role(self, value):
+        try:
+            self._quest_role = int(value)
+        except:
+            self._quest_role = None
+        
+    @property
+    def member_role(self) -> str:
+        return str(self._member_role)
+    
+    @member_role.setter
+    def member_role(self, value):
+        try:
+            self._member_role = int(value)
+        except:
+            self._member_role = None
+
+    @property
+    def tier_2_role(self) -> str:
+        return str(self._tier_2_role)
+    
+    @tier_2_role.setter
+    def tier_2_role(self, value):
+        try:
+            self._tier_2_role = int(value)
+        except:
+            self._tier_2_role = None
+
+    @property
+    def tier_3_role(self) -> str:
+        return str(self._tier_3_role)
+    
+    @tier_3_role.setter
+    def tier_3_role(self, value):
+        try:
+            self._tier_3_role = int(value)
+        except:
+            self._tier_3_role = None
+
+    @property
+    def tier_4_role(self) -> str:
+        return str(self._tier_4_role)
+    
+    @tier_4_role.setter
+    def tier_4_role(self, value):
+        try:
+            self._tier_4_role = int(value)
+        except:
+            self._tier_4_role = None
+
+    @property
+    def tier_5_role(self) -> str:
+        return str(self._tier_5_role)
+    
+    @tier_5_role.setter
+    def tier_5_role(self, value):
+        try:
+            self._tier_5_role = int(value)
+        except:
+            self._tier_5_role = None
+
+    @property
+    def tier_6_role(self) -> str:
+        return str(self._tier_6_role)
+    
+    @tier_6_role.setter
+    def tier_6_role(self, value):
+        try:
+            self._tier_6_role = int(value)
+        except:
+            self._tier_6_role = None
+
+    @property
+    def application_channel(self) -> str:
+        return str(self._application_channel)
+    
+    @application_channel.setter
+    def application_channel(self, value):
+        try:
+            self._application_channel = int(value)
+        except:
+            self._application_channel = None
+
+    @property
+    def market_channel(self) -> str:
+        return str(self._market_channel)
+    
+    @market_channel.setter
+    def market_channel(self, value):
+        try:
+            self._market_channel = int(value)
+        except:
+            self._market_channel = None
+
+    @property
+    def announcement_channel(self) -> str:
+        return str(self._announcement_channel)
+    
+    @announcement_channel.setter
+    def announcement_channel(self, value):
+        try:
+            self._announcement_channel = int(value)
+        except:
+            self._announcement_channel = None
+
+    @property
+    def staff_channel(self) -> str:
+        return str(self._staff_channel)
+    
+    @staff_channel.setter
+    def staff_channel(self, value):
+        try:
+            self._staff_channel = int(value)
+        except:
+            self._staff_channel = None
+
+    @property
+    def help_channel(self) -> str:
+        return str(self._help_channel)
+    
+    @help_channel.setter
+    def help_channel(self, value):
+        try:
+            self._help_channel = int(value)
+        except:
+            self._help_channel = None
+
+    @property
+    def arena_board_channel(self) -> str:
+        return str(self._arena_board_channel)
+    
+    @arena_board_channel.setter
+    def arena_board_channel(self, value):
+        try:
+            self._arena_board_channel = int(value)
+        except:
+            self._arena_board_channel = None
+
+    @property
+    def exit_channel(self) -> str:
+        return str(self._exit_channel)
+    
+    @exit_channel.setter
+    def exit_channel(self, value):
+        try:
+            self._exit_channel = int(value)
+        except:
+            self._exit_channel = None
+
+    @property
+    def entrance_channel(self) -> str:
+        return str(self._entrance_channel)
+    
+    @entrance_channel.setter
+    def entrance_channel(self, value):
+        try:
+            self._entrance_channel = int(value)
+        except:
+            self._entrance_channel = None
 
 class RefMessage(db.Model):
     __tablename__ = "ref_messages"
@@ -203,78 +568,99 @@ class RefMessage(db.Model):
 class Character(db.Model):
     __tablename__ = "characters"
     id: Mapped[int] = mapped_column(primary_key=True)
-    guild_id: Mapped[int] = mapped_column(ForeignKey("players.guild_id"), nullable=False)
-    player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
-    species: Mapped[int] = mapped_column(ForeignKey("c_character_species.id"), nullable=False)
+    _guild_id: Mapped[int] = mapped_column("guild_id", ForeignKey("players.guild_id"), nullable=False)
+    _player_id: Mapped[int] = mapped_column("player_id", ForeignKey("players.id"), nullable=False)
+    _species: Mapped[int] = mapped_column("species", ForeignKey("c_character_species.id"), nullable=False)
     credits: Mapped[int]
-    faction: Mapped[int] = mapped_column(ForeignKey("c_factions.id"), nullable=True)
+    _faction: Mapped[int] = mapped_column("faction", ForeignKey("c_factions.id"), nullable=True)
     name: Mapped[str]
     level: Mapped[int]
     active: Mapped[bool]
 
     player = relationship("Player", 
                           back_populates="characters",
-                          foreign_keys=[player_id])
+                          foreign_keys=[_player_id])
     
     classes = relationship("CharacterClass",
                            back_populates="character",
                            lazy="select",
                            primaryjoin="and_(Character.id == CharacterClass.character_id, CharacterClass.active == True)")
     
-    species_record = relationship(
+    _species_record = relationship(
         "Species",
         backref="characters",
-        foreign_keys=[species],
+        foreign_keys=[_species],
         lazy="joined"
     )
 
-    faction_record = relationship("Faction")
+    _faction_record = relationship("Faction")
+    
+    @property
+    def faction(self):
+        return self._faction_record
 
+    @property
+    def species(self):
+        return self._species_record
     
+    @property
+    def player_id(self):
+        return str(self._player_id)
     
+    @property
+    def guild_id(self):
+        return str(self._guild_id)
+
 class CharacterClass(db.Model):
     __tablename__ = "character_class"
     id: Mapped[int] = mapped_column(primary_key=True)
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.id"), nullable=False)
-    primary_class: Mapped[int] = mapped_column(ForeignKey("c_character_class.id"), nullable=False)
-    archetype: Mapped[int] = mapped_column(ForeignKey("c_character_archetype.id"), nullable=True)
+    _primary_class: Mapped[int] = mapped_column("primary_class", ForeignKey("c_character_class.id"), nullable=False)
+    _archetype: Mapped[int] = mapped_column("archetype", ForeignKey("c_character_archetype.id"), nullable=True)
     active: Mapped[bool]
 
     character = relationship("Character",
                              back_populates="classes",
                              foreign_keys=[character_id])
     
-    primary_class_record = relationship(
+    _primary_class_record = relationship(
         "PrimaryClass",
         backref="character_class",
-        foreign_keys=[primary_class],
+        foreign_keys=[_primary_class],
         lazy="joined"
     )
 
-    archetype_record = relationship(
+    _archetype_record = relationship(
         "Archetype",
         backref="character_class",
-        foreign_keys=[archetype],
+        foreign_keys=[_archetype],
         lazy="joined"
     )
+
+    @property
+    def primary_class(self):
+        return self._primary_class_record
+    
+    @property
+    def archetype(self):
+        return self._archetype_record
 
 
 class Player(db.Model):
     __tablename__ = "players"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    _id: Mapped[int] = mapped_column("id", primary_key=True)
     cc: Mapped[int]
     div_cc: Mapped[int]
-    guild_id: Mapped[int] = mapped_column(primary_key=True)
+    _guild_id: Mapped[int] = mapped_column("guild_id", primary_key=True)
     points: Mapped[int]
     activity_points: Mapped[int]
     handicap_amount: Mapped[int]
     _statistics: Mapped[str] = mapped_column("statistics")
-    member = None
 
     characters = relationship("Character", 
                               back_populates="player",
                               lazy="select",
-                              primaryjoin="and_(Player.id == Character.player_id, Player.guild_id == Character.guild_id, Character.active == True)")
+                              primaryjoin="and_(Player._id == Character._player_id, Player._guild_id == Character._guild_id, Character.active == True)")
 
     __table_args__ = (
         db.PrimaryKeyConstraint("id", "guild_id"),
@@ -289,9 +675,26 @@ class Player(db.Model):
         self.activity_points = kwargs.get('activity_points')
         self.handicap_amount = kwargs.get('handicap_amount')
         self.statistics = kwargs.get("statistics", {})
-        self.member = kwargs.get('member')
 
-    @hybrid_property
+    @property
+    def id(self):
+        return str(self._id)
+    
+    @property
+    def guild_id(self):
+        return str(self._guild_id)
+    
+    @property
+    def member(self):
+        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        try:
+            if (m := next((m for m in members if m.user and m.user._id == self._id), None)):
+                return m.__dict__
+            return None
+        except:
+            return None
+
+    @hybrid_property    
     def statistics(self):
         try:
             return json.loads(self._statistics)
@@ -305,41 +708,95 @@ class Player(db.Model):
 class Log(db.Model):
     __tablename__ = "log"
     id: Mapped[int] = mapped_column(primary_key=True)
-    activity: Mapped[int] = mapped_column(ForeignKey("c_activity.id"), nullable=False)
+    _activity: Mapped[int] = mapped_column("activity", ForeignKey("c_activity.id"), nullable=False)
     notes: Mapped[str]
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.id"), nullable=True)
-    player_id: Mapped[int]
-    author: Mapped[int]
+    _player_id: Mapped[int] = mapped_column("player_id")
+    _author: Mapped[int] = mapped_column("author")
     guild_id: Mapped[int]
     cc: Mapped[int]
     credits: Mapped[int]
     renown: Mapped[int]
-    faction: Mapped[int] = mapped_column(ForeignKey("c_factions.id"), nullable=True)
+    _faction: Mapped[int] = mapped_column("faction", ForeignKey("c_factions.id"), nullable=True)
     invalid: Mapped[bool]
     created_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
-    activity_record = relationship(Activity, back_populates="logs")
-    faction_record = relationship("Faction")
-    character_record = relationship("Character")
-
-    member = None
-    author_record = None
+    _activity_record = relationship(Activity, back_populates="logs")
+    _faction_record = relationship("Faction")
+    _character_record = relationship("Character")
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
-        self.activity = kwargs.get('activity')
+        self._activity = kwargs.get('activity')
         self.notes = kwargs.get('notes')
         self.character_id = kwargs.get('character_id')
-        self.player_id = kwargs.get('character_id')
-        self.author = kwargs.get('author')
+        self._player_id = kwargs.get('character_id')
+        self._author = kwargs.get('author')
         self.guild_id = kwargs.get('guild_id')
         self.cc = kwargs.get('cc')
         self.credits = kwargs.get('credits')
         self.renown = kwargs.get('renown')
-        self.faction = kwargs.get('faction')
+        self._faction = kwargs.get('faction')
         self.invalid = kwargs.get('invalid')
         self.created_ts = kwargs.get('created_ts')
-        self.member = kwargs.get('member')
+
+    @property
+    def activity(self):
+        return self._activity_record
+    
+    @activity.setter
+    def activity(self, value):
+        try:
+            self._activity = int(value)
+        except:
+            self._activity = ""
+
+    @property
+    def faction(self):
+        return self._faction_record
+    
+    @faction.setter
+    def faction(self, value):
+        try:
+            self._faction = int(value)
+        except:
+            self._faction = ""
+
+    @property
+    def member(self):
+        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        try:
+            if (m := next((m for m in members if m.user and m.user._id == self._player_id), None)):
+                return m.__dict__
+            return None
+        except:
+            return None
+        
+    @property
+    def author(self):
+        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        try:
+            if (m := next((m for m in members if m.user and m.user._id == self._author), None)):
+                return m.__dict__
+            return ""
+        except:
+            return ""
+        
+    @property   
+    def character(self):
+        return self._character_record
+    
+    @property
+    def player_id(self):
+        return str(self._player_id)
+    
+    @player_id.setter
+    def player_id(self, value):
+        try:
+            self._player_id = int(value)
+        except:
+            self._player_id = None
+
 
 class BotMessage():
     def __init__(self, message_id: str, channel_id: str, channel_name: str, title: str, content: str, **kwargs):
@@ -351,57 +808,22 @@ class BotMessage():
         self.pin = kwargs.get('pin', False)
         self.error = kwargs.get("error", "")
 
-class DiscordUser:
-    global_name: str = None
-    id: int = None
-    username: str = None
 
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
+class CustomJSONProvider(JSONProvider):
+    def dumps(self, obj, **kwargs):
+        return json.dumps(obj, **kwargs, cls=AlchemyEncoder)
 
-
-class DiscordMember:
-    nick: str = None
-    roles: [] = None
-    user: DiscordUser = None
-    bot: bool = None
-
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                if key == "user":
-                    self.user = DiscordUser(**kwargs[key] or {}).__dict__
-                else:
-                    setattr(self, key, kwargs[key])
-
-class DiscordChannel:
-    id: int = None
-    name: str = None
-    parent_id: int = None
-    type: int = None
-
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
-class DiscordRole:
-    id: int = None
-    name: str = None
-
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
+    def loads(self, s: str | bytes, **kwargs):
+        return json.loads(s, **kwargs)
+      
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
-                return obj.isoformat()
-
+            return obj.isoformat()
+        elif isinstance(obj, (DiscordMember, DiscordUser, DiscordChannel, DiscordRole)):
+            return obj.to_dict()
+                    
         elif isinstance(obj.__class__, DeclarativeMeta):
             fields = {}
             columns = obj.__table__.columns.keys()
@@ -419,31 +841,16 @@ class AlchemyEncoder(json.JSONEncoder):
                     fields[field] = None
 
             if isinstance(obj, Log):
-                fields["activity"] = obj.activity_record
-                fields["faction"] = obj.faction_record
-                fields["member"] = DiscordMember(**obj.member or {}).__dict__
-                fields["character"] = obj.character_record
-                fields["author_record"] = DiscordMember(**obj.author_record or {}).__dict__
+                fields["member"] = obj.member
+                fields["character"] = obj.character
+                fields["author"] = obj.author
 
             elif isinstance(obj, Player):
                 fields["characters"] = obj.characters
-                fields["member"] = DiscordMember(**obj.member or {}).__dict__
+                fields["member"] = obj.member
 
             elif isinstance(obj, Character):
                 fields["classes"] = obj.classes
-                fields["species"] = obj.species_record
-                fields["faction"] = obj.faction_record
-
-            elif isinstance(obj, CharacterClass):
-                fields['primary_class'] = obj.primary_class_record
-                fields["archetype"] = obj.archetype_record
-            
-            elif isinstance(obj, Store):
-                fields['sku'] = str(obj.sku)
-
-            elif isinstance(obj, ResoluteGuild):
-                fields['entry_role'] = str(obj.entry_role)
-                fields['help_channel'] = str(obj.help_channel)
 
             return fields
         return json.JSONEncoder.default(self, obj)

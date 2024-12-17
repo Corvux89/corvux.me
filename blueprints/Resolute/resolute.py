@@ -5,9 +5,9 @@ from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_ADMINS, DISCORD_GUILD_ID
-from helpers.general_helpers import get_channels_from_cache, get_members_from_cache, get_roles_from_cache
-from helpers.resolute_helpers import log_search_filter, log_set_discord_attributes, trigger_compendium_reload, trigger_guild_reload
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
+from helpers.general_helpers import get_channels_from_cache, get_roles_from_cache
+from helpers.resolute_helpers import log_search_filter, trigger_compendium_reload, trigger_guild_reload
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
 from sqlalchemy.orm import joinedload
 
 
@@ -65,12 +65,6 @@ def upsert_guild():
                               func.count(Character.player_id).label('count')).filter(and_(Character.guild_id == DISCORD_GUILD_ID, Character.active == True))\
                               .group_by(Character.player_id).having(func.count(Character.player_id)>update_guild.max_characters).count() > 0:
             return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
-        
-        def validateNumericInput(value):
-            try:
-                return int(value)
-            except:
-                return None
 
         guild.weekly_announcement = update_guild.weekly_announcement
         guild.ping_announcement = update_guild.ping_announcement
@@ -80,27 +74,27 @@ def upsert_guild():
         guild.div_limit = update_guild.div_limit
         guild.reward_threshold = update_guild.reward_threshold
 
-        guild.entry_role = validateNumericInput(update_guild.entry_role)
-        guild.member_role = validateNumericInput(update_guild.member_role)
-        guild.admin_role = validateNumericInput(update_guild.admin_role) 
-        guild.staff_role = validateNumericInput(update_guild.staff_role) 
-        guild.bot_role = validateNumericInput(update_guild.bot_role)
-        guild.quest_role = validateNumericInput(update_guild.quest_role)
+        guild.entry_role = update_guild.entry_role
+        guild.member_role = update_guild.member_role
+        guild.admin_role = update_guild.admin_role
+        guild.staff_role = update_guild.staff_role
+        guild.bot_role = update_guild.bot_role
+        guild.quest_role = update_guild.quest_role
 
-        guild.tier_2_role = validateNumericInput(update_guild.tier_2_role)
-        guild.tier_3_role = validateNumericInput(update_guild.tier_3_role)
-        guild.tier_4_role = validateNumericInput(update_guild.tier_4_role)
-        guild.tier_5_role = validateNumericInput(update_guild.tier_5_role)
-        guild.tier_6_role = validateNumericInput(update_guild.tier_6_role)
+        guild.tier_2_role = update_guild.tier_2_role
+        guild.tier_3_role = update_guild.tier_3_role
+        guild.tier_4_role = update_guild.tier_4_role
+        guild.tier_5_role = update_guild.tier_5_role
+        guild.tier_6_role = update_guild.tier_6_role
 
-        guild.application_channel = validateNumericInput(update_guild.application_channel)
-        guild.market_channel = validateNumericInput(update_guild.market_channel)
-        guild.announcement_channel = validateNumericInput(update_guild.announcement_channel)
-        guild.staff_channel = validateNumericInput(update_guild.staff_channel)
-        guild.help_channel = validateNumericInput(update_guild.help_channel)
-        guild.arena_board_channel = validateNumericInput(update_guild.arena_board_channel)
-        guild.exit_channel = validateNumericInput(update_guild.exit_channel)
-        guild.entrance_channel = validateNumericInput(update_guild.entrance_channel)
+        guild.application_channel = update_guild.application_channel
+        guild.market_channel = update_guild.market_channel
+        guild.announcement_channel = update_guild.announcement_channel
+        guild.staff_channel = update_guild.staff_channel
+        guild.help_channel = update_guild.help_channel
+        guild.arena_board_channel = update_guild.arena_board_channel
+        guild.exit_channel = update_guild.exit_channel
+        guild.entrance_channel = update_guild.entrance_channel
         
         db.session.commit()
         trigger_guild_reload(guild.id)
@@ -189,48 +183,34 @@ def ref_messages():
 @resolute_blueprint.route('/api/channels', methods=['GET'])
 def get_channels():
     channels = get_channels_from_cache()
-    clean_out = []
-    for c in channels:
-        if 'parent_id' in c and c.get('parent_id') != "" and c.get('type',0) not in [4, 13, 15]:
-            clean_out.append({"id": c.get('id'), "name": c.get('name')})
-
-    return jsonify(clean_out)
+    return jsonify([DiscordChannel(**c) for c in channels])
 
 @resolute_blueprint.route('/api/roles', methods=['GET'])
 def get_roles():
     roles = get_roles_from_cache()
-    clean_out = [DiscordRole(id=r.get('id'), name=r.get('name')).__dict__ for r in roles]
-    return jsonify(clean_out)
+    return jsonify([DiscordRole(**r) for r in roles])
 
 @resolute_blueprint.route('/api/players', methods=["GET"])
 def get_players():
     db: SQLAlchemy = current_app.config.get('DB')
-    members = get_members_from_cache()
-
     players: list[Player] = (db.session.query(Player)
-                             .filter(Player.guild_id == DISCORD_GUILD_ID)
+                             .filter(Player._guild_id == DISCORD_GUILD_ID)
                              .options(joinedload(Player.characters))
                              .all())
-    
-    for p in players:
-        p.member = next((m for m in members if int(m["user"]["id"]) == p.id), None)
-
-
     return jsonify(players)
 
 @resolute_blueprint.route('/api/logs', methods=["GET", "POST"])
 def get_logs():
     db: SQLAlchemy = current_app.config.get('DB')
-    members = get_members_from_cache()
     query = (db.session.query(Log)
              .filter(Log.guild_id == DISCORD_GUILD_ID)
              .join(Activity)
              .outerjoin(Faction)
              .outerjoin(Character)
              .options(
-                 joinedload(Log.activity_record),
-                 joinedload(Log.faction_record),
-                 joinedload(Log.character_record)
+                 joinedload(Log._activity_record),
+                 joinedload(Log._faction_record),
+                 joinedload(Log._character_record)
              ))
 
     if request.method == "POST":
@@ -257,9 +237,6 @@ def get_logs():
         filtered_records = query.count()
         logs = query.all()
 
-        # Add in discord stuff
-        log_set_discord_attributes(logs)
-
         # Post query sorting because they're discord attributes
         if column_index == 2: #Author
             logs = sorted(logs,
@@ -285,13 +262,8 @@ def get_logs():
 
         return jsonify(response)
         
-
-
     logs: list[Log] = query.all()
     
-    log_set_discord_attributes(logs)
-    
-
     return jsonify(logs)
 
 @resolute_blueprint.route('/api/activities', methods=['GET', 'PATCH'])
@@ -306,18 +278,22 @@ def get_activites():
         return jsonify(activities)   
     
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = [Activity(**a) for a in request.get_json()]
 
-        for act in update_data:
-            activity = next((a for a in activities if a.id == act["id"]), None)        
-            activity.cc = act["cc"]
-            activity.diversion = act["diversion"]
-            activity.points = act["points"]
+            for act in update_data:
+                activity = next((a for a in activities if a.id == act.id), None)        
+                activity.cc = act.cc
+                activity.diversion = act.diversion
+                activity.points = act.points
 
-        db.session.commit()
-        trigger_compendium_reload()
+            db.session.commit()
+            trigger_compendium_reload()
 
-        return jsonify(200)
+            return jsonify(200)
+        except Exception as e:  
+            db.session.rollback()
+            return jsonify({"error": "Failed to update activities"}), 500
     
 @resolute_blueprint.route('/api/activity_points', methods=['GET', 'PATCH'])
 def get_activity_points():
@@ -331,16 +307,20 @@ def get_activity_points():
         return jsonify(points)   
     
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = [ActivityPoints(**a) for a in request.get_json()]
 
-        for act in update_data:
-            activity = next((a for a in points if a.id == act["id"]), None)        
-            activity.points = act["points"]
+            for act in update_data:
+                activity = next((a for a in points if a.id == act.id), None)        
+                activity.points = act.points
 
-        db.session.commit()
-        trigger_compendium_reload()
+            db.session.commit()
+            trigger_compendium_reload()
 
-        return jsonify(200)
+            return jsonify(200)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to update activity points"}), 500
 
 @resolute_blueprint.route('/api/code_conversion', methods=['GET', 'PATCH'])
 def get_code_conversion():
@@ -354,16 +334,20 @@ def get_code_conversion():
         return jsonify(points)   
     
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = [CodeConversion(**c) for c in request.get_json()]
 
-        for d in update_data:
-            conversion = next((c for c in points if c.id == d["id"]), None)
-            conversion.value = d["value"]
+            for d in update_data:
+                conversion = next((c for c in points if c.id == d.id), None)
+                conversion.value = d.value
 
-        db.session.commit()
-        trigger_compendium_reload()
+            db.session.commit()
+            trigger_compendium_reload()
 
-        return jsonify(200)
+            return jsonify(200)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to update code conversions"}), 500
 
 @resolute_blueprint.route('/api/level_costs', methods=['GET', 'PATCH'])
 def get_level_costs():
@@ -377,16 +361,20 @@ def get_level_costs():
         return jsonify(costs)   
     
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = [LevelCost(**c) for c in request.get_json()]
 
-        for d in update_data:
-            cost = next((c for c in costs if c.id == d["id"]), None)
-            cost.cc = d["cc"]
+            for d in update_data:
+                cost = next((c for c in costs if c.id == c.id), None)
+                cost.cc = d.cc
 
-        db.session.commit()
-        trigger_compendium_reload()
+            db.session.commit()
+            trigger_compendium_reload()
 
-        return jsonify(200)
+            return jsonify(200)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to update level costs"}), 500
     
 @resolute_blueprint.route('/api/financial', methods=['GET', 'PATCH'])
 def get_financial():
@@ -399,34 +387,41 @@ def get_financial():
         return jsonify(fin)   
     
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = Financial(**request.get_json())
 
-        fin.monthly_goal = update_data['monthly_goal']
-        fin.monthly_total = update_data['monthly_total']
-        fin.reserve = update_data['reserve']
-        fin.month_count = update_data['month_count']
+            fin.monthly_goal = update_data.monthly_goal
+            fin.monthly_total = update_data.monthly_total
+            fin.reserve = update_data.reserve
+            fin.month_count = update_data.month_count
 
-        db.session.commit()
+            db.session.commit()
 
-        return jsonify(200)
+            return jsonify(200)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to update financials"}), 500
     
 @resolute_blueprint.route('/api/store', methods=['GET', 'PATCH'])
 def get_store():
     db: SQLAlchemy = current_app.config.get('DB')
     store: list[Store] = (db.session.query(Store)
-                          .order_by(asc(Store.sku))
+                          .order_by(asc(Store._sku))
                           .all())
     
     if request.method == "GET":
         return jsonify(store)
     elif request.method == "PATCH":
-        update_data = request.get_json()
+        try:
+            update_data = [Store(**s) for s in request.get_json()]
+            for s in update_data:
+                if sku := next((x for x in store if x.sku == s.sku), None):
+                    sku.user_cost = s.user_cost
 
-        for s in update_data:
-            if sku := next((x for x in store if x.sku == int(s['sku'])), None):
-                sku.user_cost = s['user_cost']
-
-        db.session.commit()
-        return jsonify(200)
+            db.session.commit()
+            return jsonify(200)
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": "Failed to update store"}), 500
 
     

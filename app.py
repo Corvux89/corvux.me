@@ -13,12 +13,12 @@ from blueprints.auth import auth_blueprint
 from blueprints.Resolute.resolute import resolute_blueprint
 from constants import DB_URI, DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
-from models.resolute import AlchemyEncoder
+from models.resolute import CustomJSONProvider
 
 app = Flask(__name__)
 
 app.secret_key = SECRET_KEY
-app.json_encoder = AlchemyEncoder
+app.json = CustomJSONProvider(app)
 
 app.config.update(
     DEBUG=WEB_DEBUG

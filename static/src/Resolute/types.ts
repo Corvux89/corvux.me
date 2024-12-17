@@ -136,6 +136,11 @@ export interface Player{
     statistics: GenericDict
 }
 
+export function playerName(obj: GenericDict): string {
+    const user: GenericDict = obj?.user as GenericDict ?? undefined
+    return obj?.nick?.toString() ?? user ? user?.global_name?.toString() ?? user?.username?.toString() : "Player not found"
+}
+
 export interface Log{
     id: string,
     activity: Activity,

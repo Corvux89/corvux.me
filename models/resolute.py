@@ -359,7 +359,7 @@ class ResoluteGuild(db.Model):
         return str(self._admin_role)
     
     @admin_role.setter
-    def entry_role(self, value):
+    def admin_role(self, value):
         try:
             self._admin_role = int(value)
         except:

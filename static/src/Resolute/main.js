@@ -1,5 +1,6 @@
 import { ToastError } from '../General/main.js';
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
+import { playerName } from './types.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -91,14 +92,11 @@ $(document).on("click", "#player-character-table tbody tr", function () {
     const row = table.row(this);
     const rowData = row.data();
     const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
-    // Check if a dropdown row already exists and remove it
     if ($(this).next().hasClass('dropdown-row')) {
         $(this).next().remove();
         return;
     }
-    // Remove any existing dropdown rows
     $('.dropdown-row').remove();
-    // Create a new dropdown row
     const additionalInfo = `
         <tr class="dropdown-row">
             <td colspan="${table.columns().count()}">
@@ -109,16 +107,13 @@ $(document).on("click", "#player-character-table tbody tr", function () {
             </td>
         </tr>
     `;
-    // Insert the dropdown row after the clicked row
     $(this).after(additionalInfo);
 });
 $(document).on('click', '#player-table tbody tr', function () {
     const table = $("#player-table").DataTable();
     const data = table.row(this).data();
-    var user = data.member ? data.member.user : undefined;
-    var name = data.member != null ? data.member.nick != null ? data.member.nick : user && user.global_name != null ? user.global_name : user.username : "Player not found";
     $("#member-id").val(data.id);
-    $("#member-name").val(`${name}`);
+    $("#member-name").val(`${playerName(data.member)}`);
     $("#player-cc").val(data.cc);
     $("#player-div-cc").val(data.div_cc);
     $("#player-act-points").val(data.activity_points);
@@ -760,7 +755,7 @@ async function buildCensusTable() {
     const players = await getPlayers();
     const characters = players.flatMap(player => player.characters.map(character => ({
         ...character,
-        player_name: player.member ? player.member?.nick?.toString() ?? player.member?.user?.global_name?.toString() ?? player.member?.user?.username?.toString() : ""
+        player_name: playerName(player.member)
     })));
     $("body").removeClass("busy");
     if ($.fn.DataTable.isDataTable("#player-table")) {
@@ -781,7 +776,7 @@ async function buildCensusTable() {
                 data: "member",
                 title: "Name",
                 render: function (data, type, row) {
-                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`;
+                    return `${playerName(data)}`;
                 }
             },
             {
@@ -889,14 +884,14 @@ async function buildLogTable() {
                 title: "Author",
                 data: "author",
                 render: (data) => {
-                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`;
+                    return `${playerName(data)}`;
                 }
             },
             {
                 data: 'member',
                 title: "Player",
                 render: (data) => {
-                    return `${data?.nick ?? data?.user?.global_name ?? data?.user?.username ?? "Player not found"}`;
+                    return `${playerName(data)}`;
                 }
             },
             {

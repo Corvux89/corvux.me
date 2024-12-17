@@ -57,13 +57,13 @@ def upsert_guild():
         update_guild = ResoluteGuild(**request.get_json())
 
         # Validation        
-        if db.session.query(Character).filter(and_(Character.guild_id == DISCORD_GUILD_ID,
+        if db.session.query(Character).filter(and_(Character._guild_id == DISCORD_GUILD_ID,
                                                                               Character.active == True,
                                                                               Character.level > update_guild.max_level)).count() > 0:
             return abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
-        elif db.session.query(Character.player_id,
-                              func.count(Character.player_id).label('count')).filter(and_(Character.guild_id == DISCORD_GUILD_ID, Character.active == True))\
-                              .group_by(Character.player_id).having(func.count(Character.player_id)>update_guild.max_characters).count() > 0:
+        elif db.session.query(Character._player_id,
+                              func.count(Character._player_id).label('count')).filter(and_(Character._guild_id == DISCORD_GUILD_ID, Character.active == True))\
+                              .group_by(Character._player_id).having(func.count(Character._player_id)>update_guild.max_characters).count() > 0:
             return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
 
         guild.weekly_announcement = update_guild.weekly_announcement

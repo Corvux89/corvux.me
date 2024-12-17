@@ -75,6 +75,10 @@ class DiscordMember:
                 continue
         return result
     
+    @property
+    def member_display_name(self):
+        return self.nick or self.user.global_name or self.user.username or "zzz"
+    
 
 class DiscordChannel:
     _id: int = None
@@ -713,7 +717,7 @@ class Log(db.Model):
     character_id: Mapped[int] = mapped_column(ForeignKey("characters.id"), nullable=True)
     _player_id: Mapped[int] = mapped_column("player_id")
     _author: Mapped[int] = mapped_column("author")
-    guild_id: Mapped[int]
+    _guild_id: Mapped[int] = mapped_column("guild_id")
     cc: Mapped[int]
     credits: Mapped[int]
     renown: Mapped[int]
@@ -732,7 +736,7 @@ class Log(db.Model):
         self.character_id = kwargs.get('character_id')
         self._player_id = kwargs.get('character_id')
         self._author = kwargs.get('author')
-        self.guild_id = kwargs.get('guild_id')
+        self._guild_id = kwargs.get('guild_id')
         self.cc = kwargs.get('cc')
         self.credits = kwargs.get('credits')
         self.renown = kwargs.get('renown')
@@ -763,6 +767,17 @@ class Log(db.Model):
             self._faction = ""
 
     @property
+    def guild_id(self):
+        return self._guild_id
+    
+    @guild_id.setter
+    def guild_id(self, value):
+        try:
+            self._guild_id = int(value)
+        except:
+            self._guild_id = ""
+
+    @property
     def member(self):
         members = [DiscordMember(**m) for m in get_members_from_cache()]
         try:
@@ -773,6 +788,10 @@ class Log(db.Model):
             return None
         
     @property
+    def member_name(self):
+        return self.member.get('nick') or self.member.get('user', {}).get('global_name') or self.member.get('user', {}).get('username') if self.member else "zzz"
+        
+    @property
     def author(self):
         members = [DiscordMember(**m) for m in get_members_from_cache()]
         try:
@@ -781,6 +800,7 @@ class Log(db.Model):
             return ""
         except:
             return ""
+
         
     @property   
     def character(self):

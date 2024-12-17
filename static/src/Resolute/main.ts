@@ -1,6 +1,7 @@
+import { start } from 'repl'
 import { ToastError } from '../General/main.js'
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint, playerName } from './types.js'
+import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint, playerName, classString } from './types.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()
@@ -174,7 +175,7 @@ $(document).on('click', '#player-table tbody tr', function(){
                 title: `Class`,
                 width: "70%",
                 render: function(data, type, row){
-                    return data.map(obj => `${obj.archetype?.value ? `${obj.archetype.value} ` : ''}${obj.primary_class.value}`).join('\n')
+                    return classString(data)
                 }
             }
         ],
@@ -940,7 +941,7 @@ async function buildCensusTable(){
                 title: `Class`,
                 width: "70%",
                 render: function(data, type, row){
-                    return data.map(obj => `${obj.archetype?.value ? `${obj.archetype.value} ` : ''}${obj.primary_class.value}`).join('\n')
+                    return classString(data)
                 }
             },
             {
@@ -1120,7 +1121,7 @@ async function buildPricingTab(){
                 }
             }
         ]
-    })
+    }) 
 
     if ($.fn.DataTable.isDataTable("#level-cost-table")) {
         $("#level-cost-table").DataTable().destroy();

@@ -1,6 +1,6 @@
 import { ToastError } from '../General/main.js';
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
-import { playerName } from './types.js';
+import { playerName, classString } from './types.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -146,7 +146,7 @@ $(document).on('click', '#player-table tbody tr', function () {
                 title: `Class`,
                 width: "70%",
                 render: function (data, type, row) {
-                    return data.map(obj => `${obj.archetype?.value ? `${obj.archetype.value} ` : ''}${obj.primary_class.value}`).join('\n');
+                    return classString(data);
                 }
             }
         ],
@@ -822,7 +822,7 @@ async function buildCensusTable() {
                 title: `Class`,
                 width: "70%",
                 render: function (data, type, row) {
-                    return data.map(obj => `${obj.archetype?.value ? `${obj.archetype.value} ` : ''}${obj.primary_class.value}`).join('\n');
+                    return classString(data);
                 }
             },
             {

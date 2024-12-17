@@ -121,6 +121,11 @@ export interface Character{
     level: number,
     active: boolean
     player_name?: string
+    classes: CharacterClass[]
+}
+
+export function classString(obj: CharacterClass[]){
+    return obj.map(c => `${c.archetype?.value ? `${c.archetype.value} ` : ''}${c.primary_class.value}`).join('\n')
 }
 
 export interface Player{

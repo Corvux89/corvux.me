@@ -562,7 +562,7 @@ class ResoluteGuild(db.Model):
     def activity_points_channel(self) -> str:
         return str(self._activity_points_channel)
     
-    @entrance_channel.setter
+    @activity_points_channel.setter
     def activity_points_channel(self, value):
         try:
             self._activity_points_channel = int(value)

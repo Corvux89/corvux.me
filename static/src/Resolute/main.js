@@ -589,6 +589,7 @@ $('#guild-settings-save-button').on('click', function () {
         guild.arena_board_channel = $('#guild-arena-board-channel').find(':selected').val().toString();
         guild.exit_channel = $('#guild-exit-channel').find(':selected').val().toString();
         guild.entrance_channel = $('#guild-entrance-channel').find(':selected').val().toString();
+        guild.activity_points_channel = $('#guild-activity-points-channel').find(':selected').val().toString();
         updateGuild(guild);
     });
 });

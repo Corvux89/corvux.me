@@ -1,0 +1,29 @@
+{% extends "template.html" %} {% block body %}
+<a href="{{ url_for('homepage') }}"><p>Click Here</a> to go to the Home Page</p>
+
+<div class="d-inline-flex">
+    <p>Redirecting in</p>
+    <p id="timer"></p> 
+    <p>seconds</p> 
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+
+    var seconds = 6
+    let url = "{{ url_for('homepage') }}"
+    $("#error-toast .toast-body").html("testing");
+    $("#error-toast").toast("show");
+
+    function redirect(){
+        if (seconds <= 0){
+        window.location = url
+        } else {
+            seconds--
+            document.getElementById('timer').innerHTML=`${seconds}`
+            setTimeout(() => redirect(), 1000)
+        }
+    }
+
+    // redirect()
+</script>
+{% endblock %}  

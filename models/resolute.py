@@ -309,6 +309,7 @@ class ResoluteGuild(db.Model):
     _arena_board_channel: Mapped[int] = mapped_column("arena_board_channel")
     _exit_channel: Mapped[int] = mapped_column("exit_channel")
     _entrance_channel: Mapped[int] = mapped_column("entrance_channel")
+    _activity_points_channel: Mapped[int] = mapped_column("activity_points_channel")
 
     def __init__(self, **kwargs):
         self._id = DISCORD_GUILD_ID
@@ -342,6 +343,7 @@ class ResoluteGuild(db.Model):
         self._arena_board_channel = kwargs.get('arena_board_channel')
         self._exit_channel = kwargs.get('exit_channel')
         self._entrance_channel = kwargs.get('entrance_channel')
+        self._activity_points_channel = kwargs.get('activity_points_channel')
     
     @property
     def id(self) -> str:
@@ -555,6 +557,18 @@ class ResoluteGuild(db.Model):
             self._entrance_channel = int(value)
         except:
             self._entrance_channel = None
+
+    @property
+    def activity_points_channel(self) -> str:
+        return str(self._activity_points_channel)
+    
+    @entrance_channel.setter
+    def activity_points_channel(self, value):
+        try:
+            self._activity_points_channel = int(value)
+        except:
+            self._activity_points_channel = None
+
 
 class RefMessage(db.Model):
     __tablename__ = "ref_messages"

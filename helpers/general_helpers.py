@@ -11,6 +11,11 @@ CHANNEL_CACHE = {}
 
 ROLE_CACHE = {}
 
+BOT_CACHE = {
+    "guilds": None,
+    "timestamp": 0
+}
+
 def get_members_from_cache(guild_id: int = DISCORD_GUILD_ID):
     current_time = time.time()
 
@@ -55,3 +60,14 @@ def get_roles_from_cache(guild_id: int = DISCORD_GUILD_ID):
         cache['roles'] = roles
         cache['timestamp'] = current_time
     return cache['roles']
+
+def get_bot_guilds_from_cache():
+    current_time = time.time()
+
+    if BOT_CACHE['guilds'] is None or (current_time - BOT_CACHE['timestamp'] > CACHE_TIMEOUT):
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        guilds = discord_session.bot_request(f"/users/@me/guilds")
+        BOT_CACHE['guilds'] = guilds
+        BOT_CACHE['timestamp'] = current_time
+
+    return BOT_CACHE['guilds']

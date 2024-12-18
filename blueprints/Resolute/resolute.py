@@ -1,11 +1,11 @@
 import os
 
-from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
+from flask import Blueprint, Flask, Response, abort, current_app, redirect, render_template, request, jsonify, url_for
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
-from helpers.auth_helper import is_admin
+from helpers.auth_helper import is_admin, login_requred
 from helpers.general_helpers import get_channels_from_cache, get_roles_from_cache
 from helpers.resolute_helpers import log_search_filter, trigger_compendium_reload, trigger_guild_reload
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordMember, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
@@ -15,7 +15,7 @@ from sqlalchemy.orm import joinedload
 resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
 
-@resolute_blueprint.route('/')
+@resolute_blueprint.route('/', methods=['GET'])
 @is_admin
 def resolute_main():
     if is_admin():
@@ -25,7 +25,14 @@ def resolute_main():
 
         return render_template('Resolute/resolute_main.html', tabs=tabs)
     
-    return "here"
+    return redirect(url_for('resolute_profile'))
+
+@resolute_blueprint.route('/profile', methods=['GET'])
+@login_requred
+def resolute_profile():
+    discord_session = current_app.config.get('DISCORD_SESSION')
+    user = discord_session.fetch_user()    
+    return render_template("Resolute/resolute_profile.html", user=user)
 
 @resolute_blueprint.route('/terms')
 def terms():
@@ -89,6 +96,7 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
     guild.arena_board_channel = update_guild.arena_board_channel
     guild.exit_channel = update_guild.exit_channel
     guild.entrance_channel = update_guild.entrance_channel
+    guild.activity_points_channel = update_guild.activity_points_channel
     
     db.session.commit()
     trigger_guild_reload(guild.id)

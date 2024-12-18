@@ -550,6 +550,8 @@ $('#guild-settings-button').on('click', async function() {
         .append(`<option>Select a role</option>`)
     $('#guild-entrance-channel').html('')
         .append(`<option>Select a role</option>`)
+    $('#guild-activity-points-channel').html('')
+        .append(`<option>Select a role</option>`)
 
     channels.forEach(channel => {
         $('#guild-application-channel').append(`
@@ -582,6 +584,10 @@ $('#guild-settings-button').on('click', async function() {
 
         $('#guild-entrance-channel').append(`
             <option value="${channel.id}" ${guild.entrance_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+        `)
+
+        $('#guild-activity-points-channel').append(`
+            <option value="${channel.id}" ${guild.activity_points_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
         `)
     })
     

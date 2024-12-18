@@ -44,6 +44,6 @@ def callback():
 def logout():
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
     discord_session.revoke()
-    if session['resolute']:
+    if session.get('resolute'):
         session.pop('resolute')
     return redirect(url_for('homepage'))

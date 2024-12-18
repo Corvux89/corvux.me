@@ -8,11 +8,11 @@ from models.resolute import Activity, Character, Log
 import json
 
 
-def log_search_filter(search_value: str) -> []:
+def log_search_filter(search_value: str, guild_id: int) -> []:
     if not search_value:
         return []
     
-    members = get_members_from_cache()
+    members = get_members_from_cache(guild_id)
     member_filter = []
     search_filter = []
     for member in members:

@@ -9,7 +9,8 @@ def get_csp():
             'https://analytics.google.com/',
             'https://www.google-analytics.com/',
             'https://use.fontawesome.com',
-            'https://otfbm.io/'
+            'https://otfbm.io/',
+            'https://discordapp.com/api'
         ],
         'script-src': [
             '\'self\'',

@@ -13,7 +13,14 @@ const financial_url = `${window.location.href}api/financial`;
 const store_url = `${window.location.href}api/store`;
 export function getGuild() {
     return fetch(guild_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -41,7 +48,14 @@ export function updateGuild(guild) {
 }
 export function getMessages() {
     return fetch(message_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -110,21 +124,42 @@ export function deleteMessage(mesage_id) {
 }
 export function getChannels() {
     return fetch(channel_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
 }
 export function getRoles() {
     return fetch(role_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
 }
 export function getLogs() {
     return fetch(log_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         res.forEach(log => {
             log.created_ts = new Date(log.created_ts).toLocaleString();
@@ -134,7 +169,14 @@ export function getLogs() {
 }
 export function getActivities() {
     return fetch(activity_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -162,14 +204,28 @@ export function updateActivities(activities) {
 }
 export function getPlayers() {
     return fetch(player_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
 }
 export function getActivityPoints() {
     return fetch(activity_point_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -197,7 +253,14 @@ export function updateActivityPoints(activities) {
 }
 export function getCodeconversions() {
     return fetch(code_conversion_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -225,7 +288,14 @@ export function udpateCodeConversion(conversions) {
 }
 export function getLevelCosts() {
     return fetch(level_cost_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -253,7 +323,14 @@ export function updateLevelCosts(costs) {
 }
 export function getFinancial() {
     return fetch(financial_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });
@@ -281,7 +358,14 @@ export function updateFinancial(fin) {
 }
 export function getStores() {
     return fetch(store_url)
-        .then(res => res.json())
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
         .then(res => {
         return res;
     });

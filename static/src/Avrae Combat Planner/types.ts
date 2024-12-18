@@ -1,5 +1,4 @@
-import { map } from "jquery"
-import { inputSelect, inputText, savePlan } from "./utils.js"
+import { inputSelect, inputText } from "./utils.js"
 
 const monsterNode = "monsters" as const
 const settingNode = "avraesettings" as const

@@ -1,10 +1,11 @@
 import os
 
-from flask import Blueprint, Flask, Response, abort, current_app, redirect, render_template, request, jsonify, url_for
+from flask import Blueprint, Flask, Response, abort, current_app, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
-from constants import DISCORD_ADMINS, DISCORD_GUILD_ID
+from constants import DISCORD_GUILD_ID
+from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_channels_from_cache, get_roles_from_cache
 from helpers.resolute_helpers import log_search_filter, trigger_compendium_reload, trigger_guild_reload
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordMember, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
@@ -14,28 +15,17 @@ from sqlalchemy.orm import joinedload
 resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
 
-@resolute_blueprint.before_request
-def before_request():
-    exclusions = ['/resolute/terms', '/resolute/privacy']
-    if request.path in exclusions:
-        return None
-    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-    
-    if not discord_session or not discord_session.authorized:
-        return redirect(url_for('auth.login', next=request.endpoint))
-    
-    user = discord_session.fetch_user()
-
-    if user.id not in DISCORD_ADMINS:
-        return redirect(url_for('homepage')) 
-
 @resolute_blueprint.route('/')
+@is_admin
 def resolute_main():
-    tab_folder = "templates/Resolute/tabs"
+    if is_admin():
+        tab_folder = "templates/Resolute/tabs"
 
-    tabs = [f"/Resolute/tabs/{file}" for file in os.listdir(tab_folder) if file.endswith(".html")]
+        tabs = [f"/Resolute/tabs/{file}" for file in os.listdir(tab_folder) if file.endswith(".html")]
 
-    return render_template('Resolute/resolute_main.html', tabs=tabs)
+        return render_template('Resolute/resolute_main.html', tabs=tabs)
+    
+    return "here"
 
 @resolute_blueprint.route('/terms')
 def terms():
@@ -45,65 +35,68 @@ def terms():
 def privacy():
     return render_template('Resolute/privacy.html')
 
-@resolute_blueprint.route('/api/guild', methods=['GET', 'PATCH'])
-@resolute_blueprint.route('/api/guild/<guild_id>', methods=['GET', 'PATCH'])
-def upsert_guild(guild_id: int = DISCORD_GUILD_ID):
+@resolute_blueprint.route('/api/guild', methods=['GET'])
+@resolute_blueprint.route('/api/guild/<guild_id>', methods=['GET'])
+def get_guild(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get('DB')
     guild: ResoluteGuild = db.get_or_404(ResoluteGuild, guild_id)
+    return jsonify(guild)
 
-    if request.method == 'GET':
-        return jsonify(guild)
+@resolute_blueprint.route('/api/guild', methods=['PATCH'])
+@resolute_blueprint.route('/api/guild/<guild_id>', methods=['PATCH'])
+@is_admin
+def update_guild(guild_id: int = DISCORD_GUILD_ID):
+    db: SQLAlchemy = current_app.config.get('DB')
+    guild: ResoluteGuild = db.get_or_404(ResoluteGuild, guild_id)
+    update_guild = ResoluteGuild(**request.get_json())
 
-    elif request.method == 'PATCH':
-        update_guild = ResoluteGuild(**request.get_json())
+    # Validation        
+    if db.session.query(Character).filter(and_(Character._guild_id == guild_id,
+                                                                            Character.active == True,
+                                                                            Character.level > update_guild.max_level)).count() > 0:
+        return abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
+    elif db.session.query(Character._player_id,
+                            func.count(Character._player_id).label('count')).filter(and_(Character._guild_id == guild_id, Character.active == True))\
+                            .group_by(Character._player_id).having(func.count(Character._player_id)>update_guild.max_characters).count() > 0:
+        return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
 
-        # Validation        
-        if db.session.query(Character).filter(and_(Character._guild_id == guild_id,
-                                                                              Character.active == True,
-                                                                              Character.level > update_guild.max_level)).count() > 0:
-            return abort(Response(f"There are current characters with a level exceeding {update_guild.max_level}", 400))
-        elif db.session.query(Character._player_id,
-                              func.count(Character._player_id).label('count')).filter(and_(Character._guild_id == guild_id, Character.active == True))\
-                              .group_by(Character._player_id).having(func.count(Character._player_id)>update_guild.max_characters).count() > 0:
-            return abort(Response(f"There are currently players with more than {update_guild.max_characters} character(s).", 400))
+    guild.weekly_announcement = update_guild.weekly_announcement
+    guild.ping_announcement = update_guild.ping_announcement
+    guild.max_level = update_guild.max_level
+    guild.handicap_cc = update_guild.handicap_cc
+    guild.max_characters = update_guild.max_characters
+    guild.div_limit = update_guild.div_limit
+    guild.reward_threshold = update_guild.reward_threshold
 
-        guild.weekly_announcement = update_guild.weekly_announcement
-        guild.ping_announcement = update_guild.ping_announcement
-        guild.max_level = update_guild.max_level
-        guild.handicap_cc = update_guild.handicap_cc
-        guild.max_characters = update_guild.max_characters
-        guild.div_limit = update_guild.div_limit
-        guild.reward_threshold = update_guild.reward_threshold
+    guild.entry_role = update_guild.entry_role
+    guild.member_role = update_guild.member_role
+    guild.admin_role = update_guild.admin_role
+    guild.staff_role = update_guild.staff_role
+    guild.bot_role = update_guild.bot_role
+    guild.quest_role = update_guild.quest_role
 
-        guild.entry_role = update_guild.entry_role
-        guild.member_role = update_guild.member_role
-        guild.admin_role = update_guild.admin_role
-        guild.staff_role = update_guild.staff_role
-        guild.bot_role = update_guild.bot_role
-        guild.quest_role = update_guild.quest_role
+    guild.tier_2_role = update_guild.tier_2_role
+    guild.tier_3_role = update_guild.tier_3_role
+    guild.tier_4_role = update_guild.tier_4_role
+    guild.tier_5_role = update_guild.tier_5_role
+    guild.tier_6_role = update_guild.tier_6_role
 
-        guild.tier_2_role = update_guild.tier_2_role
-        guild.tier_3_role = update_guild.tier_3_role
-        guild.tier_4_role = update_guild.tier_4_role
-        guild.tier_5_role = update_guild.tier_5_role
-        guild.tier_6_role = update_guild.tier_6_role
-
-        guild.application_channel = update_guild.application_channel
-        guild.market_channel = update_guild.market_channel
-        guild.announcement_channel = update_guild.announcement_channel
-        guild.staff_channel = update_guild.staff_channel
-        guild.help_channel = update_guild.help_channel
-        guild.arena_board_channel = update_guild.arena_board_channel
-        guild.exit_channel = update_guild.exit_channel
-        guild.entrance_channel = update_guild.entrance_channel
-        
-        db.session.commit()
-        trigger_guild_reload(guild.id)
+    guild.application_channel = update_guild.application_channel
+    guild.market_channel = update_guild.market_channel
+    guild.announcement_channel = update_guild.announcement_channel
+    guild.staff_channel = update_guild.staff_channel
+    guild.help_channel = update_guild.help_channel
+    guild.arena_board_channel = update_guild.arena_board_channel
+    guild.exit_channel = update_guild.exit_channel
+    guild.entrance_channel = update_guild.entrance_channel
     
-    return abort(404)
+    db.session.commit()
+    trigger_guild_reload(guild.id)
+    return jsonify(200)
 
 @resolute_blueprint.route('/api/message', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 @resolute_blueprint.route('/api/message/<guild_id>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@is_admin
 def ref_messages(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get('DB')
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
@@ -183,12 +176,14 @@ def ref_messages(guild_id: int = DISCORD_GUILD_ID):
     
     
 @resolute_blueprint.route('/api/channels', methods=['GET'])
-def get_channels():
-    channels = get_channels_from_cache()
+@resolute_blueprint.route('/api/channels/<guild_id>', methods=['GET'])
+def get_channels(guild_id: int = DISCORD_GUILD_ID):
+    channels = get_channels_from_cache(guild_id)
     return jsonify([DiscordChannel(**c) for c in channels])
 
 @resolute_blueprint.route('/api/roles', methods=['GET'])
-def get_roles():
+@resolute_blueprint.route('/api/roles/<guild_id>', methods=['GET'])
+def get_roles(guild_id: int = DISCORD_GUILD_ID):
     roles = get_roles_from_cache()
     return jsonify([DiscordRole(**r) for r in roles])
 
@@ -212,6 +207,7 @@ def get_players(guild_id: int = DISCORD_GUILD_ID, player_id: int = None):
 
 @resolute_blueprint.route('/api/logs', methods=["GET", "POST"])
 @resolute_blueprint.route('/api/logs/<guild_id>', methods=["GET", "POST"])
+@is_admin
 def get_logs(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get('DB')
     query = (db.session.query(Log)
@@ -237,7 +233,7 @@ def get_logs(guild_id: int = DISCORD_GUILD_ID):
         recordsTotal = query.count()
 
         if search_value:
-            query = query.filter(or_(*log_search_filter(search_value)))
+            query = query.filter(or_(*log_search_filter(search_value, guild_id)))
 
         # Query Sorting
         columns = [Log.id, Log.created_ts, None, None, Character.name, Activity.value, Log.notes, Log.invalid]
@@ -279,6 +275,7 @@ def get_logs(guild_id: int = DISCORD_GUILD_ID):
     return jsonify(logs)
 
 @resolute_blueprint.route('/api/activities', methods=['GET', 'PATCH'])
+@is_admin
 def get_activites():
     db: SQLAlchemy = current_app.config.get('DB')
     activities: list[Activity] = (db.session.query(Activity)
@@ -308,6 +305,7 @@ def get_activites():
             return jsonify({"error": "Failed to update activities"}), 500
     
 @resolute_blueprint.route('/api/activity_points', methods=['GET', 'PATCH'])
+@is_admin
 def get_activity_points():
     db: SQLAlchemy = current_app.config.get('DB')
     points: list[ActivityPoints] = (db.session.query(ActivityPoints)
@@ -335,6 +333,7 @@ def get_activity_points():
             return jsonify({"error": "Failed to update activity points"}), 500
 
 @resolute_blueprint.route('/api/code_conversion', methods=['GET', 'PATCH'])
+@is_admin
 def get_code_conversion():
     db: SQLAlchemy = current_app.config.get('DB')
     points: list[CodeConversion] = (db.session.query(CodeConversion)
@@ -362,6 +361,7 @@ def get_code_conversion():
             return jsonify({"error": "Failed to update code conversions"}), 500
 
 @resolute_blueprint.route('/api/level_costs', methods=['GET', 'PATCH'])
+@is_admin
 def get_level_costs():
     db: SQLAlchemy = current_app.config.get('DB')
     costs: list[LevelCost] = (db.session.query(LevelCost)
@@ -389,6 +389,7 @@ def get_level_costs():
             return jsonify({"error": "Failed to update level costs"}), 500
     
 @resolute_blueprint.route('/api/financial', methods=['GET', 'PATCH'])
+@is_admin
 def get_financial():
     db: SQLAlchemy = current_app.config.get('DB')
     fin: Financial = (db.session.query(Financial)
@@ -415,6 +416,7 @@ def get_financial():
             return jsonify({"error": "Failed to update financials"}), 500
     
 @resolute_blueprint.route('/api/store', methods=['GET', 'PATCH'])
+@is_admin
 def get_store():
     db: SQLAlchemy = current_app.config.get('DB')
     store: list[Store] = (db.session.query(Store)

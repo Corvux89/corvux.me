@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, request, make_response, send_from_directory
+from flask import Flask, render_template, request, make_response
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
@@ -13,6 +13,7 @@ from blueprints.auth import auth_blueprint
 from blueprints.Resolute.resolute import resolute_blueprint
 from constants import DB_URI, DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_REDIRECT_URI, DISCORD_SECRET_KEY, WEB_DEBUG, SECRET_KEY
 from helpers import get_csp
+from helpers.error_handlers import register_handlers
 from models.resolute import CustomJSONProvider
 
 app = Flask(__name__)
@@ -60,10 +61,6 @@ def site_map():
     response.headers["Content-Type"] = "application/xml"
     return response
 
-@app.errorhandler(404)
-def not_found(e):
-    return render_template("404.html")
-
 csp = get_csp()
 
 Bootstrap(app)
@@ -76,6 +73,7 @@ talisman = Talisman(
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 app.register_blueprint(resolute_blueprint,url_prefix='/resolute')
+register_handlers(app)
 
 if __name__ == "__main__":
     app.run()

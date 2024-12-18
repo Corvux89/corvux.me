@@ -17,7 +17,13 @@ const store_url = `${window.location.href}api/store`
 
 export function getGuild(): Promise<ResoluteGuild>{
     return fetch(guild_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as ResoluteGuild
     })
@@ -50,7 +56,13 @@ export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
 
 export function getMessages(): Promise<RefMessage[]>{
     return fetch(message_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as RefMessage[]
     })
@@ -132,7 +144,13 @@ export function deleteMessage(mesage_id: string): void{
 
 export function getChannels(): Promise<DiscordChannel[]>{
     return fetch(channel_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as DiscordChannel[]
     })
@@ -140,7 +158,13 @@ export function getChannels(): Promise<DiscordChannel[]>{
 
 export function getRoles(): Promise<DiscordRole[]>{
     return fetch(role_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as DiscordRole[]
     })
@@ -148,7 +172,13 @@ export function getRoles(): Promise<DiscordRole[]>{
 
 export function getLogs(): Promise<Log[]>{
     return fetch(log_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         res.forEach(log => {
             log.created_ts = new Date(log.created_ts).toLocaleString()
@@ -161,7 +191,13 @@ export function getLogs(): Promise<Log[]>{
 
 export function getActivities(): Promise<Activity[]>{
     return fetch(activity_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as Activity[]
     })
@@ -194,7 +230,13 @@ export function updateActivities(activities: Activity[]): Promise<Activity[]>{
 
 export function getPlayers(): Promise<Player[]>{
     return fetch(player_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as Player[]
     })
@@ -202,7 +244,13 @@ export function getPlayers(): Promise<Player[]>{
 
 export function getActivityPoints(): Promise<ActivityPoint[]>{
     return fetch(activity_point_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as ActivityPoint[]
     })
@@ -235,7 +283,13 @@ export function updateActivityPoints(activities: ActivityPoint[]): Promise<Activ
 
 export function getCodeconversions(): Promise<CodeConversion[]>{
     return fetch(code_conversion_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as CodeConversion[]
     })
@@ -268,7 +322,13 @@ export function udpateCodeConversion(conversions: CodeConversion[]): Promise<Cod
 
 export function getLevelCosts(): Promise<LevelCost[]>{
     return fetch(level_cost_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as LevelCost[]
     })
@@ -301,7 +361,13 @@ export function updateLevelCosts(costs: LevelCost[]): Promise<LevelCost[]>{
 
 export function getFinancial(): Promise<Financial>{
     return fetch(financial_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as Financial
     })
@@ -334,7 +400,13 @@ export function updateFinancial(fin: Financial): Promise<Financial>{
 
 export function getStores(): Promise<Store[]>{
     return fetch(store_url)
-    .then(res => res.json())
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
     .then(res => {
         return res as Store[]
     })

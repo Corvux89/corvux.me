@@ -5,47 +5,53 @@ from flask import current_app
 from constants import CACHE_TIMEOUT, DISCORD_GUILD_ID, LIMIT
 
 
-MEMBER_CACHE = {
-    "members": None,
-    "timestamp": 0
-}
+MEMBER_CACHE = {}
 
-CHANNEL_CACHE = {
-    "channels": None,
-    "timestamp": 0
-}
+CHANNEL_CACHE = {}
 
-ROLE_CACHE = {
-    "roles": None,
-    "timestamp": 0
-}
+ROLE_CACHE = {}
 
-def get_members_from_cache():
+def get_members_from_cache(guild_id: int = DISCORD_GUILD_ID):
     current_time = time.time()
 
-    if MEMBER_CACHE["members"] is None or (current_time - MEMBER_CACHE['timestamp'] > CACHE_TIMEOUT):
-        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-        members = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/members?limit={LIMIT}")
-        MEMBER_CACHE['members'] = members
-        MEMBER_CACHE['timestamp'] = current_time
-    return MEMBER_CACHE['members']
+    if guild_id not in MEMBER_CACHE:
+        MEMBER_CACHE[guild_id] = {"members": None, "timestamp": 0}
 
-def get_channels_from_cache():
+    cache = MEMBER_CACHE[guild_id]
+
+    if cache["members"] is None or (current_time - cache['timestamp'] > CACHE_TIMEOUT):
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        members = discord_session.bot_request(f"/guilds/{guild_id}/members?limit={LIMIT}")
+        cache['members'] = members
+        cache['timestamp'] = current_time
+    return cache['members']
+
+def get_channels_from_cache(guild_id: int = DISCORD_GUILD_ID):
     current_time = time.time()
 
-    if CHANNEL_CACHE['channels'] is None or (current_time - CHANNEL_CACHE['timestamp'] > CACHE_TIMEOUT):
-        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-        channels = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/channels")
-        CHANNEL_CACHE['channels'] = channels
-        CHANNEL_CACHE['timestamp'] = current_time
-    return CHANNEL_CACHE['channels']
+    if guild_id not in CHANNEL_CACHE:
+        CHANNEL_CACHE[guild_id] = {"channels": None, "timestamp": 0}
 
-def get_roles_from_cache():
+    cache = CHANNEL_CACHE[guild_id]
+
+    if cache['channels'] is None or (current_time - cache['timestamp'] > CACHE_TIMEOUT):
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        channels = discord_session.bot_request(f"/guilds/{guild_id}/channels")
+        cache['channels'] = channels
+        cache['timestamp'] = current_time
+    return cache['channels']
+
+def get_roles_from_cache(guild_id: int = DISCORD_GUILD_ID):
     current_time = time.time()
 
-    if ROLE_CACHE['roles'] is None or (current_time - ROLE_CACHE['timestamp'] > CACHE_TIMEOUT):
+    if guild_id not in ROLE_CACHE:
+        ROLE_CACHE[guild_id] = {"roles": None, "timestamp": 0}
+
+    cache = ROLE_CACHE[guild_id]
+
+    if cache['roles'] is None or (current_time - cache['timestamp'] > CACHE_TIMEOUT):
         discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-        roles = discord_session.bot_request(f"/guilds/{DISCORD_GUILD_ID}/roles")
-        ROLE_CACHE['roles'] = roles
-        ROLE_CACHE['timestamp'] = current_time
-    return ROLE_CACHE['roles']
+        roles = discord_session.bot_request(f"/guilds/{guild_id}/roles")
+        cache['roles'] = roles
+        cache['timestamp'] = current_time
+    return cache['roles']

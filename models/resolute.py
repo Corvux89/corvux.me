@@ -690,7 +690,7 @@ class Player(db.Model):
     
     @property
     def member(self):
-        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        members = [DiscordMember(**m) for m in get_members_from_cache(self._guild_id)]
         try:
             if (m := next((m for m in members if m.user and m.user._id == self._id), None)):
                 return m.__dict__
@@ -779,7 +779,7 @@ class Log(db.Model):
 
     @property
     def member(self):
-        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        members = [DiscordMember(**m) for m in get_members_from_cache(self._guild_id)]
         try:
             if (m := next((m for m in members if m.user and m.user._id == self._player_id), None)):
                 return m.__dict__
@@ -793,7 +793,7 @@ class Log(db.Model):
         
     @property
     def author(self):
-        members = [DiscordMember(**m) for m in get_members_from_cache()]
+        members = [DiscordMember(**m) for m in get_members_from_cache(self._guild_id)]
         try:
             if (m := next((m for m in members if m.user and m.user._id == self._author), None)):
                 return m.__dict__

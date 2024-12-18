@@ -1,7 +1,6 @@
-import { start } from 'repl'
 import { ToastError } from '../General/main.js'
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, GenericDict, DataTableRequest, Character, ActivityPoint, playerName, classString } from './types.js'
+import { RefMessage, NewMessage, Log, Activity, Player, DataTableRequest, Character, ActivityPoint, playerName, classString } from './types.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()

@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app
+from flask import current_app, redirect, url_for
 
 from constants import DISCORD_ADMINS
 from helpers.general_helpers import get_bot_guilds_from_cache
@@ -10,7 +10,10 @@ def is_admin(f=None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            if not _is_user_admin():
+            discord_session = current_app.config.get('DISCORD_SESSION')
+            if discord_session and not discord_session.authorized:
+                return redirect(url_for("auth.login"))
+            elif not _is_user_admin():
                 raise AdminAccessError()
             return func(*args, **kwargs)
         return decorated_function
@@ -34,7 +37,10 @@ def login_requred(f=None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            if not _is_logged_in():
+            discord_session = current_app.config.get('DISCORD_SESSION')
+            if discord_session and not discord_session.authorized:
+                return redirect(url_for("auth.login"))
+            elif not _is_logged_in():
                 raise LoginError()
             return func(*args, **kwargs)
         return decorated_function

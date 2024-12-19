@@ -206,13 +206,22 @@ $(document).on('click', '#player-table tbody tr', function () {
         pageLength: 50,
         info: false,
         paging: false,
-        data: Object.entries(data.statistics.npc ?? {}).map(([key, value]) => ({
-            command: key,
-            count: value["count"] ?? 0,
-            characters: value["num_characters"],
-            lines: value["num_lines"],
-            words: value["num_words"]
-        })),
+        data: Object.entries(data.statistics.npc ?? {}).map(([key, stats]) => {
+            const summary = Object.values(stats).reduce((totals, dailyStats) => {
+                totals.count += dailyStats.count ?? 0;
+                totals.num_lines += dailyStats.num_lines ?? 0;
+                totals.num_words += dailyStats.num_words ?? 0;
+                totals.num_characters += dailyStats.num_characters ?? 0;
+                return totals;
+            }, { count: 0, num_lines: 0, num_words: 0, num_characters: 0 });
+            return {
+                command: key,
+                count: summary.count,
+                characters: summary.num_characters,
+                lines: summary.num_lines,
+                words: summary.num_words
+            };
+        }),
         columns: [
             {
                 data: "command",
@@ -457,25 +466,25 @@ $('#guild-settings-button').on('click', async function () {
         `);
     });
     $('#guild-application-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-market-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-announcement-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-staff-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-help-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-arena-board-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-exit-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-exit-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-entrance-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     $('#guild-activity-points-channel').html('')
-        .append(`<option>Select a role</option>`);
+        .append(`<option>Select a channel</option>`);
     channels.forEach(channel => {
         $('#guild-application-channel').append(`
             <option value="${channel.id}" ${guild.application_channel == channel.id.toString() ? 'selected' : ''}>${channel.name}</option>

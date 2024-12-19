@@ -186,3 +186,16 @@ export interface DataTableRequest {
     startDate: string
     endDate: string
 }
+
+export type  DailyStats = {
+    count: number
+    num_lines: number
+    num_words: number
+    num_characters: number
+}
+
+export type NPCStats = Record<string, DailyStats>
+
+export type statistics = {
+    npc: Record<string, NPCStats>
+}

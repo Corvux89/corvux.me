@@ -1,6 +1,7 @@
 I have over 10 years of experience in Healthcare IT, specializing in workflow automation to enhance patient outcomes, improve provider satisfaction, and streamline operations.
 
 My key contributions include:
+
 **Streamlining Patient Journeys**: I've developed and implemented solutions for efficient patient scheduling, triage, and healthcare navigation. This includes systems for COVID-19 screening and testing.
 
 **Advancing Diagnostic Capabilities**: I helped design and deploy tools to assist physicians in diagnosing complex neurological comditions. I also helped create a tool to help physicians determine the best antibiotic for certain patients based on empiric evidence. 

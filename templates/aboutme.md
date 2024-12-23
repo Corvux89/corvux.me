@@ -1,7 +1,10 @@
-I've been working in Healthcare IT for over 10 years working to automate workflow to improve patient outcomes, and increase provider and patient satisfaction. I've done work to help streamline and automate patient scheduling and triage from the first point of contact, diagnostic tools to help physicians diagnose and manage treatment for various complex neurological conditions, and tools for physicians to determine the best antibiotic to prescribe to a patient based on empiric recommendations. 
+I have over 10 years of experience in Healthcare IT, specializing in workflow automation to enhance patient outcomes, improve provider satisfaction, and streamline operations.
 
-The past couple of years I've been working with <a href="https://www.northshore.org/personalized-medicine/" target="_blank" class="undecorated-link">Personalized Medicine</a> helping integrate genetic testing into patient care as part of one of the only pharmacogenomics clinics in the country. This covers disciplines from medical genetics, clinical practices, informatics, lab services, and research.
+My key contributions include:
+**Streamlining Patient Journeys**: I've developed and implemented solutions for efficient patient scheduling, triage, and healthcare navigation. This includes systems for COVID-19 screening and testing.
 
-During COVID I helped our organization and staff shift to addressing the surge of patients we were expecting. I built tools to help patients navigate our system for symptomatic, asymptomatic, and pre-procedural testing, serology testing, while helping our operational staff gauge supplies and volumes. This helped route patients where most appropriate and freed up clinical staff so they could attend to patients rather than phone calls/messages checking symptoms against the latest guidelines.
+**Advancing Diagnostic Capabilities**: I helped design and deploy tools to assist physicians in diagnosing complex neurological comditions. I also helped create a tool to help physicians determine the best antibiotic for certain patients based on empiric evidence. 
 
-When not at work, I enjoy spending time with my family, playing various video/tabletop games, and working on some passions projects to help refine skills and learn something new.
+<a href="https://www.northshore.org/personalized-medicine/" target="_blank" class="undecorated-link">**Pioneering Personalized Medicine**:</a> I've played a key role in establisheing a leading pharmacogenomics clinic. Including integrating genetic testing into patient care across clniical specialties. 
+
+Beyond my professional work, I value spending time with my family, engaging in hobbies like gaming, and pursuing personal projects to continuously expand my skills and knowledge.

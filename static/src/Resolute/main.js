@@ -10,6 +10,9 @@ $("#announcement-ping").on("change", function () {
         updateGuild(guild);
     });
 });
+$("#npc-start-date, #npc-end-date").on("change", function () {
+    $("#global-npc-table").DataTable().draw();
+});
 $(document).on('click', '.announcement-delete', function (e) {
     e.stopPropagation();
     getGuild()
@@ -111,12 +114,12 @@ $(document).on("click", "#player-character-table tbody tr", function () {
 });
 $(document).on('click', '#player-table tbody tr', function () {
     const table = $("#player-table").DataTable();
-    const data = table.row(this).data();
-    $("#member-id").val(data.id);
-    $("#member-name").val(`${playerName(data.member)}`);
-    $("#player-cc").val(data.cc);
-    $("#player-div-cc").val(data.div_cc);
-    $("#player-act-points").val(data.activity_points);
+    const playerData = table.row(this).data();
+    $("#member-id").val(playerData.id);
+    $("#member-name").val(`${playerName(playerData.member)}`);
+    $("#player-cc").val(playerData.cc);
+    $("#player-div-cc").val(playerData.div_cc);
+    $("#player-act-points").val(playerData.activity_points);
     if ($.fn.DataTable.isDataTable("#player-character-table")) {
         $("#player-character-table").DataTable().destroy();
     }
@@ -124,7 +127,7 @@ $(document).on('click', '#player-table tbody tr', function () {
         orderCellsTop: true,
         info: false,
         paging: false,
-        data: data.characters,
+        data: playerData.characters,
         columns: [
             {
                 data: "name",
@@ -171,7 +174,7 @@ $(document).on('click', '#player-table tbody tr', function () {
         pageLength: 50,
         info: false,
         paging: false,
-        data: Object.entries(data.statistics.commands ?? {}).map(([key, value]) => ({
+        data: Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
             command: key,
             value: value
         })),
@@ -201,12 +204,12 @@ $(document).on('click', '#player-table tbody tr', function () {
     if ($.fn.DataTable.isDataTable("#global-npc-table")) {
         $("#global-npc-table").DataTable().destroy();
     }
-    $("#global-npc-table").DataTable({
+    const npcTable = $("#global-npc-table").DataTable({
         orderCellsTop: true,
         pageLength: 50,
         info: false,
         paging: false,
-        data: Object.entries(data.statistics.npc ?? {}).map(([key, stats]) => {
+        data: Object.entries(playerData.statistics.npc ?? {}).map(([key, stats]) => {
             const summary = Object.values(stats).reduce((totals, dailyStats) => {
                 totals.count += dailyStats.count ?? 0;
                 totals.num_lines += dailyStats.num_lines ?? 0;
@@ -263,6 +266,21 @@ $(document).on('click', '#player-table tbody tr', function () {
                 }
             }
         ]
+    });
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        const startDate = $("#npc-start-date").val();
+        const endDate = $("#npc-end-date").val();
+        const rowData = npcTable.row(dataIndex).data();
+        const key = rowData.command;
+        const npcStats = playerData.statistics.npc[key];
+        if (!npcStats)
+            return true;
+        const rowDates = Object.keys(npcStats).map(dateStr => new Date(dateStr));
+        const minDate = startDate ? new Date(startDate) : new Date(Math.min(...rowDates.map(date => date.getTime())));
+        const maxDate = endDate ? new Date(endDate) : new Date(Math.max(...rowDates.map(date => date.getTime())));
+        return rowDates.some(date => {
+            return date >= minDate && date <= maxDate;
+        });
     });
     $("#player-modal").modal("show");
     $("#member-overview-button").tab("show");
@@ -1039,4 +1057,7 @@ async function buildPricingTab() {
             }
         ]
     });
+}
+function parseDateString(dateString) {
+    return dateString ? new Date(dateString) : null;
 }

@@ -1,4 +1,3 @@
-import { stat } from 'fs'
 import { ToastError } from '../General/main.js'
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
 import { RefMessage, NewMessage, Log, Activity, Player, DataTableRequest, Character, ActivityPoint, playerName, classString, NPCStats } from './types.js'
@@ -236,6 +235,8 @@ $(document).on('click', '#player-table tbody tr', function(){
 
     if ($.fn.DataTable.isDataTable("#global-npc-table")) {
         $("#global-npc-table").DataTable().destroy();
+        $("#npc-start-date").val("")
+        $("#npc-end-date").val("")
     }
 
     const npcTable = $("#global-npc-table").DataTable({
@@ -307,6 +308,9 @@ $(document).on('click', '#player-table tbody tr', function(){
     })
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
+        if (settings.nTable.id !== 'global-npc-table') {
+            return true;
+        }
         const startDate = $("#npc-start-date").val() as string
         const endDate = $("#npc-end-date").val() as string
         const rowData = npcTable.row(dataIndex).data()

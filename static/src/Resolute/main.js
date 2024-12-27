@@ -203,6 +203,8 @@ $(document).on('click', '#player-table tbody tr', function () {
     });
     if ($.fn.DataTable.isDataTable("#global-npc-table")) {
         $("#global-npc-table").DataTable().destroy();
+        $("#npc-start-date").val("");
+        $("#npc-end-date").val("");
     }
     const npcTable = $("#global-npc-table").DataTable({
         orderCellsTop: true,
@@ -268,6 +270,9 @@ $(document).on('click', '#player-table tbody tr', function () {
         ]
     });
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        if (settings.nTable.id !== 'global-npc-table') {
+            return true;
+        }
         const startDate = $("#npc-start-date").val();
         const endDate = $("#npc-end-date").val();
         const rowData = npcTable.row(dataIndex).data();

@@ -589,7 +589,6 @@ $('#guild-settings-button').on('click', async function () {
     $('#guild-dev-channels').html('')
         .append(`<option>Select channel(s)</option>`);
     channels.forEach(channel => {
-        console.log(channel);
         $('#guild-application-channel').append(`
             <option value="${channel.id}" ${guild.application_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
         `);
@@ -1151,40 +1150,6 @@ async function buildPricingTab() {
             }
         ]
     });
-}
-function filterGlobalNPCTable(row) {
-    const table = $("#player-table").DataTable();
-    const playerData = table.row(row).data();
-    const rowData = row.data();
-    const startDate = $("#npc-start-date").val();
-    const endDate = $("#npc-end-date").val();
-    const key = rowData.command;
-    console.log(playerData);
-    const npcStats = playerData.statistics.npc[key];
-    if (!npcStats)
-        return rowData;
-    const rowDates = Object.keys(npcStats).map(dateStr => {
-        const [year, month, day] = dateStr.split('-').map(Number);
-        return new Date(year, month - 1, day);
-    });
-    const minDate = startDate ? new Date(...startDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num))) : new Date(Math.min(...rowDates.map(date => date.getTime())));
-    const maxDate = endDate ? new Date(...endDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num))) : new Date(Math.max(...rowDates.map(date => date.getTime())));
-    let newData = {};
-    newData.count = 0;
-    newData.num_characters = 0;
-    newData.num_lines = 0;
-    newData.num_words = 0;
-    rowDates.forEach(date => {
-        if (date >= minDate && date <= maxDate) {
-            const dateStr = date.toISOString().split('T')[0];
-            const stats = npcStats[dateStr];
-            newData.count += stats.count;
-            newData.num_characters += stats.num_characters;
-            newData.num_lines += stats.num_lines;
-            newData.num_words += stats.num_words;
-        }
-    });
-    return newData;
 }
 $("#npc-start-date, #npc-end-date").on("change", function () {
     $("#global-npc-table").DataTable().draw();

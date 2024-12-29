@@ -97,6 +97,8 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
     guild.exit_channel = update_guild.exit_channel
     guild.entrance_channel = update_guild.entrance_channel
     guild.activity_points_channel = update_guild.activity_points_channel
+    guild.rp_post_channel = update_guild.rp_post_channel
+    guild.dev_channels = update_guild.dev_channels
     
     db.session.commit()
     trigger_guild_reload(guild.id)

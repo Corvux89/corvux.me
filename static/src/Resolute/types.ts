@@ -29,6 +29,8 @@ export interface ResoluteGuild {
     exit_channel: string
     entrance_channel: string
     activity_points_channel: string
+    rp_post_channel: string
+    dev_channels: string[]
 }
 
 export interface RefMessage {

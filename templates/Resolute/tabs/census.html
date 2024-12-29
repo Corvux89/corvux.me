@@ -73,6 +73,9 @@
                                     <button-tab label-text="Commands" controls="command-stats-tab"
                                         custom-id="command-stats-button" active></button-tab>
 
+                                        <button-tab label-text="Say Stats" controls="say-stats-tab"
+                                        custom-id="say-stats-button"></button-tab>
+
                                     <button-tab label-text="NPC" controls="npc-stats-tab"
                                         custom-id="npc-stats-button"></button-tab>
                                 </div>
@@ -81,6 +84,24 @@
                                     <div class="tab-pane fade show active" id="command-stats-tab" role="tabpanel" aria-labelledby="command-stats-button" tabindex="0">
                                         <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="stats-table"></table>
                                     </div>
+
+                                    <div class="tab-pane fade show" id="say-stats-tab" role="tabpanel" aria-labelledby="say-stats-button" tabindex="0">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <div class="form-floating">
+                                                    <input type="date" class="form-control" id="say-start-date">
+                                                    <label for="say-start-date">Start Date:</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-floating">
+                                                    <input type="date" class="form-control" id="say-end-date">
+                                                    <label for="say-end-date">End Date:</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table" id="say-table"></table>
+                                    </div>
                                     
                                 
                                     <div class="tab-pane fade show" id="npc-stats-tab" role="tabpanel" aria-labelledby="npc-stats-button" tabindex="0">
@@ -88,13 +109,13 @@
                                             <div class="col-3">
                                                 <div class="form-floating">
                                                     <input type="date" class="form-control" id="npc-start-date">
-                                                    <label for="start-date">Start Date:</label>
+                                                    <label for="npc-start-date">Start Date:</label>
                                                 </div>
                                             </div>
                                             <div class="col-3">
                                                 <div class="form-floating">
                                                     <input type="date" class="form-control" id="npc-end-date">
-                                                    <label for="end-date">End Date:</label>
+                                                    <label for="npc-end-date">End Date:</label>
                                                 </div>
                                             </div>
                                         </div>

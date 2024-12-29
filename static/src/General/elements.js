@@ -252,9 +252,10 @@ class SelectTab extends HTMLElement {
         this.label = '';
         this.options = [];
         this.selectedValue = '';
+        this.multiple = false;
     }
     static get observedAttributes() {
-        return ['options', 'selected', 'custom-id', 'custom-label'];
+        return ['options', 'selected', 'custom-id', 'custom-label', 'multiple'];
     }
     connectedCallback() {
         this.updateFromAttributes();
@@ -267,6 +268,7 @@ class SelectTab extends HTMLElement {
         if (name == 'custom-label') {
             this.label = newValue;
         }
+        this.multiple = this.hasAttribute('multiple');
         if (name === 'options') {
             try {
                 this.options = JSON.parse(newValue);
@@ -302,6 +304,7 @@ class SelectTab extends HTMLElement {
         if (selected) {
             this.selectedValue = selected;
         }
+        this.multiple = this.hasAttribute('multiple');
     }
     renderOptions() {
         return this.options
@@ -309,14 +312,24 @@ class SelectTab extends HTMLElement {
             .join('');
     }
     render() {
-        this.innerHTML = `
-      <div class="form-floating">
-        <select class="form-select" id="${this._id}">
-          ${this.renderOptions()}
-        </select>
-        <label for="${this._id}">${this.label}
-      </div>
-    `;
+        if (this.multiple) {
+            this.innerHTML = `
+          <label for="${this._id}" class="text-white">${this.label}</label>
+          <select class="form-select" id="${this._id}" ${this.multiple ? 'multiple' : ''}>
+            ${this.renderOptions()}
+          </select>
+      `;
+        }
+        else {
+            this.innerHTML = `
+        <div class="form-floating">
+          <select class="form-select" id="${this._id}">
+            ${this.renderOptions()}
+          </select>
+          <label for="${this._id}">${this.label}</label>
+        </div>
+      `;
+        }
     }
 }
 // Define the custom element

@@ -1,6 +1,7 @@
 import { ToastError } from '../General/main.js'
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, DataTableRequest, Character, ActivityPoint, playerName, classString, NPCStats } from './types.js'
+import { RefMessage, NewMessage, Log, Activity, Player, DataTableRequest, Character, ActivityPoint, playerName, classString, NPCStats, DailyStats } from './types.js'
+import { filterStats } from './utils.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()
@@ -11,10 +12,6 @@ $("#announcement-ping").on("change", function (){
         guild.ping_announcement = $(this).prop("checked")
         updateGuild(guild)
     })
-})
-
-$("#npc-start-date, #npc-end-date").on("change", function(){
-    $("#global-npc-table").DataTable().draw()
 })
 
 $(document).on('click', '.announcement-delete', function(e){
@@ -42,7 +39,6 @@ $(document).on('click', '#message-table tbody tr', function(e){
     const row = table.row(this)
     const modal = $("#message-modal-edit-form")
     const message: RefMessage = row.data()
-    console.log(message)
     
     $("#message-title").val(message.title)
     $("#message-channel").html('')
@@ -233,6 +229,83 @@ $(document).on('click', '#player-table tbody tr', function(){
         ]
     })
 
+    if ($.fn.DataTable.isDataTable("#say-table")) {
+        $("#say-table").DataTable().destroy();
+        $("#say-start-date").val("")
+        $("#say-end-date").val("")
+    }
+
+    const sayTable = $("#say-table").DataTable({
+        orderCellsTop: true,
+        pageLength: 25,
+        info: false,
+        paging: false,
+        data: Object.entries(playerData.statistics.say as Record<string, NPCStats> ?? {}).map(([key, stats]) => {
+            const summary = Object.values(stats).reduce(
+                (totals, dailyStats) => {
+                    totals.count += dailyStats.count ?? 0
+                    totals.num_lines += dailyStats.num_lines ?? 0
+                    totals.num_words += dailyStats.num_words ?? 0
+                    totals.num_characters += dailyStats.num_characters ?? 0
+                    return totals
+                },
+                {count: 0, num_lines: 0, num_words: 0, num_characters: 0}
+            )
+
+            return {
+                command: key,
+                count: summary.count,
+                characters: summary.num_characters,
+                lines: summary.num_lines,
+                words: summary.num_words
+            }
+        }),
+        columns: [
+            {
+                title: "Character",
+                data: "command",
+                render: function(data, type, row){
+                    return playerData.characters.find(c => c.id == parseInt(data)).name ?? "Character not found"
+                }
+            },
+            {
+                data: "count",
+                title: "# Posts"
+            },
+            {
+                title: "Characters",
+                data: "characters"
+            },
+            {
+                title: "Lines",
+                data: "lines"
+            },
+            {
+                title: "Words",
+                data: "words"
+            },
+            {
+                title: "Avg. Words / Post",
+                data: "words",
+                render: function(data, type, row){
+                    return `${row.count == 0 ? 0 : (data/row.count).toFixed(2)}`
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        columnDefs: [
+            {
+                targets: [0,1],
+                createdCell: function(td, cellData, rowData, row, col){ 
+                    $(td).css({
+                        "white-space": "pre",
+                        "word-wrap": "normal"
+                    })
+                }
+            }
+        ]
+    })
+
     if ($.fn.DataTable.isDataTable("#global-npc-table")) {
         $("#global-npc-table").DataTable().destroy();
         $("#npc-start-date").val("")
@@ -308,26 +381,41 @@ $(document).on('click', '#player-table tbody tr', function(){
     })
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
-        if (settings.nTable.id !== 'global-npc-table') {
-            return true;
+        if (settings.nTable.id == 'global-npc-table') {
+            const startDate = $("#npc-start-date").val() as string
+            const endDate = $("#npc-end-date").val() as string
+            var rowData = npcTable.row(dataIndex).data()
+            const key = rowData.command
+
+            const npcStats = playerData.statistics.npc[key]
+
+            if (!npcStats) return true
+
+            rowData = filterStats(npcStats, rowData, startDate, endDate)
+
+            npcTable.row(dataIndex).data(rowData)
+
+            return rowData.count > 0
+
+        } else if (settings.nTable.id == 'say-table'){
+            const startDate = $("#say-start-date").val() as string
+            const endDate = $("#say-end-date").val() as string
+            var rowData = sayTable.row(dataIndex).data()
+            const key = rowData.command
+
+            const npcStats = playerData.statistics.say[key]
+
+            if (!npcStats) return true
+
+            rowData = filterStats(npcStats, rowData, startDate, endDate)
+
+            sayTable.row(dataIndex).data(rowData)
+
+            return rowData.count > 0
+
         }
-        const startDate = $("#npc-start-date").val() as string
-        const endDate = $("#npc-end-date").val() as string
-        const rowData = npcTable.row(dataIndex).data()
-        const key = rowData.command
 
-        const npcStats = playerData.statistics.npc[key]
-
-        if (!npcStats) return true
-
-        const rowDates = Object.keys(npcStats).map(dateStr => new Date(dateStr))
-
-        const minDate = startDate ? new Date(startDate) : new Date(Math.min(...rowDates.map(date => date.getTime())))
-        const maxDate = endDate ? new Date(endDate) : new Date(Math.max(...rowDates.map(date => date.getTime())))
-
-        return rowDates.some(date => {
-            return date >= minDate && date <= maxDate
-        })
+        return true
     })
 
 
@@ -498,8 +586,6 @@ $('#guild-settings-button').on('click', async function() {
     channels.sort((a, b) => a.name.localeCompare(b.name))
     $('body').removeClass("busy")
 
-    console.log(guild.id)
-
     $('#guild-max-level').val(guild.max_level.toString()) 
     $('#guild-handicap-cc').val(guild.handicap_cc.toString())
     $('#guild-max-characters').val(guild.max_characters.toString())
@@ -595,42 +681,55 @@ $('#guild-settings-button').on('click', async function() {
         .append(`<option>Select a channel</option>`)
     $('#guild-activity-points-channel').html('')
         .append(`<option>Select a channel</option>`)
+    $('#guild-rp-post-channel').html('')
+        .append(`<option>Select a channel</option>`)
+    $('#guild-dev-channels').html('')
+        .append(`<option>Select channel(s)</option>`)
 
     channels.forEach(channel => {
+        console.log(channel)
         $('#guild-application-channel').append(`
-            <option value="${channel.id}" ${guild.application_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.application_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-market-channel').append(`
-            <option value="${channel.id}" ${guild.market_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.market_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-announcement-channel').append(`
-            <option value="${channel.id}" ${guild.announcement_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.announcement_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-staff-channel').append(`
-            <option value="${channel.id}" ${guild.staff_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.staff_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-help-channel').append(`
-            <option value="${channel.id}" ${guild.help_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.help_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-arena-board-channel').append(`
-            <option value="${channel.id}" ${guild.arena_board_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.arena_board_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-exit-channel').append(`
-            <option value="${channel.id}" ${guild.exit_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.exit_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-entrance-channel').append(`
-            <option value="${channel.id}" ${guild.entrance_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.entrance_channel == channel.id ? 'selected': ''}>${channel.name}</option>
         `)
 
         $('#guild-activity-points-channel').append(`
-            <option value="${channel.id}" ${guild.activity_points_channel == channel.id.toString() ? 'selected': ''}>${channel.name}</option>
+            <option value="${channel.id}" ${guild.activity_points_channel == channel.id ? 'selected': ''}>${channel.name}</option>
+        `)
+
+        $('#guild-rp-post-channel').append(`
+            <option value="${channel.id}" ${guild.rp_post_channel == channel.id ? 'selected': ''}>${channel.name}</option>
+        `)
+
+        $('#guild-dev-channels').append(`
+            <option value="${channel.id}" ${guild.dev_channels.indexOf(channel.id) > -1 ? 'selected': ''}>${channel.name}</option>
         `)
     })
     
@@ -728,6 +827,8 @@ $('#guild-settings-save-button').on('click', function(){
         guild.exit_channel = $('#guild-exit-channel').find(':selected').val().toString()
         guild.entrance_channel = $('#guild-entrance-channel').find(':selected').val().toString()
         guild.activity_points_channel = $('#guild-activity-points-channel').find(':selected').val().toString()
+        guild.rp_post_channel = $('#guild-rp-post-channel').find(':selected').val().toString()
+        guild.dev_channels = $('#guild-dev-channels').find(':selected').toArray().map(e => $(e).val().toString())
         updateGuild(guild)
     })
 })
@@ -1205,6 +1306,53 @@ async function buildPricingTab(){
     })
 }
 
-function parseDateString(dateString) {
-    return dateString ? new Date(dateString) : null;
+function filterGlobalNPCTable(row){ 
+    const table = $("#player-table").DataTable()
+    const playerData = table.row(row).data() as Player
+    const rowData = row.data()
+    const startDate = $("#npc-start-date").val() as string
+    const endDate = $("#npc-end-date").val() as string
+    const key = rowData.command
+
+    console.log(playerData)
+
+    const npcStats = playerData.statistics.npc[key]
+
+    if (!npcStats) return rowData
+
+    const rowDates = Object.keys(npcStats).map(dateStr => {
+        const [year, month, day] = dateStr.split('-').map(Number)
+        return new Date(year, month - 1, day)
+    });
+
+
+    const minDate = startDate ? new Date(...(startDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num)) as [number, number, number])) : new Date(Math.min(...rowDates.map(date => date.getTime())))
+    const maxDate = endDate ? new Date(...(endDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num)) as [number, number, number])) : new Date(Math.max(...rowDates.map(date => date.getTime())))
+
+    let newData = {} as DailyStats
+    newData.count = 0 
+    newData.num_characters = 0
+    newData.num_lines = 0
+    newData.num_words = 0
+
+
+    rowDates.forEach(date => {
+        if (date >= minDate && date <= maxDate){
+            const dateStr = date.toISOString().split('T')[0];
+            const stats = npcStats[dateStr]
+            newData.count += stats.count
+            newData.num_characters += stats.num_characters
+            newData.num_lines += stats.num_lines
+            newData.num_words += stats.num_words
+        }
+    })
+    return newData
 }
+
+$("#npc-start-date, #npc-end-date").on("change", function(){
+    $("#global-npc-table").DataTable().draw()
+})
+
+$("#say-start-date, #say-end-date").on("change", function(){
+    $("#say-table").DataTable().draw()
+})

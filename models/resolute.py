@@ -4,9 +4,10 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask.json.provider import JSONProvider
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy import BigInteger, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from constants import DISCORD_GUILD_ID
 from helpers.general_helpers import get_members_from_cache
@@ -310,6 +311,8 @@ class ResoluteGuild(db.Model):
     _exit_channel: Mapped[int] = mapped_column("exit_channel")
     _entrance_channel: Mapped[int] = mapped_column("entrance_channel")
     _activity_points_channel: Mapped[int] = mapped_column("activity_points_channel")
+    _rp_post_channel: Mapped[int] = mapped_column("rp_post_channel")
+    _dev_channels: Mapped[list[int]] = mapped_column( "dev_channels", ARRAY(BigInteger),)
 
     def __init__(self, **kwargs):
         self._id = DISCORD_GUILD_ID
@@ -344,6 +347,8 @@ class ResoluteGuild(db.Model):
         self._exit_channel = kwargs.get('exit_channel')
         self._entrance_channel = kwargs.get('entrance_channel')
         self._activity_points_channel = kwargs.get('activity_points_channel')
+        self._rp_post_channel = kwargs.get('rp_post_channel')
+        self._dev_channels = kwargs.get('dev_channels', [])
     
     @property
     def id(self) -> str:
@@ -568,6 +573,28 @@ class ResoluteGuild(db.Model):
             self._activity_points_channel = int(value)
         except:
             self._activity_points_channel = None
+
+    @property
+    def rp_post_channel(self) -> str:
+        return str(self._rp_post_channel)
+    
+    @rp_post_channel.setter
+    def rp_post_channel(self, value):
+        try:
+            self._rp_post_channel = int(value)
+        except:
+            self._rp_post_channel = None
+
+    @property
+    def dev_channels(self) -> list[str]:
+        return [str(c) for c in self._dev_channels]
+    
+    @dev_channels.setter
+    def dev_channels(self, value):       
+        try:
+            self._dev_channels = [int(c) for c in value]
+        except:
+            self._dev_channels = []
 
 
 class RefMessage(db.Model):

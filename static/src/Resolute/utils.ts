@@ -1,13 +1,12 @@
 import { DailyStats, NPCStats } from "./types.js";
 
 export function filterStats(sourceData: NPCStats, rowData, startDate: string, endDate: string): NPCStats {
-    const rowDates = Object.keys(sourceData).map(dateStr => {
-        const [year, month, day] = dateStr.split('-').map(Number)
-        return new Date(year, month - 1, day)
+    const rowDates = Object.keys(sourceData).map(dateStr => { 
+        return new Date(dateStr.replace('-', '/'))
     })
 
-    const minDate = startDate ? new Date(...(startDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num)) as [number, number, number])) : new Date(Math.min(...rowDates.map(date => date.getTime())))
-    const maxDate = endDate ? new Date(...(endDate.split('-').map((num, index) => index === 1 ? Number(num) - 1 : Number(num)) as [number, number, number])) : new Date(Math.max(...rowDates.map(date => date.getTime())))
+    const minDate = startDate ? new Date(startDate.replace('-', '/')) : new Date(Math.min(...rowDates.map(date => date.getTime())))
+    const maxDate = endDate ? new Date(endDate.replace('-', '/')) : new Date(Math.max(...rowDates.map(date => date.getTime())))
 
     let newData = {} as DailyStats
     newData.count = 0 

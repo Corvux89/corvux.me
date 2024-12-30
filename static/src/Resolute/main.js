@@ -1,7 +1,7 @@
 import { ToastError } from '../General/main.js';
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js';
-import { playerName, classString } from './types.js';
-import { filterStats } from './utils.js';
+import { playerName } from './types.js';
+import { filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js';
 $('body').addClass("busy");
 buildAnnouncementTable();
 $("#announcement-ping").on("change", function () {
@@ -117,253 +117,13 @@ $(document).on('click', '#player-table tbody tr', function () {
     $("#player-cc").val(playerData.cc);
     $("#player-div-cc").val(playerData.div_cc);
     $("#player-act-points").val(playerData.activity_points);
-    if ($.fn.DataTable.isDataTable("#player-character-table")) {
-        $("#player-character-table").DataTable().destroy();
-    }
-    $("#player-character-table").DataTable({
-        orderCellsTop: true,
-        info: false,
-        paging: false,
-        data: playerData.characters,
-        columns: [
-            {
-                data: "name",
-                title: "Name"
-            },
-            {
-                data: "level",
-                title: "Level"
-            },
-            {
-                data: "species",
-                title: "Species",
-                render: function (data, type, row) {
-                    return `${data != null ? data.value : "Not found"}`;
-                }
-            },
-            {
-                data: "classes",
-                title: `Class`,
-                width: "70%",
-                render: function (data, type, row) {
-                    return classString(data);
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        columnDefs: [
-            {
-                targets: [0, 3],
-                createdCell: function (td, cellData, rowData, row, col) {
-                    $(td).css({
-                        "white-space": "pre",
-                        "word-wrap": "normal"
-                    });
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#stats-table")) {
-        $("#stats-table").DataTable().destroy();
-    }
-    $("#stats-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 50,
-        info: false,
-        paging: false,
-        data: Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
-            command: key,
-            value: value
-        })),
-        columns: [
-            {
-                data: "command",
-                title: "Command"
-            },
-            {
-                data: "value",
-                title: "# Times Used"
-            }
-        ],
-        order: [[0, 'desc']],
-        columnDefs: [
-            {
-                targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
-                    $(td).css({
-                        "white-space": "pre",
-                        "word-wrap": "normal"
-                    });
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#say-table")) {
-        $("#say-table").DataTable().destroy();
-        $("#say-start-date").val("");
-        $("#say-end-date").val("");
-    }
-    const sayTable = $("#say-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 25,
-        info: false,
-        paging: false,
-        data: Object.entries(playerData.statistics.say ?? {}).map(([key, stats]) => {
-            const summary = Object.values(stats).reduce((totals, dailyStats) => {
-                totals.count += dailyStats.count ?? 0;
-                totals.num_lines += dailyStats.num_lines ?? 0;
-                totals.num_words += dailyStats.num_words ?? 0;
-                totals.num_characters += dailyStats.num_characters ?? 0;
-                return totals;
-            }, { count: 0, num_lines: 0, num_words: 0, num_characters: 0 });
-            return {
-                command: key,
-                count: summary.count,
-                characters: summary.num_characters,
-                lines: summary.num_lines,
-                words: summary.num_words
-            };
-        }),
-        columns: [
-            {
-                title: "Character",
-                data: "command",
-                render: function (data, type, row) {
-                    return playerData.characters.find(c => c.id == parseInt(data)).name ?? "Character not found";
-                }
-            },
-            {
-                data: "count",
-                title: "# Posts"
-            },
-            {
-                title: "Characters",
-                data: "characters"
-            },
-            {
-                title: "Lines",
-                data: "lines"
-            },
-            {
-                title: "Words",
-                data: "words"
-            },
-            {
-                title: "Avg. Words / Post",
-                data: "words",
-                render: function (data, type, row) {
-                    return `${row.count == 0 ? 0 : (data / row.count).toFixed(2)}`;
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        columnDefs: [
-            {
-                targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
-                    $(td).css({
-                        "white-space": "pre",
-                        "word-wrap": "normal"
-                    });
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#global-npc-table")) {
-        $("#global-npc-table").DataTable().destroy();
-        $("#npc-start-date").val("");
-        $("#npc-end-date").val("");
-    }
-    const npcTable = $("#global-npc-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 50,
-        info: false,
-        paging: false,
-        data: Object.entries(playerData.statistics.npc ?? {}).map(([key, stats]) => {
-            const summary = Object.values(stats).reduce((totals, dailyStats) => {
-                totals.count += dailyStats.count ?? 0;
-                totals.num_lines += dailyStats.num_lines ?? 0;
-                totals.num_words += dailyStats.num_words ?? 0;
-                totals.num_characters += dailyStats.num_characters ?? 0;
-                return totals;
-            }, { count: 0, num_lines: 0, num_words: 0, num_characters: 0 });
-            return {
-                command: key,
-                count: summary.count,
-                characters: summary.num_characters,
-                lines: summary.num_lines,
-                words: summary.num_words
-            };
-        }),
-        columns: [
-            {
-                data: "command",
-                title: "NPC Key"
-            },
-            {
-                data: "count",
-                title: "# Posts"
-            },
-            {
-                title: "Characters",
-                data: "characters"
-            },
-            {
-                title: "Lines",
-                data: "lines"
-            },
-            {
-                title: "Words",
-                data: "words"
-            },
-            {
-                title: "Avg. Words / Post",
-                data: "words",
-                render: function (data, type, row) {
-                    return `${row.count == 0 ? 0 : data / row.count}`;
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        columnDefs: [
-            {
-                targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
-                    $(td).css({
-                        "white-space": "pre",
-                        "word-wrap": "normal"
-                    });
-                }
-            }
-        ]
-    });
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        if (settings.nTable.id == 'global-npc-table') {
-            const startDate = $("#npc-start-date").val();
-            const endDate = $("#npc-end-date").val();
-            var rowData = npcTable.row(dataIndex).data();
-            const key = rowData.command;
-            const npcStats = playerData.statistics.npc[key];
-            if (!npcStats)
-                return true;
-            rowData = filterStats(npcStats, rowData, startDate, endDate);
-            npcTable.row(dataIndex).data(rowData);
-            return rowData.count > 0;
-        }
-        else if (settings.nTable.id == 'say-table') {
-            const startDate = $("#say-start-date").val();
-            const endDate = $("#say-end-date").val();
-            var rowData = sayTable.row(dataIndex).data();
-            const key = rowData.command;
-            const npcStats = playerData.statistics.say[key];
-            if (!npcStats)
-                return true;
-            rowData = filterStats(npcStats, rowData, startDate, endDate);
-            sayTable.row(dataIndex).data(rowData);
-            return rowData.count > 0;
-        }
-        return true;
-    });
+    initPlayerCharacterTable(playerData.characters);
+    initStatsTable(Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
+        command: key,
+        value: value
+    })));
+    initSayTable(playerData);
+    initGlobalNPCTable(playerData);
     $("#player-modal").modal("show");
     $("#member-overview-button").tab("show");
     $("#command-stats-button").tab("show");
@@ -502,126 +262,42 @@ $('#guild-settings-button').on('click', async function () {
     roles.sort((a, b) => a.name.localeCompare(b.name));
     channels.sort((a, b) => a.name.localeCompare(b.name));
     $('body').removeClass("busy");
+    const roleSelectors = [
+        { selector: '#guild-entry-role', value: [guild.entry_role] },
+        { selector: '#guild-member-role', value: [guild.member_role] },
+        { selector: '#guild-admin-role', value: [guild.admin_role] },
+        { selector: '#guild-staff-role', value: [guild.staff_role] },
+        { selector: '#guild-bot-role', value: [guild.bot_role] },
+        { selector: '#guild-quest-role', value: [guild.quest_role] },
+        { selector: '#tier-2-role', value: [guild.tier_2_role] },
+        { selector: '#tier-3-role', value: [guild.tier_3_role] },
+        { selector: '#tier-4-role', value: [guild.tier_4_role] },
+        { selector: '#tier-5-role', value: [guild.tier_5_role] },
+        { selector: '#tier-6-role', value: [guild.tier_6_role] }
+    ];
+    const channelSelectors = [
+        { selector: '#guild-application-channel', value: [guild.application_channel] },
+        { selector: '#guild-market-channel', value: [guild.market_channel] },
+        { selector: '#guild-announcement-channel', value: [guild.announcement_channel] },
+        { selector: '#guild-staff-channel', value: [guild.staff_channel] },
+        { selector: '#guild-help-channel', value: [guild.help_channel] },
+        { selector: '#guild-arena-board-channel', value: [guild.arena_board_channel] },
+        { selector: '#guild-exit-channel', value: [guild.exit_channel] },
+        { selector: '#guild-entrance-channel', value: [guild.entrance_channel] },
+        { selector: '#guild-activity-points-channel', value: [guild.activity_points_channel] },
+        { selector: '#guild-rp-post-channel', value: [guild.rp_post_channel] },
+        { selector: '#guild-dev-channels', value: guild.dev_channels }
+    ];
     $('#guild-max-level').val(guild.max_level.toString());
     $('#guild-handicap-cc').val(guild.handicap_cc.toString());
     $('#guild-max-characters').val(guild.max_characters.toString());
     $('#guild-div-cc').val(guild.div_limit.toString());
     $('#guild-reward-threshold').val(guild.reward_threshold ? guild.reward_threshold.toString() : "");
-    $('#guild-entry-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#guild-member-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#guild-admin-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#guild-staff-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#guild-bot-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#guild-quest-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#tier-2-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#tier-3-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#tier-4-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#tier-5-role').html('')
-        .append(`<option>Select a role</option>`);
-    $('#tier-6-role').html('')
-        .append(`<option>Select a role</option>`);
-    roles.forEach(role => {
-        $('#guild-entry-role').append(`
-            <option value="${role.id}" ${guild.entry_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#guild-member-role').append(`
-            <option value="${role.id}" ${guild.member_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#guild-admin-role').append(`
-            <option value="${role.id}" ${guild.admin_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#guild-staff-role').append(`
-            <option value="${role.id}" ${guild.staff_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#guild-bot-role').append(`
-            <option value="${role.id}" ${guild.bot_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#guild-quest-role').append(`
-            <option value="${role.id}" ${guild.quest_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#tier-2-role').append(`
-            <option value="${role.id}" ${guild.tier_2_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#tier-3-role').append(`
-            <option value="${role.id}" ${guild.tier_3_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#tier-4-role').append(`
-            <option value="${role.id}" ${guild.tier_4_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#tier-5-role').append(`
-            <option value="${role.id}" ${guild.tier_5_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
-        $('#tier-6-role').append(`
-            <option value="${role.id}" ${guild.tier_6_role == role.id.toString() ? 'selected' : ''}>${role.name}</option>
-        `);
+    roleSelectors.forEach(selector => {
+        populateSelectOption(selector.selector, roles, selector.value, "Select a role");
     });
-    $('#guild-application-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-market-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-announcement-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-staff-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-help-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-arena-board-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-exit-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-exit-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-entrance-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-activity-points-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-rp-post-channel').html('')
-        .append(`<option>Select a channel</option>`);
-    $('#guild-dev-channels').html('')
-        .append(`<option>Select channel(s)</option>`);
-    channels.forEach(channel => {
-        $('#guild-application-channel').append(`
-            <option value="${channel.id}" ${guild.application_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-market-channel').append(`
-            <option value="${channel.id}" ${guild.market_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-announcement-channel').append(`
-            <option value="${channel.id}" ${guild.announcement_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-staff-channel').append(`
-            <option value="${channel.id}" ${guild.staff_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-help-channel').append(`
-            <option value="${channel.id}" ${guild.help_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-arena-board-channel').append(`
-            <option value="${channel.id}" ${guild.arena_board_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-exit-channel').append(`
-            <option value="${channel.id}" ${guild.exit_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-entrance-channel').append(`
-            <option value="${channel.id}" ${guild.entrance_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-activity-points-channel').append(`
-            <option value="${channel.id}" ${guild.activity_points_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-rp-post-channel').append(`
-            <option value="${channel.id}" ${guild.rp_post_channel == channel.id ? 'selected' : ''}>${channel.name}</option>
-        `);
-        $('#guild-dev-channels').append(`
-            <option value="${channel.id}" ${guild.dev_channels.indexOf(channel.id) > -1 ? 'selected' : ''}>${channel.name}</option>
-        `);
+    channelSelectors.forEach(selector => {
+        populateSelectOption(selector.selector, channels, selector.value, "Select a channel");
     });
 });
 $('#financial-settings-button').on('click', async function () {
@@ -632,33 +308,7 @@ $('#financial-settings-button').on('click', async function () {
     $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`);
     $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`);
     $('#reserve').val(`${fin.reserve.toFixed(2)}`);
-    if ($.fn.DataTable.isDataTable("#sku-table")) {
-        $("#sku-table").DataTable().destroy();
-    }
-    $("#sku-table").DataTable({
-        orderCellsTop: true,
-        // @ts-ignore
-        responsive: true,
-        pageLength: 25,
-        lengthChange: false,
-        info: false,
-        paging: false,
-        data: store,
-        columns: [
-            {
-                title: "SKU",
-                data: "sku",
-                width: "5%"
-            },
-            {
-                title: "Cost",
-                data: "user_cost",
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control sku-cost-input" step="0.01" data-id="${row.sku}" value="${data != null ? data : ''}"/>`;
-                }
-            }
-        ]
-    });
+    initSKUTable(store);
 });
 $('#financial-submit-button').on('click', function () {
     getFinancial()
@@ -739,6 +389,7 @@ $("#level-cost-submit-button").on('click', function () {
         costs.forEach(cost => {
             cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString());
         });
+        console.log(costs);
         updateLevelCosts(costs);
     });
 });
@@ -759,123 +410,14 @@ async function buildAnnouncementTable() {
     $("body").removeClass("busy");
     $("#announcement-table-body").html('');
     $("#announcement-ping").prop("checked", guild.ping_announcement);
-    if ($.fn.DataTable.isDataTable("#announcement-table")) {
-        $("#announcement-table").DataTable().destroy();
-    }
-    $("#announcement-table").DataTable({
-        orderCellsTop: true,
-        //@ts-ignore
-        responsive: true,
-        searching: false,
-        info: false,
-        paging: false,
-        ordering: false,
-        pageLength: 10,
-        language: {
-            emptyTable: "No announcements this week!"
-        },
-        data: guild.weekly_announcement,
-        columns: [
-            {
-                width: "5%",
-                render: function (data, type, row) {
-                    return `
-                    <button class="btn fa-solid fa-trash text-white announcement-delete" data-id=${row.id}></button>
-                    `;
-                }
-            },
-            {
-                title: "Title",
-                render: function (data, type, row) {
-                    const parts = row.split("|");
-                    const title = parts.length > 1 ? parts[0] : "None";
-                    return title;
-                }
-            }
-        ]
-    });
+    initAnnouncementTable(guild.weekly_announcement);
 }
 async function buildActivityTable() {
     const activities = await getActivities();
-    const activity_points = await getActivityPoints();
+    const activityPoints = await getActivityPoints();
     $("body").removeClass("busy");
-    if ($.fn.DataTable.isDataTable("#activity-table")) {
-        $("#activity-table").DataTable().destroy();
-    }
-    $("#activity-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 50,
-        lengthChange: false,
-        //@ts-ignore
-        responsive: true,
-        info: false,
-        paging: false,
-        data: activities,
-        columns: [
-            {
-                data: "value",
-                title: "Name"
-            },
-            {
-                data: "cc",
-                title: "CC",
-                orderable: false,
-                searchable: false,
-                width: "20%",
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control cc-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
-                }
-            },
-            {
-                data: "diversion",
-                title: "Diversion",
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<div class="form-check"><input type="checkbox" class="form-check-input diversion-input" data-id="${row.id}" ${data ? 'checked' : ''}/></div>`;
-                }
-            },
-            {
-                data: "points",
-                title: "Points",
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control points-input" data-id="${row.id}" value="${data}"/>`;
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#activity-points-table")) {
-        $("#activity-points-table").DataTable().destroy();
-    }
-    $("#activity-points-table").DataTable({
-        orderCellsTop: true,
-        // @ts-ignore
-        responsive: true,
-        pageLength: 10,
-        lengthChange: false,
-        searching: false,
-        info: false,
-        paging: false,
-        data: activity_points,
-        columns: [
-            {
-                data: "id",
-                searchable: false,
-                title: "Activity Level"
-            },
-            {
-                data: "points",
-                title: "Points",
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control point-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
-                }
-            }
-        ]
-    });
+    initActivityTable(activities);
+    initActivityPointsTable(activityPoints);
 }
 async function buildCensusTable() {
     const players = await getPlayers();
@@ -884,276 +426,64 @@ async function buildCensusTable() {
         player_name: playerName(player.member)
     })));
     $("body").removeClass("busy");
-    if ($.fn.DataTable.isDataTable("#player-table")) {
-        $("#player-table").DataTable().destroy();
-    }
-    $("#player-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 50,
-        lengthChange: false,
-        data: players,
-        columns: [
-            {
-                data: "id",
-                title: "ID",
-                width: "5%"
-            },
-            {
-                data: "member",
-                title: "Name",
-                render: function (data, type, row) {
-                    return `${playerName(data)}`;
-                }
-            },
-            {
-                data: "characters",
-                searchable: false,
-                title: "# Characters",
-                render: function (data, type, row) {
-                    return data.length;
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#characters-table")) {
-        $("#characters-table").DataTable().destroy();
-    }
-    $("#characters-table").DataTable({
-        orderCellsTop: true,
-        pageLength: 50,
-        lengthChange: false,
-        data: characters,
-        columns: [
-            {
-                title: "Name",
-                data: "name"
-            },
-            {
-                title: "Level",
-                data: "level"
-            },
-            {
-                title: "Player",
-                data: "player_name"
-            },
-            {
-                title: "Species",
-                data: "species",
-                render: function (data, type, row) {
-                    return `${data != null ? data.value : "Not found"}`;
-                }
-            },
-            {
-                data: "classes",
-                title: `Class`,
-                width: "70%",
-                render: function (data, type, row) {
-                    return classString(data);
-                }
-            },
-            {
-                title: "Faction",
-                data: "faction",
-                render: function (data, type, row) {
-                    return `${data != null ? data.value : ""}`;
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        columnDefs: [
-            {
-                targets: [0, 3],
-                createdCell: function (td, cellData, rowData, row, col) {
-                    $(td).css({
-                        "white-space": "pre",
-                        "word-wrap": "normal"
-                    });
-                }
-            }
-        ]
-    });
+    initPlayerTable(players);
+    initCharacterTable(characters);
 }
 async function buildLogTable() {
-    if ($.fn.DataTable.isDataTable("#log-table")) {
-        $("#log-table").DataTable().destroy();
-    }
-    $("#log-table").DataTable({
-        stateSave: true,
-        processing: true,
-        serverSide: true,
-        language: {
-            emptyTable: "No logs to display."
-        },
-        ajax: {
-            url: 'api/logs',
-            type: 'POST',
-            contentType: 'application/json',
-            data: (d) => {
-                const requestData = d;
-                return JSON.stringify(requestData);
-            }
-        },
-        columns: [
-            {
-                title: "ID",
-                data: 'id'
-            },
-            {
-                title: "Created",
-                data: 'created_ts',
-                render: function (data, type, row) {
-                    let date = new Date(data);
-                    return date.toLocaleString();
-                }
-            },
-            {
-                title: "Author",
-                data: "author",
-                render: (data) => {
-                    return `${playerName(data)}`;
-                }
-            },
-            {
-                data: 'member',
-                title: "Player",
-                render: (data) => {
-                    return `${playerName(data)}`;
-                }
-            },
-            {
-                title: "Character",
-                data: "character",
-                render: (data) => `${data == null ? "" : data.name}`
-            },
-            {
-                title: "Activity",
-                data: 'activity.value'
-            },
-            {
-                title: "Notes",
-                data: 'notes'
-            },
-            {
-                title: "Valid?",
-                data: 'invalid',
-                render: (data) => {
-                    return data
-                        ? `<i class="fa-solid fa-x"></i>`
-                        : `<i class="fa-solid fa-check"></i>`;
-                }
-            }
-        ],
-        order: [[0, 'desc']],
-        pageLength: 10
-    });
+    initLogTable();
     $("body").removeClass("busy");
 }
 async function buildMessageTab() {
     const messages = await getMessages();
     $("body").removeClass("busy");
-    if ($.fn.DataTable.isDataTable("#message-table")) {
-        $("#message-table").DataTable().destroy();
-    }
-    $("#message-table").DataTable({
-        data: messages,
-        pageLength: 50,
-        columns: [
-            {
-                width: "5%",
-                render: function (data, type, row) {
-                    return `
-                    <button class="btn fa-solid fa-trash text-white message-delete" data-id=${row.message_id}></button>
-                    `;
-                }
-            },
-            {
-                title: "Title",
-                data: "title"
-            },
-            {
-                title: "Channel",
-                data: "channel_name"
-            },
-            {
-                title: "Pinned?",
-                data: "pin",
-                render: (data) => {
-                    return data
-                        ? `<i class="fa-solid fa-check"></i>`
-                        : ``;
-                }
-            }
-        ]
-    });
+    initMessageTable(messages);
 }
 async function buildPricingTab() {
     const conversions = await getCodeconversions();
     const costs = await getLevelCosts();
     $("body").removeClass("busy");
-    if ($.fn.DataTable.isDataTable("#conversion-table")) {
-        $("#conversion-table").DataTable().destroy();
-    }
-    $("#conversion-table").DataTable({
-        orderCellsTop: true,
-        // @ts-ignore
-        responsive: true,
-        pageLength: 10,
-        lengthChange: false,
-        searching: false,
-        info: false,
-        paging: false,
-        data: conversions,
-        columns: [
-            {
-                data: "id",
-                searchable: false,
-                title: "Level"
-            },
-            {
-                data: "value",
-                title: "# Credits / Chain Code",
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control credit-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
-                }
-            }
-        ]
-    });
-    if ($.fn.DataTable.isDataTable("#level-cost-table")) {
-        $("#level-cost-table").DataTable().destroy();
-    }
-    $("#level-cost-table").DataTable({
-        orderCellsTop: true,
-        // @ts-ignore
-        responsive: true,
-        pageLength: 10,
-        lengthChange: false,
-        searching: false,
-        info: false,
-        paging: false,
-        data: costs,
-        columns: [
-            {
-                data: "id",
-                searchable: false,
-                title: "Level"
-            },
-            {
-                data: "cc",
-                title: "Chain Codes",
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
-                }
-            }
-        ]
-    });
+    initConversionTable(conversions);
+    initLevelCostTable(costs);
 }
 $("#npc-start-date, #npc-end-date").on("change", function () {
     $("#global-npc-table").DataTable().draw();
 });
 $("#say-start-date, #say-end-date").on("change", function () {
     $("#say-table").DataTable().draw();
+});
+// Filter Functions
+$.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    if (settings.nTable.id == 'global-npc-table') {
+        const playerData = $("#player-table").DataTable().row(0).data();
+        const npcTable = $("#global-npc-table").DataTable();
+        const startDate = $("#npc-start-date").val();
+        const endDate = $("#npc-end-date").val();
+        var rowData = npcTable.row(dataIndex).data();
+        if (!rowData)
+            return true;
+        const key = rowData.command;
+        const npcStats = playerData.statistics.npc[key];
+        if (!npcStats)
+            return true;
+        rowData = filterStats(npcStats, rowData, startDate, endDate);
+        npcTable.row(dataIndex).data(rowData);
+        return rowData.count > 0;
+    }
+    else if (settings.nTable.id == 'say-table') {
+        const playerData = $("#player-table").DataTable().row(0).data();
+        const sayTable = $("#say-table").DataTable();
+        const startDate = $("#say-start-date").val();
+        const endDate = $("#say-end-date").val();
+        var rowData = sayTable.row(dataIndex).data();
+        if (!rowData)
+            return true;
+        const key = rowData.command;
+        const npcStats = playerData.statistics.say[key];
+        if (!npcStats)
+            return true;
+        rowData = filterStats(npcStats, rowData, startDate, endDate);
+        sayTable.row(dataIndex).data(rowData);
+        return rowData.count > 0;
+    }
+    return true;
 });

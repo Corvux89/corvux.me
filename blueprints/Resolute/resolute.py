@@ -387,7 +387,7 @@ def get_level_costs():
             update_data = [LevelCost(**c) for c in request.get_json()]
 
             for d in update_data:
-                cost = next((c for c in costs if c.id == c.id), None)
+                cost = next((c for c in costs if c.id == d.id), None)
                 cost.cc = d.cc
 
             db.session.commit()

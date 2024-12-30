@@ -12,7 +12,7 @@ def is_admin(f=None):
         def decorated_function(*args, **kwargs):
             discord_session = current_app.config.get('DISCORD_SESSION')
             if discord_session and not discord_session.authorized:
-                return redirect(url_for("auth.login"))
+                return redirect(url_for("auth.login", next=request.endpoint))
             elif not _is_user_admin():
                 raise AdminAccessError()
             return func(*args, **kwargs)
@@ -39,7 +39,7 @@ def login_requred(f=None):
         def decorated_function(*args, **kwargs):
             discord_session = current_app.config.get('DISCORD_SESSION')
             if discord_session and not discord_session.authorized:
-                return redirect(url_for("auth.login"))
+                return redirect(url_for("auth.login", next=request.endpoint))
             elif not _is_logged_in():
                 raise LoginError()
             return func(*args, **kwargs)

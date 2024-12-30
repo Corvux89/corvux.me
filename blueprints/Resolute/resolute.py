@@ -30,10 +30,11 @@ def resolute_main():
 
 @resolute_blueprint.route('/profile', methods=['GET'])
 def resolute_profile():
-    discord_session = current_app.config.get('DISCORD_SESSION')
-    user = discord_session.fetch_user()
-    if not user:
-        return redirect(url_for('auth.login'))    
+    try:
+        discord_session = current_app.config.get('DISCORD_SESSION')
+        user = discord_session.fetch_user()
+    except:
+        return redirect(url_for('auth.login', next="resolute.resolute_profile"))    
     return render_template("Resolute/resolute_profile.html", user=user)
 
 @resolute_blueprint.route('/terms')

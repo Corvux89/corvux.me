@@ -454,7 +454,8 @@ $("#say-start-date, #say-end-date").on("change", function () {
 // Filter Functions
 $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
     if (settings.nTable.id == 'global-npc-table') {
-        const playerData = $("#player-table").DataTable().row(0).data();
+        const playerData = $("#player-table").DataTable().row(0).data(), console, log;
+        (playerData);
         const npcTable = $("#global-npc-table").DataTable();
         const startDate = $("#npc-start-date").val();
         const endDate = $("#npc-end-date").val();

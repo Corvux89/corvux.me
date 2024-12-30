@@ -553,8 +553,8 @@ $("#say-start-date, #say-end-date").on("change", function(){
 // Filter Functions
 $.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
     if (settings.nTable.id == 'global-npc-table') {
-        const playerData = $("#player-table").DataTable().row(0).data() as Player
-        console.log(playerData)
+        var playerID = $("#member-id").val()
+        const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
         const npcTable = $("#global-npc-table").DataTable()
         const startDate = $("#npc-start-date").val() as string
         const endDate = $("#npc-end-date").val() as string
@@ -573,7 +573,8 @@ $.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
         return rowData.count > 0
 
     } else if (settings.nTable.id == 'say-table'){
-        const playerData = $("#player-table").DataTable().row(0).data() as Player
+        var playerID = $("#member-id").val()
+        const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
         const sayTable = $("#say-table").DataTable()
         const startDate = $("#say-start-date").val() as string
         const endDate = $("#say-end-date").val() as string

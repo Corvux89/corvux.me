@@ -1,18 +1,18 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
 import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
-const guild_url = `${window.location.href}api/guild`
-const message_url = `${window.location.href}api/message`
-const channel_url = `${window.location.href}api/channels`
-const role_url = `${window.location.href}api/roles`
-const log_url = `${window.location.href}api/logs`
-const activity_url = `${window.location.href}api/activities`
-const activity_point_url = `${window.location.href}api/activity_points`
-const player_url = `${window.location.href}api/players`
-const code_conversion_url = `${window.location.href}api/code_conversion`
-const level_cost_url = `${window.location.href}api/level_costs`
-const financial_url = `${window.location.href}api/financial`
-const store_url = `${window.location.href}api/store`
+const guild_url = `api/guild`
+const message_url = `api/message`
+const channel_url = `api/channels`
+const role_url = `api/roles`
+const log_url = `api/logs`
+const activity_url = `api/activities`
+const activity_point_url = `api/activity_points`
+const player_url = `api/players`
+const code_conversion_url = `api/code_conversion`
+const level_cost_url = `api/level_costs`
+const financial_url = `api/financial`
+const store_url = `api/store`
 
 
 export function getGuild(): Promise<ResoluteGuild>{

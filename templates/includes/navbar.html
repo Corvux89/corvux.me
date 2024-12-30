@@ -52,9 +52,15 @@
                     <a class="nav-link" href="{{ url_for('complanner.planner') }}">Avrae Combat Planner</a>
                 </li>
 
-                {% if session.resolute %}
+                {% if session.resolute_admin %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for ('resolute.resolute_main') }}">Resolute Management</a>
+                </li>
+                {% endif %}
+
+                {% if session.resolute_member %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for ('resolute.resolute_profile') }}">Resolute Profile</a>
                 </li>
                 {% endif %}
                 

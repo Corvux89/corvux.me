@@ -16,7 +16,7 @@ resolute_blueprint = Blueprint('resolute', __name__)
 app = Flask(__name__)
 
 @resolute_blueprint.route('/', methods=['GET'])
-@is_admin
+@login_requred
 def resolute_main():
     if is_admin():
         tab_folder = "templates/Resolute/tabs"
@@ -25,13 +25,15 @@ def resolute_main():
 
         return render_template('Resolute/resolute_main.html', tabs=tabs)
     
-    return redirect(url_for('resolute_profile'))
+    return redirect(url_for('resolute.resolute_profile'))
+
 
 @resolute_blueprint.route('/profile', methods=['GET'])
-@login_requred
 def resolute_profile():
     discord_session = current_app.config.get('DISCORD_SESSION')
-    user = discord_session.fetch_user()    
+    user = discord_session.fetch_user()
+    if not user:
+        return redirect(url_for('auth.login'))    
     return render_template("Resolute/resolute_profile.html", user=user)
 
 @resolute_blueprint.route('/terms')

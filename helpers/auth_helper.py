@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app, redirect, url_for
+from flask import current_app, redirect, request, url_for
 
 from constants import DISCORD_ADMINS
 from helpers.general_helpers import get_bot_guilds_from_cache
@@ -46,7 +46,7 @@ def login_requred(f=None):
         return decorated_function
 
     def _is_logged_in():
-        discord_session = current_app.config.get('DISCORD_SESSION')
+        discord_session = current_app.config.get('DISCORD_SESSION') 
         if not discord_session or not discord_session.authorized:
             return False
         

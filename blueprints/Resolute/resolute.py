@@ -109,31 +109,32 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
 
 @resolute_blueprint.route('/api/message', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 @resolute_blueprint.route('/api/message/<guild_id>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@resolute_blueprint.route('/api/message/<guild_id>/<message_id>', methods=['GET'])
 @is_admin
-def ref_messages(guild_id: int = DISCORD_GUILD_ID):
+def ref_messages(guild_id: int = DISCORD_GUILD_ID, message_id: int = None):
     db: SQLAlchemy = current_app.config.get('DB')
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
     
     if request.method == "GET":
-        clean_out = []
-
-        messages: list[RefMessage] = db.session.query(RefMessage).filter(RefMessage.guild_id==guild_id)
-
-        for message in messages:
+        if message_id:
+            message: RefMessage = db.get_or_404(RefMessage, message_id)
             msg = bot_request_with_retry(f'/channels/{message.channel_id}/messages/{message.message_id}')
 
             if 'id' not in msg:
                 db.session.delete(message)
+                db.session.commit()
             else:
-                channel = discord_session.bot_request(f'/channels/{message.channel_id}')
+                channels = get_channels_from_cache(guild_id)
+                channel = next((c for c in channels if c['id'] == message.channel_id), None)
                 m = BotMessage(str(message.message_id), str(message.channel_id), channel['name'], message.title, msg['content'],
                                pin=msg['pinned'],
                                error=f"{msg['message']} - Need to ensure the bot has 'Read Message History' access to #{channel.name}" if 'message' in msg else '')
 
-                clean_out.append(vars(m))
+                return jsonify(m.__dict__)
 
-        db.session.commit()
-        return jsonify(clean_out)
+        else:
+            messages: list[RefMessage] = db.session.query(RefMessage).filter(RefMessage._guild_id==guild_id).all()
+            return jsonify(messages)
     
     elif request.method == "POST":
         payload = request.get_json()

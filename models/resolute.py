@@ -10,7 +10,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from constants import DISCORD_GUILD_ID
-from helpers.general_helpers import get_members_from_cache
+from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
 
 db = SQLAlchemy()
 
@@ -599,16 +599,57 @@ class ResoluteGuild(db.Model):
 
 class RefMessage(db.Model):
     __tablename__ = "ref_messages"
-    guild_id: Mapped[int]
-    message_id: Mapped[int] = mapped_column(primary_key=True)
-    channel_id: Mapped[int]
+    _guild_id: Mapped[int] = mapped_column("guild_id")
+    _message_id: Mapped[int] = mapped_column("message_id", primary_key=True)
+    _channel_id: Mapped[int] = mapped_column("channel_id")
     title: Mapped[str]
 
     def __init__(self, **kwargs):
-        self.guild_id = kwargs.get("guild_id", DISCORD_GUILD_ID)
-        self.message_id = kwargs.get('message_id')
-        self.channel_id = kwargs.get('channel_id')
+        self._guild_id = kwargs.get("guild_id", DISCORD_GUILD_ID)
+        self._message_id = kwargs.get('message_id')
+        self._channel_id = kwargs.get('channel_id')
         self.title = kwargs.get('title')
+    
+    @property
+    def channel_name(self):
+        channels = get_channels_from_cache(self._guild_id)
+        return next((c.get('name') for c in channels if c.get('id') == self.channel_id), None)
+
+    @property
+    def guild_id(self):
+        return str(self._guild_id)
+    
+    @guild_id.setter
+    def guild_id(self, value):
+        try:
+            self._guild_id = int(value)
+        except:
+            self._guild_id = None
+
+    @property
+    def message_id(self):
+        return str(self._message_id)
+    
+    @message_id.setter
+    def message_id(self, value):
+        try:
+            self._message_id = int(value)
+        except:
+            self._message_id = None
+            
+    @property
+    def channel_id(self):
+        return str(self._channel_id)
+    
+    @channel_id.setter
+    def channel_id(self, value):
+        try:
+            self._channel_id = int(value)
+        except:
+            self._channel_id = None
+
+
+
 
 class Character(db.Model):
     __tablename__ = "characters"
@@ -912,6 +953,9 @@ class AlchemyEncoder(json.JSONEncoder):
 
             elif isinstance(obj, Character):
                 fields["classes"] = obj.classes
+
+            elif isinstance(obj, RefMessage):
+                fields["channel_name"] = obj.channel_name
 
             return fields
         return json.JSONEncoder.default(self, obj)

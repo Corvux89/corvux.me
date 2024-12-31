@@ -54,18 +54,32 @@ export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
     })
 }
 
-export function getMessages(): Promise<RefMessage[]>{
-    return fetch(message_url)
-    .then(res => {
-        if (res.ok){
-            return res.json()
-        } else{
-            return res.json().then(err => ToastError(err.error))
-        }
-    })
-    .then(res => {
-        return res as RefMessage[]
-    })
+export function getMessages(guild_id?: string, message_id?: string): Promise<RefMessage[] | RefMessage> {
+    if (message_id && guild_id){
+        return fetch(`${message_url}/${guild_id}/${message_id}`)
+            .then(res => {
+                if (res.ok){
+                    return res.json()
+                } else{
+                    return res.json().then(err => ToastError(err.error))
+                }
+            })
+            .then(res => {
+                return res as RefMessage
+            })
+    } else {
+        return fetch(message_url)
+            .then(res => {
+                if (res.ok){
+                    return res.json()
+                } else{
+                    return res.json().then(err => ToastError(err.error))
+                }
+            })
+            .then(res => {
+                return res as RefMessage[]
+            })
+    }
 }
 
 export function newMessage(message: NewMessage): Promise<RefMessage>{

@@ -590,15 +590,6 @@ export function initMessageTable(messages) {
             {
                 title: "Channel",
                 data: "channel_name"
-            },
-            {
-                title: "Pinned?",
-                data: "pin",
-                render: (data) => {
-                    return data
-                        ? `<i class="fa-solid fa-check"></i>`
-                        : ``;
-                }
             }
         ]
     });

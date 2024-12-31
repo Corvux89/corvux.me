@@ -46,19 +46,35 @@ export function updateGuild(guild) {
         request.send(JSON.stringify(guild));
     });
 }
-export function getMessages() {
-    return fetch(message_url)
-        .then(res => {
-        if (res.ok) {
-            return res.json();
-        }
-        else {
-            return res.json().then(err => ToastError(err.error));
-        }
-    })
-        .then(res => {
-        return res;
-    });
+export function getMessages(guild_id, message_id) {
+    if (message_id && guild_id) {
+        return fetch(`${message_url}/${guild_id}/${message_id}`)
+            .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            else {
+                return res.json().then(err => ToastError(err.error));
+            }
+        })
+            .then(res => {
+            return res;
+        });
+    }
+    else {
+        return fetch(message_url)
+            .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            else {
+                return res.json().then(err => ToastError(err.error));
+            }
+        })
+            .then(res => {
+            return res;
+        });
+    }
 }
 export function newMessage(message) {
     return new Promise((resolve, reject) => {

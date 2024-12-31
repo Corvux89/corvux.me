@@ -39,7 +39,7 @@ export interface RefMessage {
     channel_name: string,
     title: string,
     error: string,
-    content: string,
+    content?: string,
     pin: boolean
 }
 

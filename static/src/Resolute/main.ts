@@ -34,11 +34,13 @@ $(document).on('click', '.message-delete', function(e){
     .modal("show")
 })
 
-$(document).on('click', '#message-table tbody tr', function(e){
+$(document).on('click', '#message-table tbody tr', async function(e){
     const table = $("#message-table").DataTable()
     const row = table.row(this)
     const modal = $("#message-modal-edit-form")
-    const message: RefMessage = row.data()
+    const msg: RefMessage = row.data()
+    const guild = await getGuild()
+    const message = await getMessages(guild.id, msg.message_id) as RefMessage
     
     $("#message-title").val(message.title)
     $("#message-channel").html('')

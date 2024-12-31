@@ -647,15 +647,6 @@ export function initMessageTable(messages: RefMessage[]): void {
             {
                 title: "Channel",
                 data: "channel_name"
-            },
-            {
-                title: "Pinned?",
-                data: "pin",
-                render: (data) => {
-                    return data
-                        ? `<i class="fa-solid fa-check"></i>`
-                        : ``
-                }
             }
         ]
     })

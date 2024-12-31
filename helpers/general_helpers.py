@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import time
 from flask_discord import DiscordOAuth2Session
 from flask import current_app
@@ -71,3 +72,16 @@ def get_bot_guilds_from_cache():
         BOT_CACHE['timestamp'] = current_time
 
     return BOT_CACHE['guilds']
+
+def bot_request_with_retry(url, retries=5, backoff_factor=1.0):
+    discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+    for attempt in range(retries):
+        try:
+            return discord_session.bot_request(url)
+        except HTTPException as e:
+            if e.status == 429:  # Rate limit status code
+                retry_after = e.response.headers.get('Retry-After', backoff_factor * (2 ** attempt))
+                time.sleep(float(retry_after))
+            else:
+                raise
+    raise Exception("Max retries exceeded")

@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin, login_requred
-from helpers.general_helpers import get_channels_from_cache, get_roles_from_cache
+from helpers.general_helpers import bot_request_with_retry, get_channels_from_cache, get_roles_from_cache
 from helpers.resolute_helpers import log_search_filter, trigger_compendium_reload, trigger_guild_reload
 from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordMember, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
 from sqlalchemy.orm import joinedload
@@ -113,14 +113,14 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
 def ref_messages(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get('DB')
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
-
+    
     if request.method == "GET":
         clean_out = []
 
         messages: list[RefMessage] = db.session.query(RefMessage).filter(RefMessage.guild_id==guild_id)
 
         for message in messages:
-            msg = discord_session.bot_request(f'/channels/{message.channel_id}/messages/{message.message_id}')
+            msg = bot_request_with_retry(f'/channels/{message.channel_id}/messages/{message.message_id}')
 
             if 'id' not in msg:
                 db.session.delete(message)

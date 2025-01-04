@@ -4,7 +4,7 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask.json.provider import JSONProvider
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import BigInteger, ForeignKey, DateTime
+from sqlalchemy import BigInteger, ForeignKey, DateTime, String
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -287,6 +287,7 @@ class ResoluteGuild(db.Model):
     ping_announcement: Mapped[bool]
     handicap_cc: Mapped[int]
     reward_threshold: Mapped[int]
+    weekly_announcement: Mapped[list[str]] = mapped_column("weekly_announcement", ARRAY(String))
 
     # User Roles
     _entry_role: Mapped[int] = mapped_column("entry_role")

@@ -11,6 +11,7 @@ const code_conversion_url = `api/code_conversion`;
 const level_cost_url = `api/level_costs`;
 const financial_url = `api/financial`;
 const store_url = `api/store`;
+const enetitlement_url = `api/entitlements`;
 export function getGuild() {
     return fetch(guild_url)
         .then(res => {
@@ -405,5 +406,19 @@ export function updateStores(store) {
             reject(new Error("Something went wrong"));
         };
         request.send(JSON.stringify(store));
+    });
+}
+export function getEntitlements() {
+    return fetch(enetitlement_url)
+        .then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+            return res.json().then(err => ToastError(err.error));
+        }
+    })
+        .then(res => {
+        return res;
     });
 }

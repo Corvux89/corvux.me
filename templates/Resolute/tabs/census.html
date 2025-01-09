@@ -5,6 +5,9 @@
 
             <button-tab label-text="Characters" controls="characters-tab"
                 custom-id="characters-tab-button"></button-tab>
+
+            <button-tab label-text="Player Say Summary" controls="say-tab"
+                custom-id="say-button"></button-tab>
         </div>
 
         <div class="tab-content" id="census-content">
@@ -18,6 +21,26 @@
                 tabindex="0">
                 <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table"
                     id="characters-table"></table>
+            </div>
+
+            <div class="tab-pane fade" id="say-tab" role="tabpanel" aria-labelledby="say-button"
+                tabindex="0">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="say-summary-start-date">
+                            <label for="say-summary-start-date">Start Date:</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="say-summary-end-date">
+                            <label for="say-summary-end-date">End Date:</label>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-striped table-dark table-condensed table-hover mb-0 selectable wide-table"
+                    id="say-summary-table"></table>
             </div>
         </div>
     </div>

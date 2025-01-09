@@ -1,7 +1,8 @@
+import { stat } from 'fs'
 import { ToastError } from '../General/main.js'
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
+import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getEntitlements, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
 import { RefMessage, NewMessage, Log, Activity, Player, Character, ActivityPoint, playerName } from './types.js'
-import { filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js'
+import { buildSaySummaryData, filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initEntitlementTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSaySummaryTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js'
 
 $('body').addClass("busy")
 buildAnnouncementTable()
@@ -372,6 +373,7 @@ $('#financial-settings-button').on('click', async function(){
     $('body').addClass("busy")
     const fin = await getFinancial()
     const store = await getStores()
+    const entitlements = await getEntitlements()
     $("body").removeClass("busy")
 
     $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`)
@@ -379,6 +381,7 @@ $('#financial-settings-button').on('click', async function(){
     $('#reserve').val(`${fin.reserve.toFixed(2)}`)
 
     initSKUTable(store)
+    initEntitlementTable(entitlements, store)
 })
 
 $('#financial-submit-button').on('click', function(){
@@ -519,6 +522,7 @@ async function buildCensusTable(){
 
     initPlayerTable(players)
     initCharacterTable(characters)
+    initSaySummaryTable(players)
 }
 
 async function buildLogTable(){
@@ -528,7 +532,7 @@ async function buildLogTable(){
 }
 
 async function buildMessageTab(){
-    const messages = await getMessages()
+    const messages = await getMessages() as RefMessage[]
     $("body").removeClass("busy")
 
     initMessageTable(messages)
@@ -552,8 +556,12 @@ $("#say-start-date, #say-end-date").on("change", function(){
     $("#say-table").DataTable().draw()
 })
 
+$("#say-summary-start-date, #say-summary-end-date").on("change", function(){
+    $("#say-summary-table").DataTable().draw()
+})
+
 // Filter Functions
-$.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
+$.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
     if (settings.nTable.id == 'global-npc-table') {
         var playerID = $("#member-id").val()
         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
@@ -594,6 +602,14 @@ $.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
 
         return rowData.count > 0
 
+    } else if (settings.nTable.id == 'say-summary-table'){
+        const playerData = $("#player-table").DataTable().rows().data().toArray() as Player[]
+        const sayTable = $("#say-summary-table").DataTable()
+        const stats = buildSaySummaryData(playerData)
+
+        sayTable.row(0).data(stats)
+
+        return stats.count > 0
     }
 
     return true

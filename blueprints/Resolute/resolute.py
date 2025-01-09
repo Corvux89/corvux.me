@@ -6,9 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin, login_requred
-from helpers.general_helpers import bot_request_with_retry, get_channels_from_cache, get_roles_from_cache
+from helpers.general_helpers import bot_request_with_retry, get_channels_from_cache, get_entitlements_from_cache, get_roles_from_cache
 from helpers.resolute_helpers import log_search_filter, trigger_compendium_reload, trigger_guild_reload
-from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordMember, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
+from models.resolute import Activity, ActivityPoints, BotMessage, Character, CodeConversion, DiscordChannel, DiscordEntitlement, DiscordMember, DiscordRole, Faction, Financial, LevelCost, Log, Player, RefMessage, ResoluteGuild, Store
 from sqlalchemy.orm import joinedload
 
 
@@ -452,4 +452,9 @@ def get_store():
             db.session.rollback()
             return jsonify({"error": "Failed to update store"}), 500
 
-    
+@resolute_blueprint.route('/api/entitlements', methods=['GET'])
+@is_admin
+def get_entitlements():
+    entitlements = get_entitlements_from_cache()
+
+    return jsonify([DiscordEntitlement(**e) for e in entitlements])

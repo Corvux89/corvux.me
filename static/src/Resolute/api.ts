@@ -1,5 +1,5 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
-import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
+import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordEntitlement, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
 const guild_url = `api/guild`
 const message_url = `api/message`
@@ -13,6 +13,7 @@ const code_conversion_url = `api/code_conversion`
 const level_cost_url = `api/level_costs`
 const financial_url = `api/financial`
 const store_url = `api/store`
+const enetitlement_url = `api/entitlements`
 
 
 export function getGuild(): Promise<ResoluteGuild>{
@@ -448,5 +449,19 @@ export function updateStores(store: Store[]): Promise<Store[]>{
         }
 
         request.send(JSON.stringify(store))
+    })
+}
+
+export function getEntitlements(): Promise<DiscordEntitlement[]>{
+    return fetch(enetitlement_url)
+    .then(res => {
+        if (res.ok){
+            return res.json()
+        } else{
+            return res.json().then(err => ToastError(err.error))
+        }
+    })
+    .then(res => {
+        return res as DiscordEntitlement[]
     })
 }

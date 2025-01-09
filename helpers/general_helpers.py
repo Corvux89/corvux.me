@@ -3,7 +3,7 @@ import time
 from flask_discord import DiscordOAuth2Session
 from flask import current_app
 
-from constants import CACHE_TIMEOUT, DISCORD_GUILD_ID, LIMIT
+from constants import CACHE_TIMEOUT, DISCORD_CLIENT_ID, DISCORD_GUILD_ID, LIMIT
 
 
 MEMBER_CACHE = {}
@@ -11,6 +11,11 @@ MEMBER_CACHE = {}
 CHANNEL_CACHE = {}
 
 ROLE_CACHE = {}
+
+ENTITLEMENT_CACHE = {
+    "entitlements": None,
+    "timestamp": 0
+}
 
 BOT_CACHE = {
     "guilds": None,
@@ -72,6 +77,19 @@ def get_bot_guilds_from_cache():
         BOT_CACHE['timestamp'] = current_time
 
     return BOT_CACHE['guilds']
+
+def get_entitlements_from_cache():
+    current_time = time.time()
+
+    
+
+    if ENTITLEMENT_CACHE['entitlements'] is None or (current_time - ENTITLEMENT_CACHE['timestamp'] > CACHE_TIMEOUT):
+        discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')
+        entitlements = discord_session.bot_request(f"/applications/{DISCORD_CLIENT_ID}/entitlements")
+        ENTITLEMENT_CACHE['entitlements'] = entitlements
+        ENTITLEMENT_CACHE['timestamp'] = current_time
+
+    return ENTITLEMENT_CACHE['entitlements']
 
 def bot_request_with_retry(url, retries=5, backoff_factor=1.0):
     discord_session: DiscordOAuth2Session = current_app.config.get('DISCORD_SESSION')

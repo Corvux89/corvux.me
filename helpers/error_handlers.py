@@ -8,6 +8,7 @@ def not_found(e):
 
 def exception_error(error):
     # return render_template("error.html", error=f"{error.message}")
+    print(error)
     return jsonify({"error": error.message}), 403
 
 def general_error(error):

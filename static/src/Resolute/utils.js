@@ -380,6 +380,57 @@ export function initSKUTable(store) {
         ]
     });
 }
+export function initEntitlementTable(entitlements, store) {
+    const tableName = "#entitlement-table";
+    destroyTable(tableName);
+    const storeMap = new Map(store.map((item) => [item.sku, item.user_cost]));
+    const userEnetitlements = entitlements.reduce((acc, entitlement) => {
+        const key = `${entitlement.user_id}-${entitlement.sku_id}`;
+        if (!acc[key]) {
+            acc[key] = { user_id: entitlement.user_id, sku_id: entitlement.sku_id, member: entitlement.member, count: 0 };
+        }
+        acc[key].count += 1;
+        return acc;
+    }, {});
+    const summaryData = Object.values(userEnetitlements).map(ent => {
+        const user_cost = storeMap.get(ent.sku_id) || 0;
+        return {
+            member_name: playerName(ent.member),
+            sku: ent.sku_id,
+            count: ent.count,
+            unit_cost: user_cost.toFixed(2),
+            total_cost: (ent.count * user_cost).toFixed(2)
+        };
+    });
+    $(tableName).DataTable({
+        orderCellsTop: true,
+        // @ts-ignore
+        responsive: true,
+        pageLength: 25,
+        lengthChange: false,
+        info: false,
+        paging: false,
+        data: summaryData,
+        columns: [
+            {
+                title: "Player",
+                data: "member_name"
+            },
+            {
+                title: "SKU",
+                data: "sku"
+            },
+            {
+                title: "Unit Cost",
+                data: "unit_cost"
+            },
+            {
+                title: "Total Cost",
+                data: "total_cost"
+            }
+        ]
+    });
+}
 export function initAnnouncementTable(announcements) {
     const tableName = "#announcement-table";
     destroyTable(tableName);
@@ -628,7 +679,7 @@ export function initConversionTable(conversions) {
 export function initLevelCostTable(costs) {
     const tableName = "#level-cost-table";
     destroyTable(tableName);
-    $("#level-cost-table").DataTable({
+    $(tableName).DataTable({
         orderCellsTop: true,
         // @ts-ignore
         responsive: true,
@@ -651,6 +702,82 @@ export function initLevelCostTable(costs) {
                 searchable: false,
                 render: function (data, type, row) {
                     return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
+                }
+            }
+        ]
+    });
+}
+export function buildSaySummaryData(playerData) {
+    const startDate = $("#say-summary-start-date").val() ? new Date($("#say-summary-start-date").val().toString()) : 0;
+    const endDate = $("#say-summary-end-date").val() ? new Date($("#say-summary-end-date").val().toString()) : new Date();
+    let stats = { count: 0, num_lines: 0, num_words: 0, num_characters: 0 };
+    playerData.forEach(player => {
+        const characters = player.statistics?.say || {};
+        for (const char in characters) {
+            const dates = characters[char];
+            for (const dateStr in dates) {
+                const date = new Date(dateStr);
+                if (date >= startDate && date <= endDate) {
+                    const s = dates[dateStr];
+                    stats.count += s.count || 0;
+                    stats.num_lines += s.num_lines || 0;
+                    stats.num_characters += s.num_characters || 0;
+                    stats.num_words += s.num_words || 0;
+                }
+            }
+        }
+    });
+    return stats;
+}
+export function initSaySummaryTable(players) {
+    const tableName = "#say-summary-table";
+    destroyTable(tableName);
+    const stats = buildSaySummaryData(players);
+    $(tableName).DataTable({
+        orderCellsTop: true,
+        pageLength: 25,
+        info: false,
+        paging: false,
+        data: [stats],
+        columns: [
+            {
+                data: "count",
+                title: "# Posts",
+                className: "text-end"
+            },
+            {
+                title: "Characters",
+                data: "num_characters",
+                className: "text-end"
+            },
+            {
+                title: "Lines",
+                data: "num_lines",
+                className: "text-end"
+            },
+            {
+                title: "Words",
+                data: "num_words",
+                className: "text-end"
+            },
+            {
+                title: "Avg. Words / Post",
+                data: "num_words",
+                className: "text-end",
+                render: function (data, type, row) {
+                    return `${row.count == 0 ? 0 : (data / row.count).toFixed(2)}`;
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        columnDefs: [
+            {
+                targets: [0, 1],
+                createdCell: function (td, cellData, rowData, row, col) {
+                    $(td).css({
+                        "white-space": "pre",
+                        "word-wrap": "normal"
+                    });
                 }
             }
         ]

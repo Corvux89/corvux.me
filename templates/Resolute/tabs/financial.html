@@ -4,6 +4,8 @@
         <div class="nav nav-tabs m-2" id="financial-tabs" role="tablist">
             <button-tab label-text="Financial" controls="financial-tab" custom-id="financial-button" active></button-tab>
 
+            <button-tab label-text="Player Breakdown" controls="entitlement-tab" custom-id="entitlement-button"></button-tab>
+
             <button-tab label-text="SKU's" controls="sku-tab" custom-id="sku-button"></button-tab>
         </div>
 
@@ -28,6 +30,16 @@
                         Changes</button>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="entitlement-tab" role="tabpanel" aria-labelledby="entitlement-button"
+                tabindex="0">
+                <div class="container-fluid">
+                    <table class="table table-striped table-dark table-condensed table-hover mb-0 wide-table"
+                        id="entitlement-table">
+                    </table>
+                </div>
+            </div>
+
 
             <div class="tab-pane fade" id="sku-tab" role="tabpanel" aria-labelledby="sku-button"
                 tabindex="0">

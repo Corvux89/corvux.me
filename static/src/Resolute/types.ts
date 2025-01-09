@@ -61,6 +61,16 @@ export interface DiscordRole {
     name: string   
 }
 
+export interface DiscordEntitlement {
+    id: string
+    sku_id: string
+    type: number
+    deleted: boolean
+    consumed: boolean
+    user_id: string
+    member: GenericDict
+}
+
 export interface Activity{
     id: number,
     value: string,

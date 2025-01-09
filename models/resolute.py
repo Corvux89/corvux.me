@@ -158,6 +158,44 @@ class DiscordRole:
         except:
             self._id = None
 
+class DiscordEntitlement:
+    id: str = None
+    sku_id: str = None
+    type: int = None
+    deleted: bool = False
+    consumed: bool = False
+    user_id: str = None
+
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            if hasattr(self, key):
+                setattr(self, key, kwargs[key])
+
+    @property
+    def member(self):
+        members = [DiscordMember(**m) for m in get_members_from_cache(DISCORD_GUILD_ID)]
+
+        try:
+            if (m := next((m for m in members if m.user and m.user.id == self.user_id), None)):
+                return m.__dict__
+            return None
+        except:
+            return None
+        
+    def to_dict(self):
+        result = {}
+        for attr in dir(self):
+            if attr.startswith("_") or callable(getattr(self, attr)):
+                continue
+            try:
+                value = getattr(self, attr)
+                result[attr] = value
+            except AttributeError:
+                continue
+        return result
+    
+    
+
 class Activity(db.Model):
     __tablename__ = "c_activity"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -924,7 +962,7 @@ class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
-        elif isinstance(obj, (DiscordMember, DiscordUser, DiscordChannel, DiscordRole)):
+        elif isinstance(obj, (DiscordMember, DiscordUser, DiscordChannel, DiscordRole, DiscordEntitlement)):
             return obj.to_dict()
                     
         elif isinstance(obj.__class__, DeclarativeMeta):

@@ -150,7 +150,7 @@ export function initPlayerCharacterTable(characters) {
                 data: "species",
                 title: "Species",
                 render: function (data, type, row) {
-                    return `${data != null ? data.value : "Not found"}`;
+                    return `${data != null ? data?.value : "Not found"}`;
                 }
             },
             {
@@ -241,7 +241,7 @@ export function initSayTable(player) {
                 title: "Character",
                 data: "command",
                 render: function (data, type, row) {
-                    return player.characters.find(c => c.id == parseInt(data)).name ?? "Character not found";
+                    return player.characters.find(c => c.id == parseInt(data))?.name ?? "Character not found/Inactive Character";
                 }
             },
             {
@@ -743,22 +743,34 @@ export function initSaySummaryTable(players) {
             {
                 data: "count",
                 title: "# Posts",
-                className: "text-end"
+                className: "text-end",
+                render: function (data, type, row) {
+                    return data.toLocaleString();
+                }
             },
             {
                 title: "Characters",
                 data: "num_characters",
-                className: "text-end"
+                className: "text-end",
+                render: function (data, type, row) {
+                    return data.toLocaleString();
+                }
             },
             {
                 title: "Lines",
                 data: "num_lines",
-                className: "text-end"
+                className: "text-end",
+                render: function (data, type, row) {
+                    return data.toLocaleString();
+                }
             },
             {
                 title: "Words",
                 data: "num_words",
-                className: "text-end"
+                className: "text-end",
+                render: function (data, type, row) {
+                    return data.toLocaleString();
+                }
             },
             {
                 title: "Avg. Words / Post",

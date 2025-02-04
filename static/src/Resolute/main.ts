@@ -446,9 +446,12 @@ $('#activity-submit-button').on('click', function(){
     getActivities()
     .then(activities => {
         activities.forEach(activity => {
-            activity.cc = parseInt($(`.cc-input[data-id="${activity.id}"]`).val().toString())
+            let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val()
+            let pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
+            
+            activity.cc = ccInputValue ? parseInt(ccInputValue.toString()) : null
             activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked')
-            activity.points = parseInt($(`.points-input[data-id="${activity.id}"]`).val().toString())
+            activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0
         })
 
         updateActivities(activities)

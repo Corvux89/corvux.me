@@ -515,7 +515,7 @@ async function buildActivityTable(){
 }
 
 async function buildCensusTable(){
-    const players: Player[] = await getPlayers()
+    const players = await getPlayers() as Player[]
     const characters: Character[] = players.flatMap(player => player.characters.map(character => ({
         ...character,
         player_name: playerName(player.member)

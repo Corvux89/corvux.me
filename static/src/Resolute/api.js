@@ -219,8 +219,15 @@ export function updateActivities(activities) {
         request.send(JSON.stringify(activities));
     });
 }
-export function getPlayers() {
-    return fetch(player_url)
+export function getPlayers(guild_id, player_id) {
+    let url = player_url;
+    if (guild_id) {
+        url = `${url}/${guild_id}`;
+        if (player_id) {
+            url = `${url}/${player_id}`;
+        }
+    }
+    return fetch(url)
         .then(res => {
         if (res.ok) {
             return res.json();
@@ -230,6 +237,9 @@ export function getPlayers() {
         }
     })
         .then(res => {
+        if (guild_id || player_id) {
+            return res;
+        }
         return res;
     });
 }

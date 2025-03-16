@@ -211,12 +211,12 @@ def get_players(guild_id: int = DISCORD_GUILD_ID, player_id: int = None):
                         .filter(and_(Player._id == player_id, Player._guild_id == guild_id))
                         .options(joinedload(Player.characters))
                         .first())
-
     else:
         players: list[Player] = (db.session.query(Player)
                                 .filter(Player._guild_id == guild_id)
                                 .options(joinedload(Player.characters))
                                 .all())
+
     return jsonify(players)
 
 @resolute_blueprint.route('/api/logs', methods=["GET", "POST"])

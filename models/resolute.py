@@ -14,16 +14,12 @@ from helpers.general_helpers import get_channels_from_cache, get_members_from_ca
 
 db = SQLAlchemy()
 
-class DiscordUser:
-    global_name: str = None
-    _id: int = None
-    username: str = None
-
+class BaseModel:
     def __init__(self, **kwargs):
         for key in kwargs:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-                
+
     def to_dict(self):
         result = {}
         for attr in dir(self):
@@ -36,16 +32,38 @@ class DiscordUser:
                 continue
         return result
     
+class IntAttributeMixin:
+    def set_int_attribute(self, attr_name, value):
+        try:
+            setattr(self, attr_name, value)
+        except (ValueError, TypeError):
+            setattr(self, attr_name, None)
+
+class MemberAttributeMixin:
+    def get_member_attribute(self, member_id: str):
+        members = [DiscordMember(**m) for m in get_members_from_cache(DISCORD_GUILD_ID)]
+        
+        try:
+            if (m := next((m for m in members if m.user and m.user.id == member_id), None)):
+                return m.__dict__
+            return None
+        except:
+            return None
+
+
+class DiscordUser(BaseModel, IntAttributeMixin):
+    global_name: str = None
+    _id: int = None
+    username: str = None
+    avatar: str = None
+    
     @property
     def id(self):
         return str(self._id)
 
     @id.setter
     def id(self, value):
-        try:
-            self._id = int(value)
-        except:
-            self._id = None
+        self.set_int_attribute("_id", value)
 
 class DiscordMember:
     nick: str = None
@@ -78,31 +96,14 @@ class DiscordMember:
     
     @property
     def member_display_name(self):
-        return self.nick or self.user.global_name or self.user.username or "zzz"
+        return self.nick or self.user.global_name or self.user.username or "Player not found"
     
 
-class DiscordChannel:
+class DiscordChannel(BaseModel, IntAttributeMixin):
     _id: int = None
     name: str = None
     _parent_id: int = None
     type: int = None
-
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
-    def to_dict(self):
-        result = {}
-        for attr in dir(self):
-            if attr.startswith("_") or callable(getattr(self, attr)):
-                continue
-            try:
-                value = getattr(self, attr)
-                result[attr] = value
-            except AttributeError:
-                continue
-        return result
     
     @property
     def id(self):
@@ -110,10 +111,7 @@ class DiscordChannel:
 
     @id.setter
     def id(self, value):
-        try:
-            self._id = int(value)
-        except:
-            self._id = None
+       self.set_int_attribute("_id", value)
     
     @property
     def parent_id(self):
@@ -121,31 +119,11 @@ class DiscordChannel:
     
     @parent_id.setter
     def parent_id(self, value):
-        try:
-            self._parent_id = int(value)
-        except:
-            self._parent_id = ""
+        self.set_int_attribute("_parent_id", value)
 
-class DiscordRole:
+class DiscordRole(BaseModel, IntAttributeMixin):
     _id: int = None
     name: str = None
-
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
-    def to_dict(self):
-        result = {}
-        for attr in dir(self):
-            if attr.startswith("_") or callable(getattr(self, attr)):
-                continue
-            try:
-                value = getattr(self, attr)
-                result[attr] = value
-            except AttributeError:
-                continue
-        return result
     
     @property
     def id(self):
@@ -153,12 +131,9 @@ class DiscordRole:
 
     @id.setter
     def id(self, value):
-        try:
-            self._id = int(value)
-        except:
-            self._id = None
+        self.set_int_attribute("_id", value)
 
-class DiscordEntitlement:
+class DiscordEntitlement(BaseModel, MemberAttributeMixin):
     id: str = None
     sku_id: str = None
     type: int = None
@@ -166,33 +141,9 @@ class DiscordEntitlement:
     consumed: bool = False
     user_id: str = None
 
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
     @property
     def member(self):
-        members = [DiscordMember(**m) for m in get_members_from_cache(DISCORD_GUILD_ID)]
-
-        try:
-            if (m := next((m for m in members if m.user and m.user.id == self.user_id), None)):
-                return m.__dict__
-            return None
-        except:
-            return None
-        
-    def to_dict(self):
-        result = {}
-        for attr in dir(self):
-            if attr.startswith("_") or callable(getattr(self, attr)):
-                continue
-            try:
-                value = getattr(self, attr)
-                result[attr] = value
-            except AttributeError:
-                continue
-        return result
+       return self.get_member_attribute(self.user_id)
     
     
 
@@ -278,7 +229,7 @@ class Species(db.Model):
         self.id = kwargs.get('id')
         self.value = kwargs.get('value')
 
-class Store(db.Model):
+class Store(db.Model, IntAttributeMixin):
     __tablename__ = "store"
     _sku: Mapped[int] = mapped_column("sku", primary_key=True)
     user_cost: Mapped[float]
@@ -293,10 +244,7 @@ class Store(db.Model):
     
     @sku.setter
     def sku(self, value):
-        try:
-            self.sku = int(value)
-        except:
-            self.sku = None
+        self.set_int_attribute("sku", value)
 
 class Financial(db.Model):
     __tablename__ = "financial"
@@ -314,7 +262,7 @@ class Financial(db.Model):
         self.last_reset = kwargs.get('last_reset')
 
 
-class ResoluteGuild(db.Model):
+class ResoluteGuild(db.Model, IntAttributeMixin):
     __tablename__ = "guilds"
     _id: Mapped[int] = mapped_column("id", primary_key=True)
     max_level: Mapped[int]
@@ -399,10 +347,7 @@ class ResoluteGuild(db.Model):
     
     @entry_role.setter
     def entry_role(self, value):
-        try:
-            self._entry_role = int(value)
-        except:
-            self._entry_role = None
+        self.set_int_attribute("_entry_role", value)
 
     @property
     def admin_role(self) -> str:
@@ -410,10 +355,7 @@ class ResoluteGuild(db.Model):
     
     @admin_role.setter
     def admin_role(self, value):
-        try:
-            self._admin_role = int(value)
-        except:
-            self._admin_role = None
+        self.set_int_attribute("_admin_role", value)
 
     @property
     def staff_role(self) -> str:
@@ -421,10 +363,7 @@ class ResoluteGuild(db.Model):
     
     @staff_role.setter
     def staff_role(self, value):
-        try:
-            self._staff_role = int(value)
-        except:
-            self._staff_role = None
+        self.set_int_attribute("_staff_role", value)
 
     @property
     def bot_role(self) -> str:
@@ -771,7 +710,7 @@ class CharacterClass(db.Model):
         return self._archetype_record
 
 
-class Player(db.Model):
+class Player(db.Model, MemberAttributeMixin):
     __tablename__ = "players"
     _id: Mapped[int] = mapped_column("id", primary_key=True)
     cc: Mapped[int]
@@ -811,13 +750,7 @@ class Player(db.Model):
     
     @property
     def member(self):
-        members = [DiscordMember(**m) for m in get_members_from_cache(self._guild_id)]
-        try:
-            if (m := next((m for m in members if m.user and m.user._id == self._id), None)):
-                return m.__dict__
-            return None
-        except:
-            return None
+       return self.get_member_attribute(self.id)
 
     @hybrid_property    
     def statistics(self):
@@ -902,7 +835,7 @@ class Log(db.Model):
     def member(self):
         members = [DiscordMember(**m) for m in get_members_from_cache(self._guild_id)]
         try:
-            if (m := next((m for m in members if m.user and m.user._id == self._player_id), None)):
+            if (m := next((m for m in members if m.user and m.user.id == self.player_id), None)):
                 return m.__dict__
             return None
         except:

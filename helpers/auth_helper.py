@@ -10,16 +10,17 @@ def is_admin(f=None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            discord_session = current_app.config.get('DISCORD_SESSION')
+            discord_session = current_app.config.get("DISCORD_SESSION")
             if discord_session and not discord_session.authorized:
                 return redirect(url_for("auth.login", next=request.endpoint))
             elif not _is_user_admin():
                 raise AdminAccessError()
             return func(*args, **kwargs)
+
         return decorated_function
 
     def _is_user_admin():
-        discord_session = current_app.config.get('DISCORD_SESSION')
+        discord_session = current_app.config.get("DISCORD_SESSION")
         if not discord_session or not discord_session.authorized:
             return False
 
@@ -33,28 +34,32 @@ def is_admin(f=None):
     # Decorator functionality
     return decorator(f)
 
+
 def login_requred(f=None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
-            discord_session = current_app.config.get('DISCORD_SESSION')
+            discord_session = current_app.config.get("DISCORD_SESSION")
             if discord_session and not discord_session.authorized:
                 return redirect(url_for("auth.login", next=request.endpoint))
             elif not _is_logged_in():
                 raise LoginError()
             return func(*args, **kwargs)
+
         return decorated_function
 
     def _is_logged_in():
-        discord_session = current_app.config.get('DISCORD_SESSION') 
+        discord_session = current_app.config.get("DISCORD_SESSION")
         if not discord_session or not discord_session.authorized:
             return False
-        
+
         try:
             user = discord_session.fetch_user()
             guilds = user.fetch_guilds()
             bot_guilds = get_bot_guilds_from_cache()
-            return bool(set([g["id"] for g in bot_guilds]) & set([str(g.id) for g in guilds]))
+            return bool(
+                set([g["id"] for g in bot_guilds]) & set([str(g.id) for g in guilds])
+            )
         except:
             return False
 

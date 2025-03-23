@@ -152,6 +152,7 @@ export interface Player{
     member: GenericDict,
     characters: Character[]
     statistics: GenericDict
+    member_display_name: string,
 }
 
 export function playerName(obj: GenericDict): string {

@@ -1,12 +1,12 @@
 import { ToastError } from "../General/main.js";
-import { getPlayers } from "./api.js";
+import { getGuild, getPlayers } from "./api.js";
 import { playerName } from "./types.js";
 import { filterStats, initPlayerCharacterTable, initSayTable } from "./utils.js";
 $('body').addClass("busy");
 const memberID = $("#member-id").val().toString();
-const players = await getPlayers();
+const guild = await getGuild();
 $('body').removeClass("busy");
-const playerData = players.find((p) => p.id == memberID);
+const playerData = await getPlayers(guild.id, memberID);
 if (!playerData) {
     ToastError("Player not found");
 }

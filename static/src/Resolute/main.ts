@@ -1,4 +1,3 @@
-import { stat } from 'fs'
 import { ToastError } from '../General/main.js'
 import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getEntitlements, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
 import { RefMessage, NewMessage, Log, Activity, Player, Character, ActivityPoint, playerName } from './types.js'
@@ -515,7 +514,7 @@ async function buildActivityTable(){
 }
 
 async function buildCensusTable(){
-    const players: Player[] = await getPlayers()
+    const players = await getPlayers() as Player[]
     const characters: Character[] = players.flatMap(player => player.characters.map(character => ({
         ...character,
         player_name: playerName(player.member)

@@ -243,8 +243,17 @@ export function updateActivities(activities: Activity[]): Promise<Activity[]>{
     })
 }
 
-export function getPlayers(): Promise<Player[]>{
-    return fetch(player_url)
+export function getPlayers(guild_id?: string, player_id?: string): Promise<Player[] | Player>{
+    let url = player_url
+    if (guild_id){
+        url = `${url}/${guild_id}`
+
+        if (player_id){
+            url = `${url}/${player_id}`
+        }
+    }        
+
+    return fetch(url)
     .then(res => {
         if (res.ok){
             return res.json()
@@ -253,6 +262,9 @@ export function getPlayers(): Promise<Player[]>{
         }
     })
     .then(res => {
+        if (guild_id || player_id){
+            return res as Player
+        }
         return res as Player[]
     })
 }

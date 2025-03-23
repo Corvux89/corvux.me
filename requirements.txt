@@ -5,6 +5,6 @@ gunicorn
 flask_sqlalchemy
 psycopg2
 flask_login
-markdown~=3.4.4
+markdown~=3.7
 Werkzeug==2.2.2
 flask_discord

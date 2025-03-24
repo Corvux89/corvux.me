@@ -4,10 +4,11 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask.json.provider import JSONProvider
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import BigInteger, ForeignKey, DateTime, String
+from sqlalchemy import BigInteger, ForeignKey, DateTime, String, inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm.decl_api import registry
 
 from constants import DISCORD_GUILD_ID
 from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
@@ -29,10 +30,14 @@ class BaseModel:
             try:
                 value = getattr(self, attr)
 
-                if isinstance(value, datetime.datetime):
+                if inspect(value, raiseerr=False) is not None or isinstance(
+                    value, registry
+                ):
+                    continue
+                elif isinstance(value, datetime.datetime):
                     result[attr] = value.isoformat()
-                elif isinstance(value, DeclarativeMeta):
-                    print(value)
+                elif hasattr(value, "to_dict"):
+                    result[attr] = value.to_dict()
                 else:
                     result[attr] = value
             except AttributeError:
@@ -792,7 +797,7 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
     @activity.setter
     def activity(self, value):
         self.set_int_attribute("_activity", value)
-        
+
     @property
     def faction(self):
         return self._faction_record
@@ -800,7 +805,7 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
     @faction.setter
     def faction(self, value):
         self.set_int_attribute("_faction", value)
-        
+
     @property
     def guild_id(self):
         return self._guild_id
@@ -808,7 +813,7 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
     @guild_id.setter
     def guild_id(self, value):
         self.set_int_attribute("_guild_id", value)
-        
+
     @property
     def member(self):
         return self.get_member_attribute(self.player_id)
@@ -828,8 +833,9 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
     @player_id.setter
     def player_id(self, value):
         self.set_int_attribute("_player_id", value)
-        
-class BotMessage:
+
+
+class BotMessage(BaseModel):
     def __init__(
         self,
         message_id: str,
@@ -860,49 +866,6 @@ class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
-        elif isinstance(
-            obj,
-            (
-                BaseModel,
-                DiscordMember,
-                DiscordUser,
-                DiscordChannel,
-                DiscordRole,
-                DiscordEntitlement,
-            ),
-        ):
+        elif hasattr(obj, "to_dict"):
             return obj.to_dict()
-
-        elif isinstance(obj.__class__, DeclarativeMeta):
-            fields = {}
-            columns = obj.__table__.columns.keys()
-
-            for field in columns:
-                data = obj.__getattribute__(field)
-                if isinstance(data, datetime.datetime):
-                    data = data.isoformat()
-                elif isinstance(data.__class__, DeclarativeMeta):
-                    data = self.default(data)
-                try:
-                    json.dumps(data)
-                    fields[field] = data
-                except TypeError:
-                    fields[field] = None
-
-            if isinstance(obj, Log):
-                fields["member"] = obj.member
-                fields["character"] = obj.character
-                fields["author"] = obj.author
-
-            elif isinstance(obj, Player):
-                fields["characters"] = obj.characters
-                fields["member"] = obj.member
-
-            elif isinstance(obj, Character):
-                fields["classes"] = obj.classes
-
-            elif isinstance(obj, RefMessage):
-                fields["channel_name"] = obj.channel_name
-
-            return fields
         return json.JSONEncoder.default(self, obj)

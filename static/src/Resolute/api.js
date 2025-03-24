@@ -1,6 +1,19 @@
 import { ToastError, ToastSuccess } from "../General/main.js";
-const guild_url = `api/guild`;
-const message_url = `api/message`;
+export const apiUrls = {
+    guild: "api/guild",
+    message: "api/message",
+    channnel: "api/channels",
+    role: "api/roles",
+    log: "api/logs",
+    activity: "api/activities",
+    activityPoint: "api/activity_points",
+    player: "api/players",
+    codeConversion: "api/code_conversion",
+    levelCost: "api/level_costs",
+    financial: "api/financial",
+    store: "api/store",
+    entitlement: "api/entitlement"
+};
 const channel_url = `api/channels`;
 const role_url = `api/roles`;
 const log_url = `api/logs`;
@@ -12,132 +25,56 @@ const level_cost_url = `api/level_costs`;
 const financial_url = `api/financial`;
 const store_url = `api/store`;
 const enetitlement_url = `api/entitlements`;
-export function getGuild() {
-    return fetch(guild_url)
-        .then(res => {
-        if (res.ok) {
-            return res.json();
-        }
-        else {
-            return res.json().then(err => ToastError(err.error));
-        }
-    })
-        .then(res => {
-        return res;
-    });
-}
-export function updateGuild(guild) {
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('PATCH', guild_url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                ToastSuccess("Updated!");
-                resolve(this.response.responseText);
-            }
-            else {
-                ToastError(this.response);
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(guild));
-    });
-}
-export function getMessages(guild_id, message_id) {
-    if (message_id && guild_id) {
-        return fetch(`${message_url}/${guild_id}/${message_id}`)
-            .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            else {
-                return res.json().then(err => ToastError(err.error));
-            }
-        })
-            .then(res => {
-            return res;
-        });
+export async function fetchData(url) {
+    const res = await fetch(url);
+    if (res.ok) {
+        return res.json();
     }
     else {
-        return fetch(message_url)
-            .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            else {
-                return res.json().then(err => ToastError(err.error));
-            }
-        })
-            .then(res => {
-            return res;
-        });
+        const err = await res.json();
+        ToastError(err.error);
+        throw new Error(err.error);
     }
 }
-export function newMessage(message) {
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('POST', message_url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                resolve(JSON.parse(this.responseText));
-            }
-            else {
-                ToastError(this.response);
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(message));
+export async function sendData(url, method, data) {
+    const res = await fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     });
+    if (res.ok) {
+        ToastSuccess("Successfully updated!");
+        return res.json();
+    }
+    else {
+        const err = await res.json();
+        ToastError(err.error);
+        throw new Error(err.error);
+    }
+}
+export function getGuild() {
+    return fetchData(apiUrls.guild);
+}
+export function updateGuild(guild) {
+    return sendData(apiUrls.guild, 'PATCH', guild);
+}
+export function getMessages(guild_id, message_id) {
+    let url = apiUrls.message;
+    if (guild_id && message_id) {
+        url = `${url}/${guild_id}/${message_id}`;
+    }
+    return fetchData(url);
+}
+export function newMessage(message) {
+    return sendData(apiUrls.message, "POST", message);
 }
 export function updateMessage(message) {
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('PATCH', message_url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                ToastSuccess("Message has been successfully updated!");
-                resolve(this.response.responseText);
-            }
-            else {
-                ToastError(this.response);
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify(message));
-    });
+    return sendData(apiUrls.message, "PATCH", message);
 }
 export function deleteMessage(mesage_id) {
-    new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('DELETE', message_url, true);
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.onload = function () {
-            if (request.status == 200) {
-                ToastSuccess(`Message successfully deleted!`);
-                resolve(this.response.responseText);
-            }
-            else {
-                ToastError(this.response);
-                resolve(null);
-            }
-        };
-        request.onerror = function () {
-            reject(new Error("Something went wrong"));
-        };
-        request.send(JSON.stringify({ "message_id": mesage_id }));
-    });
+    return sendData(apiUrls.message, "DELETE", { mesage_id });
 }
 export function getChannels() {
     return fetch(channel_url)

@@ -48,7 +48,10 @@ def log_search_filter(search_value: str, guild_id: int) -> []:
 
 def trigger_compendium_reload():
     discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
-    current_user = discord_session.fetch_user()
+    try:
+        current_user = discord_session.fetch_user()
+    except:
+        return
     url = f"{BOT_API_URL}/reload"
     headers = {"auth-token": BOT_API_AUTH_TOKEN, "Content-Type": "application/json"}
     payload = {
@@ -62,7 +65,10 @@ def trigger_compendium_reload():
 
 def trigger_guild_reload(guild_id: int):
     discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
-    current_user = discord_session.fetch_user()
+    try:
+        current_user = discord_session.fetch_user()
+    except:
+        return
     url = f"{BOT_API_URL}/guild_update"
     headers = {"auth-token": BOT_API_AUTH_TOKEN, "Content-Type": "application/json"}
     payload = {

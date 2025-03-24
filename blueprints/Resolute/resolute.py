@@ -17,7 +17,7 @@ from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
-from helpers.auth_helper import is_admin, login_requred
+from helpers.auth_helper import is_admin, is_api_admin, login_requred
 from helpers.general_helpers import (
     bot_request_with_retry,
     get_channels_from_cache,
@@ -96,92 +96,83 @@ def privacy():
 @resolute_blueprint.route("/api/guild/<guild_id>", methods=["GET"])
 def get_guild(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get("DB")
-    guild: ResoluteGuild = db.get_or_404(ResoluteGuild, guild_id)
+    guild: ResoluteGuild = (
+        db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
+    )
+    if not guild:
+        return jsonify({"error": "Guild not found"}), 404
     return jsonify(guild)
 
 
 @resolute_blueprint.route("/api/guild", methods=["PATCH"])
 @resolute_blueprint.route("/api/guild/<guild_id>", methods=["PATCH"])
-@is_admin
+@is_api_admin
 def update_guild(guild_id: int = DISCORD_GUILD_ID):
     db: SQLAlchemy = current_app.config.get("DB")
-    guild: ResoluteGuild = db.get_or_404(ResoluteGuild, guild_id)
-    update_guild = ResoluteGuild(**request.get_json())
+    guild: ResoluteGuild = (
+        db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
+    )
+    update_data = request.get_json()
 
     # Validation
-    if (
+    if not guild:
+        return jsonify({"error": "Guild not found"}), 404
+
+    # Max Level validation
+    elif (
         db.session.query(Character)
         .filter(
             and_(
                 Character._guild_id == guild_id,
                 Character.active == True,
-                Character.level > update_guild.max_level,
+                Character.level > update_data.get("max_level", guild.max_level),
             )
         )
         .count()
         > 0
     ):
-        return abort(
-            Response(
-                f"There are current characters with a level exceeding {update_guild.max_level}",
-                400,
-            )
+        return (
+            jsonify(
+                {
+                    "error": f"There are currently active characters with a level exceeding {update_data.get('max_level', guild.max_level)}"
+                }
+            ),
+            400,
         )
+
+    # Max Character Validation
     elif (
         db.session.query(
             Character._player_id, func.count(Character._player_id).label("count")
         )
         .filter(and_(Character._guild_id == guild_id, Character.active == True))
         .group_by(Character._player_id)
-        .having(func.count(Character._player_id) > update_guild.max_characters)
+        .having(
+            func.count(Character._player_id)
+            > update_data.get("max_characters", guild.max_characters)
+        )
         .count()
         > 0
     ):
-        return abort(
-            Response(
-                f"There are currently players with more than {update_guild.max_characters} character(s).",
-                400,
-            )
+        return (
+            jsonify(
+                {
+                    "error": f"There are currently players with more than {update_data.get('max_characters', guild.max_characters)} character(s)."
+                }
+            ),
+            400,
         )
 
-    guild.weekly_announcement = update_guild.weekly_announcement
-    guild.ping_announcement = update_guild.ping_announcement
-    guild.max_level = update_guild.max_level
-    guild.handicap_cc = update_guild.handicap_cc
-    guild.max_characters = update_guild.max_characters
-    guild.div_limit = update_guild.div_limit
-    guild.reward_threshold = update_guild.reward_threshold
-
-    guild.entry_role = update_guild.entry_role
-    guild.member_role = update_guild.member_role
-    guild.admin_role = update_guild.admin_role
-    guild.staff_role = update_guild.staff_role
-    guild.bot_role = update_guild.bot_role
-    guild.quest_role = update_guild.quest_role
-
-    guild.tier_2_role = update_guild.tier_2_role
-    guild.tier_3_role = update_guild.tier_3_role
-    guild.tier_4_role = update_guild.tier_4_role
-    guild.tier_5_role = update_guild.tier_5_role
-    guild.tier_6_role = update_guild.tier_6_role
-
-    guild.application_channel = update_guild.application_channel
-    guild.market_channel = update_guild.market_channel
-    guild.announcement_channel = update_guild.announcement_channel
-    guild.staff_channel = update_guild.staff_channel
-    guild.help_channel = update_guild.help_channel
-    guild.arena_board_channel = update_guild.arena_board_channel
-    guild.exit_channel = update_guild.exit_channel
-    guild.entrance_channel = update_guild.entrance_channel
-    guild.activity_points_channel = update_guild.activity_points_channel
-    guild.rp_post_channel = update_guild.rp_post_channel
-    guild.dev_channels = update_guild.dev_channels
+    for key, value in update_data.items():
+        if hasattr(guild, key):
+            setattr(guild, key, value)
 
     db.session.commit()
     trigger_guild_reload(guild.id)
     return jsonify(200)
 
 
+# TODO: Stopped here
 @resolute_blueprint.route("/api/message", methods=["GET", "POST", "PATCH", "DELETE"])
 @resolute_blueprint.route(
     "/api/message/<guild_id>", methods=["GET", "POST", "PATCH", "DELETE"]

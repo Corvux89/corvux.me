@@ -1,8 +1,22 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
 import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordEntitlement, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
-const guild_url = `api/guild`
-const message_url = `api/message`
+export const apiUrls = {
+    guild: "api/guild",
+    message: "api/message",
+    channnel: "api/channels",
+    role: "api/roles",
+    log: "api/logs",
+    activity: "api/activities",
+    activityPoint: "api/activity_points",
+    player: "api/players",
+    codeConversion: "api/code_conversion",
+    levelCost: "api/level_costs",
+    financial: "api/financial",
+    store: "api/store",
+    entitlement: "api/entitlement"
+}
+
 const channel_url = `api/channels`
 const role_url = `api/roles`
 const log_url = `api/logs`
@@ -15,146 +29,65 @@ const financial_url = `api/financial`
 const store_url = `api/store`
 const enetitlement_url = `api/entitlements`
 
-
-export function getGuild(): Promise<ResoluteGuild>{
-    return fetch(guild_url)
-    .then(res => {
-        if (res.ok){
-            return res.json()
-        } else{
-            return res.json().then(err => ToastError(err.error))
-        }
-    })
-    .then(res => {
-        return res as ResoluteGuild
-    })
-}
-
-export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest()
-
-        request.open('PATCH', guild_url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                ToastSuccess("Updated!")
-                resolve(this.response.responseText)
-            } else {
-                ToastError(this.response)
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(guild))
-    })
-}
-
-export function getMessages(guild_id?: string, message_id?: string): Promise<RefMessage[] | RefMessage> {
-    if (message_id && guild_id){
-        return fetch(`${message_url}/${guild_id}/${message_id}`)
-            .then(res => {
-                if (res.ok){
-                    return res.json()
-                } else{
-                    return res.json().then(err => ToastError(err.error))
-                }
-            })
-            .then(res => {
-                return res as RefMessage
-            })
-    } else {
-        return fetch(message_url)
-            .then(res => {
-                if (res.ok){
-                    return res.json()
-                } else{
-                    return res.json().then(err => ToastError(err.error))
-                }
-            })
-            .then(res => {
-                return res as RefMessage[]
-            })
+export async function fetchData<T>(url: string): Promise<T> {
+    const res = await fetch(url)
+    if (res.ok){
+        return res.json()
+    } else{
+        const err = await res.json()
+        ToastError(err.error)
+        throw new Error(err.error)
     }
 }
 
+export async function sendData<T>(url: string, method: string, data: any): Promise<T> {
+    const res = await fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        ToastSuccess("Successfully updated!");
+        return res.json();
+    } else {
+        const err = await res.json();
+        ToastError(err.error);
+        throw new Error(err.error);
+    }
+}
+
+
+export function getGuild(): Promise<ResoluteGuild>{
+    return fetchData(apiUrls.guild)
+}
+
+export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
+    return sendData(apiUrls.guild, 'PATCH', guild)
+}
+
+export function getMessages(guild_id?: string, message_id?: string): Promise<RefMessage[] | RefMessage> {
+    let url = apiUrls.message
+
+    if (guild_id && message_id){
+        url = `${url}/${guild_id}/${message_id}`
+    }
+    
+    return fetchData(url)
+}
+
 export function newMessage(message: NewMessage): Promise<RefMessage>{
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest()
-
-        request.open('POST', message_url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                resolve(JSON.parse(this.responseText))
-            } else {
-                ToastError(this.response)
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(message))
-    })
+    return sendData(apiUrls.message, "POST", message)
 }
 
 export function updateMessage(message: RefMessage): Promise<RefMessage>{
-    return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest()
-
-        request.open('PATCH', message_url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                ToastSuccess("Message has been successfully updated!")
-                resolve(this.response.responseText)
-            } else {
-                ToastError(this.response)
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify(message))
-    })
+    return sendData(apiUrls.message, "PATCH", message)
 }
 
-export function deleteMessage(mesage_id: string): void{
-    new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest()
-
-        request.open('DELETE', message_url, true)
-        request.setRequestHeader('Content-Type', 'application/json')
-
-        request.onload = function () {
-            if (request.status == 200){
-                ToastSuccess(`Message successfully deleted!`)
-                resolve(this.response.responseText)
-            } else {
-                ToastError(this.response)
-                resolve(null)
-            }
-        }
-
-        request.onerror = function () {
-            reject(new Error("Something went wrong"))
-        }
-
-        request.send(JSON.stringify({"message_id": mesage_id}))
-    })
+export function deleteMessage(mesage_id: string): Promise<void>{
+   return sendData(apiUrls.message, "DELETE", { mesage_id })
 }
 
 export function getChannels(): Promise<DiscordChannel[]>{

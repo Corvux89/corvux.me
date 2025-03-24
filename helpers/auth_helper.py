@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app, redirect, request, url_for
+from flask import current_app, jsonify, redirect, request, url_for
 
 from constants import DISCORD_ADMINS
 from helpers.general_helpers import get_bot_guilds_from_cache
@@ -33,6 +33,16 @@ def is_admin(f=None):
 
     # Decorator functionality
     return decorator(f)
+
+
+def is_api_admin(f=None):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_admin():
+            return jsonify({"error": "Admin access is required"}), 403
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def login_requred(f=None):

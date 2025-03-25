@@ -9,8 +9,6 @@ export function playerName(obj) {
 // TODO: Finish flushing this out
 export class G0T0Bot {
     async fetch(url) {
-        const session = document.cookie;
-        console.log(session);
         const res = await fetch(url);
         if (res.ok) {
             return res.json();

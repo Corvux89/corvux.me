@@ -856,4 +856,6 @@ class AlchemyEncoder(json.JSONEncoder):
             return obj.isoformat()
         elif hasattr(obj, "to_dict"):
             return obj.to_dict()
+        elif hasattr(obj, "to_json"):
+            return obj.to_json()
         return json.JSONEncoder.default(self, obj)

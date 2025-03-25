@@ -7,7 +7,6 @@ const bot = new G0T0Bot()
 const memberID = $("#member-id").val().toString()
 const guild = await bot.get_guild()
 const playerData = await bot.get_player(guild.id, memberID)
-console.log(playerData)
 $('body').removeClass("busy")
 if (!playerData) {
     ToastError("Player not found")

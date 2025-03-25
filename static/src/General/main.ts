@@ -7,3 +7,4 @@ export function ToastSuccess(message: string): void{
     $("#confirm-toast .toast-body").html(message)
     $("#confirm-toast").toast("show")
 }
+

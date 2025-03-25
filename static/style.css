@@ -143,3 +143,7 @@ body:not(.busy) .loading-overlay {
     pointer-events: auto; 
 }
 
+#user-info-container {
+    display: flex;
+    align-items: center;
+}

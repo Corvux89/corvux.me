@@ -1,7 +1,9 @@
 from http.client import HTTPException
 import time
 from flask_discord import DiscordOAuth2Session
+from flask_discord.models import Guild
 from flask import current_app
+
 
 from constants import CACHE_TIMEOUT, DISCORD_CLIENT_ID, DISCORD_GUILD_ID, LIMIT
 
@@ -83,7 +85,7 @@ def get_bot_guilds_from_cache():
             "DISCORD_SESSION"
         )
         guilds = discord_session.bot_request(f"/users/@me/guilds")
-        BOT_CACHE["guilds"] = guilds
+        BOT_CACHE["guilds"] = [Guild(g) for g in guilds]
         BOT_CACHE["timestamp"] = current_time
 
     return BOT_CACHE["guilds"]

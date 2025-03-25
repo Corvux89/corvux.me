@@ -383,8 +383,6 @@ def get_logs(guild_id: int):
 
     logs: list[Log] = query.all()
 
-    if not logs:
-        raise NotFound("Logs not found")
     return jsonify(logs)
 
 
@@ -473,35 +471,51 @@ def sort_logs(guild_id: int):
     return jsonify(response)
 
 
-# TODO: Activities
-@resolute_blueprint.route("/api/activities", methods=["GET", "PATCH"])
+@resolute_blueprint.route("/api/activities", methods=["GET"])
 @is_api_admin
 def get_activites():
     db: SQLAlchemy = current_app.config.get("DB")
     activities: list[Activity] = (
         db.session.query(Activity).order_by(asc(Activity.id)).all()
     )
+    return jsonify(activities)
 
-    if request.method == "GET":
-        return jsonify(activities)
 
-    elif request.method == "PATCH":
-        try:
-            update_data = [Activity(**a) for a in request.get_json()]
+@resolute_blueprint.route("/api/activities", methods=["PATCH"])
+@is_api_admin
+def update_activities():
+    db: SQLAlchemy = current_app.config.get("DB")
+    activities: list[Activity] = (
+        db.session.query(Activity).order_by(asc(Activity.id)).all()
+    )
 
+    payload = request.get_json()
+
+    try:
+        update_data = [Activity(**a) for a in payload]
+    except:
+        raise BadRequest("Data is malformed/incorrect")
+
+    try:
+        for act in update_data:
             for act in update_data:
                 activity = next((a for a in activities if a.id == act.id), None)
+
+                if not activity:
+                    db.session.rollback()
+                    raise NotFound(f"Activity {act.id} not found.")
+
                 activity.cc = act.cc
                 activity.diversion = act.diversion
                 activity.points = act.points
 
-            db.session.commit()
-            trigger_compendium_reload()
+        db.session.commit()
+        trigger_compendium_reload()
 
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update activities"}), 500
+        return jsonify(200)
+    except:
+        db.session.rollback()
+        raise BadRequest()
 
 
 @resolute_blueprint.route("/api/activity_points", methods=["GET"])
@@ -542,7 +556,8 @@ def update_activity_points():
             activity = next((a for a in points if a.id == act.id), None)
 
             if not activity:
-                raise NotFound(f"Activity f{act.id} not found")
+                db.session.rollback()
+                raise NotFound(f"Activity Point {act.id} not found")
 
             activity.points = act.points
 
@@ -555,118 +570,164 @@ def update_activity_points():
         raise BadRequest()
 
 
-# TODO: CODE CONVERSION
-@resolute_blueprint.route("/api/code_conversion", methods=["GET", "PATCH"])
-@is_admin
+@resolute_blueprint.route("/api/code_conversion", methods=["GET"])
+@is_api_admin
 def get_code_conversion():
     db: SQLAlchemy = current_app.config.get("DB")
     points: list[CodeConversion] = (
         db.session.query(CodeConversion).order_by(asc(CodeConversion.id)).all()
     )
 
-    if request.method == "GET":
-        return jsonify(points)
-
-    elif request.method == "PATCH":
-        try:
-            update_data = [CodeConversion(**c) for c in request.get_json()]
-
-            for d in update_data:
-                conversion = next((c for c in points if c.id == d.id), None)
-                conversion.value = d.value
-
-            db.session.commit()
-            trigger_compendium_reload()
-
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update code conversions"}), 500
+    return jsonify(points)
 
 
-# TODO: Level Costs
-@resolute_blueprint.route("/api/level_costs", methods=["GET", "PATCH"])
-@is_admin
+@resolute_blueprint.route("/api/code_conversion", methods=["PATCH"])
+@is_api_admin
+def update_code_conversion():
+    db: SQLAlchemy = current_app.config.get("DB")
+    points: list[CodeConversion] = (
+        db.session.query(CodeConversion).order_by(asc(CodeConversion.id)).all()
+    )
+
+    payload = request.get_json()
+
+    try:
+        update_data = [CodeConversion(**c) for c in payload]
+    except:
+        raise BadRequest("Data is malformed/incorrect")
+
+    try:
+        for d in update_data:
+            conversion = next((c for c in points if c.id == d.id), None)
+
+            if not conversion:
+                db.session.rollback()
+                raise NotFound(f"Code Conversion {d.id} not found")
+
+            conversion.value = d.value
+        db.session.commit()
+        trigger_compendium_reload()
+
+        return jsonify(200)
+    except:
+        db.session.rollback()
+        raise BadRequest()
+
+
+@resolute_blueprint.route("/api/level_costs", methods=["GET"])
+@is_api_admin
 def get_level_costs():
     db: SQLAlchemy = current_app.config.get("DB")
     costs: list[LevelCost] = (
         db.session.query(LevelCost).order_by(asc(LevelCost.id)).all()
     )
-
-    if request.method == "GET":
-        return jsonify(costs)
-
-    elif request.method == "PATCH":
-        try:
-            update_data = [LevelCost(**c) for c in request.get_json()]
-
-            for d in update_data:
-                cost = next((c for c in costs if c.id == d.id), None)
-                cost.cc = d.cc
-
-            db.session.commit()
-            trigger_compendium_reload()
-
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update level costs"}), 500
+    return jsonify(costs)
 
 
-# TODO: Financial
-@resolute_blueprint.route("/api/financial", methods=["GET", "PATCH"])
-@is_admin
+@resolute_blueprint.route("/api/level_costs", methods=["PATCH"])
+@is_api_admin
+def update_level_costs():
+    db: SQLAlchemy = current_app.config.get("DB")
+    costs: list[LevelCost] = (
+        db.session.query(LevelCost).order_by(asc(LevelCost.id)).all()
+    )
+
+    payload = request.get_json()
+
+    try:
+        update_data = [LevelCost(**c) for c in payload]
+    except:
+        raise BadRequest("Data is malformed/incorrect")
+
+    try:
+        for d in update_data:
+            cost = next((c for c in costs if c.id == d.id), None)
+
+            if not cost:
+                db.session.rollback()
+                raise NotFound(f"Level for {d.id} not found")
+
+            cost.cc = d.cc
+
+        db.session.commit()
+        trigger_compendium_reload
+
+        return jsonify(200)
+    except:
+        db.session.rollback()
+        raise BadRequest()
+
+
+@resolute_blueprint.route("/api/financial", methods=["GET"])
+@is_api_admin
 def get_financial():
     db: SQLAlchemy = current_app.config.get("DB")
     fin: Financial = db.session.query(Financial).first()
+    return jsonify(fin)
 
-    if request.method == "GET":
-        return jsonify(fin)
 
-    elif request.method == "PATCH":
-        try:
-            update_data = Financial(**request.get_json())
+@resolute_blueprint.route("/api/financial", methods=["PATCH"])
+@is_api_admin
+def update_financial():
+    db: SQLAlchemy = current_app.config.get("DB")
+    fin: Financial = db.session.query(Financial).first()
 
-            fin.monthly_goal = update_data.monthly_goal
-            fin.monthly_total = update_data.monthly_total
-            fin.reserve = update_data.reserve
-            fin.month_count = update_data.month_count
+    if not fin:
+        raise NotFound("Financial record not found")
 
-            db.session.commit()
+    try:
+        update_data = request.get_json()
 
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update financials"}), 500
+        for key, value in update_data.items():
+            if hasattr(fin, key):
+                setattr(fin, key, value)
+
+        db.session.commit()
+        return jsonify(200)
+    except Exception as e:
+        db.session.rollback()
+        raise BadRequest(e.args[0])
 
 
 # TODO: Store
-@resolute_blueprint.route("/api/store", methods=["GET", "PATCH"])
-@is_admin
+@resolute_blueprint.route("/api/store", methods=["GET"])
+@is_api_admin
 def get_store():
     db: SQLAlchemy = current_app.config.get("DB")
     store: list[Store] = db.session.query(Store).order_by(asc(Store._sku)).all()
-
-    if request.method == "GET":
-        return jsonify(store)
-    elif request.method == "PATCH":
-        try:
-            update_data = [Store(**s) for s in request.get_json()]
-            for s in update_data:
-                if sku := next((x for x in store if x.sku == s.sku), None):
-                    sku.user_cost = s.user_cost
-
-            db.session.commit()
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update store"}), 500
+    return jsonify(store)
 
 
-# TODO: Entitlements
+@resolute_blueprint.route("/api/store", methods=["PATCH"])
+@is_api_admin
+def udpate_store():
+    db: SQLAlchemy = current_app.config.get("DB")
+    store: list[Store] = db.session.query(Store).order_by(asc(Store._sku)).all()
+    payload = request.get_json()
+
+    try:
+        update_data = [Store(**s) for s in payload]
+    except:
+        raise BadRequest("Data is malformed/incorrect")
+
+    try:
+        for s in update_data:
+            sku = next((k for k in store if k.sku == s.sku), None)
+            if not sku:
+                db.session.rollback()
+                raise NotFound(f"Sku {s.sku} not found")
+
+            sku.user_cost = s.user_cost
+
+        db.session.commit()
+        return jsonify(200)
+    except:
+        db.session.rollback()
+        raise BadRequest()
+
+
 @resolute_blueprint.route("/api/entitlements", methods=["GET"])
-@is_admin
+@is_api_admin
 def get_entitlements():
     entitlements = get_entitlements_from_cache()
-
     return jsonify([DiscordEntitlement(**e) for e in entitlements])

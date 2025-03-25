@@ -1,3 +1,6 @@
+import { ToastError } from "../General/main.js"
+import { fetchData } from "./api.js"
+
 export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 
 export interface ResoluteGuild {
@@ -211,4 +214,39 @@ export type NPCStats = Record<string, DailyStats>
 
 export type statistics = {
     npc: Record<string, NPCStats>
+}
+
+// TODO: Finish flushing this out
+export class G0T0Bot{
+    async fetch<T>(url: string): Promise<T>{               
+         const session = document.cookie
+        console.log(session)
+        const res = await fetch(url)
+        if (res.ok){
+            return res.json()
+        } else{
+            const err = await res.json()
+            ToastError(err.error)
+            throw new Error(err.error)
+        }
+    }
+
+    async get_guild(guild_id?: number): Promise<ResoluteGuild>{
+        let url = 'api/guild'
+
+        if (guild_id){
+            url = `${url}/${guild_id}`
+        }
+        
+
+        const guild = await this.fetch(url) as ResoluteGuild
+
+        return guild
+    }
+
+    async get_player(guild_id: string, player_id: string): Promise<Player>{
+        const player = await this.fetch(`api/players/${guild_id}/${player_id}`) as Player
+
+        return player
+    }
 }

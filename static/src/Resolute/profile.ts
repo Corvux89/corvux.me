@@ -1,13 +1,14 @@
 import { ToastError } from "../General/main.js";
-import { apiUrls, fetchData } from "./api.js";
-import { Character, Player, playerName, ResoluteGuild } from "./types.js";
+import { Character, G0T0Bot, playerName } from "./types.js";
 import { filterStats, initPlayerCharacterTable, initSayTable } from "./utils.js";
-
+// TODO: Cleanup 
 $('body').addClass("busy")
+const bot = new G0T0Bot()
 const memberID = $("#member-id").val().toString()
-const guild = await fetchData(apiUrls.guild) as ResoluteGuild
+const guild = await bot.get_guild()
+const playerData = await bot.get_player(guild.id, memberID)
+console.log(playerData)
 $('body').removeClass("busy")
-const playerData = await fetchData(`${apiUrls.player}/${guild.id}/${memberID}`) as Player
 if (!playerData) {
     ToastError("Player not found")
 }

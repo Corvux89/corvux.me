@@ -30,14 +30,17 @@ class BaseModel:
             try:
                 value = getattr(self, attr)
 
-                if inspect(value, raiseerr=False) is not None or isinstance(
+                if hasattr(value, "to_dict"):
+                    result[attr] = value.to_dict()
+
+                elif inspect(value, raiseerr=False) is not None or isinstance(
                     value, registry
                 ):
                     continue
+
                 elif isinstance(value, datetime.datetime):
                     result[attr] = value.isoformat()
-                elif hasattr(value, "to_dict"):
-                    result[attr] = value.to_dict()
+
                 else:
                     result[attr] = value
             except AttributeError:
@@ -177,8 +180,6 @@ class Activity(db.Model, BaseModel):
     cc: Mapped[int]
     diversion: Mapped[bool]
     points: Mapped[int]
-
-    logs = relationship("Log", back_populates="_activity_record")
 
     def __init__(self, **kwargs):
         self.id = kwargs.get("id")
@@ -623,20 +624,13 @@ class Character(db.Model, BaseModel):
     level: Mapped[int]
     active: Mapped[bool]
 
-    player = relationship(
-        "Player", back_populates="characters", foreign_keys=[_player_id]
-    )
-
     classes = relationship(
         "CharacterClass",
-        back_populates="character",
         lazy="select",
         primaryjoin="and_(Character.id == CharacterClass.character_id, CharacterClass.active == True)",
     )
 
-    _species_record = relationship(
-        "Species", backref="characters", foreign_keys=[_species], lazy="joined"
-    )
+    _species_record = relationship("Species", foreign_keys=[_species], lazy="joined")
 
     _faction_record = relationship("Faction")
 
@@ -671,19 +665,14 @@ class CharacterClass(db.Model, BaseModel):
     )
     active: Mapped[bool]
 
-    character = relationship(
-        "Character", back_populates="classes", foreign_keys=[character_id]
-    )
-
     _primary_class_record = relationship(
         "PrimaryClass",
-        backref="character_class",
         foreign_keys=[_primary_class],
         lazy="joined",
     )
 
     _archetype_record = relationship(
-        "Archetype", backref="character_class", foreign_keys=[_archetype], lazy="joined"
+        "Archetype", foreign_keys=[_archetype], lazy="joined"
     )
 
     @property
@@ -708,7 +697,6 @@ class Player(db.Model, BaseModel, MemberAttributeMixin):
 
     characters = relationship(
         "Character",
-        back_populates="player",
         lazy="select",
         primaryjoin="and_(Player._id == Character._player_id, Player._guild_id == Character._guild_id, Character.active == True)",
     )
@@ -749,7 +737,7 @@ class Player(db.Model, BaseModel, MemberAttributeMixin):
         self.statistics = json.dumps(value)
 
 
-class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
+class Log(db.Model, BaseModel, IntAttributeMixin, MemberAttributeMixin):
     __tablename__ = "log"
     id: Mapped[int] = mapped_column(primary_key=True)
     _activity: Mapped[int] = mapped_column(
@@ -771,7 +759,7 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
     invalid: Mapped[bool]
     created_ts: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
-    _activity_record = relationship(Activity, back_populates="logs")
+    _activity_record = relationship("Activity")
     _faction_record = relationship("Faction")
     _character_record = relationship("Character")
 
@@ -820,7 +808,7 @@ class Log(db.Model, IntAttributeMixin, MemberAttributeMixin):
 
     @property
     def author(self):
-        return self.get_member_attribute(self.author)
+        return self.get_member_attribute(str(self._author))
 
     @property
     def character(self):

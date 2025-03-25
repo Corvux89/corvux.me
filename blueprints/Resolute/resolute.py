@@ -29,6 +29,7 @@ from helpers.resolute_helpers import (
     trigger_compendium_reload,
     trigger_guild_reload,
 )
+from models.exceptions import BadRequest, NotFound
 from models.resolute import (
     Activity,
     ActivityPoints,
@@ -49,6 +50,8 @@ from models.resolute import (
     Store,
 )
 from sqlalchemy.orm import joinedload
+
+# TODO: Cleanup API Funcitons
 
 
 resolute_blueprint = Blueprint("resolute", __name__)
@@ -92,22 +95,20 @@ def privacy():
     return render_template("Resolute/privacy.html")
 
 
-@resolute_blueprint.route("/api/guild", methods=["GET"])
 @resolute_blueprint.route("/api/guild/<guild_id>", methods=["GET"])
-def get_guild(guild_id: int = DISCORD_GUILD_ID):
+def get_guild(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     guild: ResoluteGuild = (
         db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
     )
     if not guild:
-        return jsonify({"error": "Guild not found"}), 404
+        raise NotFound("Guild not found")
     return jsonify(guild)
 
 
-@resolute_blueprint.route("/api/guild", methods=["PATCH"])
 @resolute_blueprint.route("/api/guild/<guild_id>", methods=["PATCH"])
 @is_api_admin
-def update_guild(guild_id: int = DISCORD_GUILD_ID):
+def update_guild(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     guild: ResoluteGuild = (
         db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
@@ -116,7 +117,7 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
 
     # Validation
     if not guild:
-        return jsonify({"error": "Guild not found"}), 404
+        raise NotFound("Guild not found")
 
     # Max Level validation
     elif (
@@ -131,13 +132,8 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
         .count()
         > 0
     ):
-        return (
-            jsonify(
-                {
-                    "error": f"There are currently active characters with a level exceeding {update_data.get('max_level', guild.max_level)}"
-                }
-            ),
-            400,
+        raise BadRequest(
+            f"There are currently active characters with a level exceeding {update_data.get('max_level', guild.max_level)}"
         )
 
     # Max Character Validation
@@ -154,13 +150,8 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
         .count()
         > 0
     ):
-        return (
-            jsonify(
-                {
-                    "error": f"There are currently players with more than {update_data.get('max_characters', guild.max_characters)} character(s)."
-                }
-            ),
-            400,
+        raise BadRequest(
+            f"There are currently players with more than {update_data.get('max_characters', guild.max_characters)} character(s)."
         )
 
     for key, value in update_data.items():
@@ -172,150 +163,181 @@ def update_guild(guild_id: int = DISCORD_GUILD_ID):
     return jsonify(200)
 
 
-# TODO: Stopped here
-@resolute_blueprint.route("/api/message", methods=["GET", "POST", "PATCH", "DELETE"])
-@resolute_blueprint.route(
-    "/api/message/<guild_id>", methods=["GET", "POST", "PATCH", "DELETE"]
-)
+@resolute_blueprint.route("/api/message/<guild_id>", methods=["GET"])
 @resolute_blueprint.route("/api/message/<guild_id>/<message_id>", methods=["GET"])
-@is_admin
-def ref_messages(guild_id: int = DISCORD_GUILD_ID, message_id: int = None):
+@is_api_admin
+def ref_messages(guild_id: int, message_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
-
-    if request.method == "GET":
-        if message_id:
-            message: RefMessage = db.get_or_404(RefMessage, message_id)
-            msg = bot_request_with_retry(
-                f"/channels/{message.channel_id}/messages/{message.message_id}"
-            )
-
-            if "id" not in msg:
-                db.session.delete(message)
-                db.session.commit()
-            else:
-                channels = get_channels_from_cache(guild_id)
-                channel = next(
-                    (c for c in channels if c["id"] == message.channel_id), None
-                )
-                m = BotMessage(
-                    str(message.message_id),
-                    str(message.channel_id),
-                    channel["name"],
-                    message.title,
-                    msg["content"],
-                    pin=msg["pinned"],
-                    error=(
-                        f"{msg['message']} - Need to ensure the bot has 'Read Message History' access to #{channel.name}"
-                        if "message" in msg
-                        else ""
-                    ),
-                )
-
-                return jsonify(m.__dict__)
-
-        else:
-            messages: list[RefMessage] = (
-                db.session.query(RefMessage)
-                .filter(RefMessage._guild_id == guild_id)
-                .all()
-            )
-            return jsonify(messages)
-
-    elif request.method == "POST":
-        payload = request.get_json()
-
-        msg = discord_session.bot_request(
-            f"/channels/{payload['channel_id']}/messages",
-            "POST",
-            json={"content": payload["message"]},
+    if message_id:
+        message: RefMessage = (
+            db.session.query(RefMessage)
+            .filter(RefMessage._message_id == message_id)
+            .first()
         )
 
-        if "id" in msg:
-            if payload["pin"]:
-                discord_session.bot_request(
-                    f"/channels/{payload['channel_id']}/pins/{msg['id']}", "PUT"
-                )
+        if not message:
+            raise NotFound("Message not found")
 
-            message = RefMessage(
-                guild_id=guild_id,
-                message_id=msg["id"],
-                channel_id=payload["channel_id"],
-                title=payload["title"],
-            )
+        msg = bot_request_with_retry(
+            f"/channels/{message.channel_id}/messages/{message.message_id}"
+        )
 
-            db.session.add(message)
+        if "id" not in msg:
+            db.session.delete(message)
             db.session.commit()
-
-            data = BotMessage(
+            raise NotFound("Discord message not found")
+        else:
+            channels = get_channels_from_cache(guild_id)
+            channel = next((c for c in channels if c["id"] == message.channel_id), None)
+            m = BotMessage(
                 str(message.message_id),
                 str(message.channel_id),
-                payload["channel_name"],
+                channel["name"],
                 message.title,
-                payload["message"],
-                pin=payload["pin"],
+                msg["content"],
+                pin=msg["pinned"],
+                error=(
+                    f"{msg['message']} - Need to ensure the bot has 'Read Message History' access to #{channel.name}"
+                    if "message" in msg
+                    else ""
+                ),
             )
 
-            return jsonify(vars(data))
-        else:
-            return abort(404)
+            return jsonify(m)
+    else:
+        messages: list[RefMessage] = (
+            db.session.query(RefMessage).filter(RefMessage._guild_id == guild_id).all()
+        )
+        return jsonify(messages)
 
-    elif request.method == "PATCH":
-        update_message = request.get_json()
-        message: RefMessage = db.get_or_404(RefMessage, update_message["message_id"])
 
+@resolute_blueprint.route("/api/message/<guild_id>", methods=["POST"])
+@is_api_admin
+def create_ref_message(guild_id: int):
+    db: SQLAlchemy = current_app.config.get("DB")
+    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
+    payload = request.get_json()
+
+    msg = discord_session.bot_request(
+        f"/channels/{payload['channel_id']}/messages",
+        "POST",
+        json={"content": payload["message"]},
+    )
+
+    if "pin" in payload and payload["pin"]:
+        discord_session.bot_request(
+            f"/channels/{payload['channel_id']}/pins/{msg['id']}", "PUT"
+        )
+
+    message = RefMessage(
+        guild_id=guild_id,
+        message_id=msg["id"],
+        channel_id=payload["channel_id"],
+        title=payload["title"],
+    )
+
+    db.session.add(message)
+    db.session.commit()
+
+    data = BotMessage(
+        str(message.message_id),
+        str(message.channel_id),
+        payload["channel_name"],
+        message.title,
+        payload["message"],
+        pin=payload["pin"],
+    )
+
+    return jsonify(data)
+
+
+@resolute_blueprint.route("/api/message/<message_id>", methods=["PATCH"])
+@is_api_admin
+def update_message(message_id: int = None):
+    db: SQLAlchemy = current_app.config.get("DB")
+    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
+    payload = request.get_json()
+
+    message: RefMessage = (
+        db.session.query(RefMessage)
+        .filter(RefMessage._message_id == message_id)
+        .first()
+    )
+
+    if not message:
+        raise NotFound("Message not found")
+
+    try:
         msg = discord_session.bot_request(
             f"/channels/{message.channel_id}/messages/{message.message_id}",
             "PATCH",
-            json={"content": update_message["content"]},
+            json={"content": payload["content"]},
         )
 
-        if update_message["pin"] != bool(msg.get("pinned", False)):
-            action = "PUT" if update_message["pin"] else "DELETE"
-            discord_session.bot_request(
-                f"/channels/{update_message['channel_id']}/pins/{update_message['message_id']}",
-                action,
-            )
+        message.title = payload["title"]
+    except AttributeError:
+        raise BadRequest()
 
-        message.title = update_message["title"]
-        db.session.commit()
-
-        return jsonify(200)
-
-    elif request.method == "DELETE":
-        payload = request.get_json()
-
-        message: RefMessage = db.get_or_404(RefMessage, payload["message_id"])
+    if "pin" in payload and payload["pin"] != bool(msg.get("pinned", False)):
+        action = "PUT" if payload["pin"] else "DELETE"
 
         discord_session.bot_request(
-            f"/channels/{message.channel_id}/messages/{message.message_id}", "DELETE"
+            f"/channels/{message.channel_id}/pins/{message.message_id}",
+            action,
         )
-        db.session.delete(message)
-        db.session.commit()
 
-        return jsonify(200)
-
-    return abort(404)
+    db.session.commit()
+    return jsonify(200)
 
 
-@resolute_blueprint.route("/api/channels", methods=["GET"])
+@resolute_blueprint.route("/api/message/<message_id>", methods=["DELETE"])
+@is_api_admin
+def delete_message(message_id: int):
+    db: SQLAlchemy = current_app.config.get("DB")
+    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
+
+    message: RefMessage = (
+        db.session.query(RefMessage)
+        .filter(RefMessage._message_id == message_id)
+        .first()
+    )
+
+    if not message:
+        raise NotFound("Message not found")
+
+    discord_session.bot_request(
+        f"/channels/{message.channel_id}/messages/{message.message_id}", "DELETE"
+    )
+    db.session.delete(message)
+    db.session.commit()
+    return jsonify(200)
+
+
 @resolute_blueprint.route("/api/channels/<guild_id>", methods=["GET"])
-def get_channels(guild_id: int = DISCORD_GUILD_ID):
+def get_channels(guild_id: int):
     channels = get_channels_from_cache(guild_id)
-    return jsonify([DiscordChannel(**c) for c in channels])
+    try:
+        channels = [DiscordChannel(**c) for c in channels]
+    except:
+        raise BadRequest()
+
+    return jsonify(channels)
 
 
-@resolute_blueprint.route("/api/roles", methods=["GET"])
 @resolute_blueprint.route("/api/roles/<guild_id>", methods=["GET"])
-def get_roles(guild_id: int = DISCORD_GUILD_ID):
-    roles = get_roles_from_cache()
-    return jsonify([DiscordRole(**r) for r in roles])
+def get_roles(guild_id: int):
+    roles = get_roles_from_cache(guild_id)
+    try:
+        roles = [DiscordRole(**r) for r in roles]
+    except:
+        raise BadRequest()
+
+    return jsonify(roles)
 
 
-@resolute_blueprint.route("/api/players/", methods=["GET"])
 @resolute_blueprint.route("/api/players/<guild_id>", methods=["GET"])
 @resolute_blueprint.route("/api/players/<guild_id>/<player_id>", methods=["GET"])
-def get_players(guild_id: int = DISCORD_GUILD_ID, player_id: int = None):
+def get_players(guild_id: int, player_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
     if player_id:
         players: Player = (
@@ -332,13 +354,43 @@ def get_players(guild_id: int = DISCORD_GUILD_ID, player_id: int = None):
             .all()
         )
 
+    if not players:
+        raise NotFound("Players not found")
+
     return jsonify(players)
 
 
-@resolute_blueprint.route("/api/logs", methods=["GET", "POST"])
-@resolute_blueprint.route("/api/logs/<guild_id>", methods=["GET", "POST"])
-@is_admin
-def get_logs(guild_id: int = DISCORD_GUILD_ID):
+@resolute_blueprint.route("/api/logs/<guild_id>", methods=["GET"])
+@is_api_admin
+def get_logs(guild_id: int):
+    db: SQLAlchemy = current_app.config.get("DB")
+    limit = request.args.get("limit", default=None, type=int)
+    query = (
+        db.session.query(Log)
+        .filter(Log._guild_id == guild_id)
+        .join(Activity)
+        .outerjoin(Faction)
+        .outerjoin(Character)
+        .options(
+            joinedload(Log._activity_record),
+            joinedload(Log._faction_record),
+            joinedload(Log._character_record),
+        )
+    )
+
+    if limit:
+        query = query.limit(limit)
+
+    logs: list[Log] = query.all()
+
+    if not logs:
+        raise NotFound("Logs not found")
+    return jsonify(logs)
+
+
+@resolute_blueprint.route("/api/logs/<guild_id>", methods=["POST"])
+@is_api_admin
+def sort_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     query = (
         db.session.query(Log)
@@ -353,85 +405,77 @@ def get_logs(guild_id: int = DISCORD_GUILD_ID):
         )
     )
 
-    if request.method == "POST":
-        draw = int(request.json.get("draw", 1))
-        start = int(request.json.get("start", 0))
-        length = int(request.json.get("length", 10))
-        order = request.json.get("order", [])
-        search_value = request.json.get("search", {}).get("value", "")
-        column_index = int(order[0].get("column", 0)) if len(order) > 0 else 0
-        column_dir = order[0].get("dir", "asc") if len(order) > 0 else "desc"
+    draw = int(request.json.get("draw", 1))
+    start = int(request.json.get("start", 0))
+    length = int(request.json.get("length", 10))
+    order = request.json.get("order", [])
+    search_value = request.json.get("search", {}).get("value", "")
+    column_index = int(order[0].get("column", 0)) if len(order) > 0 else 0
+    column_dir = order[0].get("dir", "asc") if len(order) > 0 else "desc"
 
-        recordsTotal = query.count()
+    recordsTotal = query.count()
 
-        if search_value:
-            query = query.filter(or_(*log_search_filter(search_value, guild_id)))
+    if search_value:
+        query = query.filter(or_(*log_search_filter(search_value, guild_id)))
 
-        # Query Sorting
-        columns = [
-            Log.id,
-            Log.created_ts,
-            None,
-            None,
-            Character.name,
-            Activity.value,
-            Log.notes,
-            Log.invalid,
-        ]
-        column = columns[column_index]
-        if column:
-            query = (
-                query.order_by(desc(column))
-                if column_dir == "desc"
-                else query.order_by(asc(column))
-            )
+    # Query Sorting
+    columns = [
+        Log.id,
+        Log.created_ts,
+        None,
+        None,
+        Character.name,
+        Activity.value,
+        Log.notes,
+        Log.invalid,
+    ]
+    column = columns[column_index]
+    if column:
+        query = (
+            query.order_by(desc(column))
+            if column_dir == "desc"
+            else query.order_by(asc(column))
+        )
 
-        # Finish out the query
-        filtered_records = query.count()
-        logs = query.all()
+    # Finish out the query
+    filtered_records = query.count()
+    logs = query.all()
 
-        # Post query sorting because they're discord attributes
-        if column_index == 2:  # Author
-            logs = sorted(
-                logs,
-                key=lambda log: (
-                    DiscordMember(**log.author).member_display_name
-                    if log.author
-                    else "zzz"
-                ),
-                reverse=(column_dir == "desc"),
-            )
+    # Post query sorting because they're discord attributes
+    if column_index == 2:  # Author
+        logs = sorted(
+            logs,
+            key=lambda log: (
+                DiscordMember(**log.author).member_display_name if log.author else "zzz"
+            ),
+            reverse=(column_dir == "desc"),
+        )
 
-        elif column_index == 3:  # Player
-            logs = sorted(
-                logs,
-                key=lambda log: (
-                    DiscordMember(**log.member).member_display_name
-                    if log.member
-                    else "zzz"
-                ),
-                reverse=(column_dir == "desc"),
-            )
+    elif column_index == 3:  # Player
+        logs = sorted(
+            logs,
+            key=lambda log: (
+                DiscordMember(**log.member).member_display_name if log.member else "zzz"
+            ),
+            reverse=(column_dir == "desc"),
+        )
 
-        # Limit
-        logs = logs[start : start + length]
+    # Limit
+    logs = logs[start : start + length]
 
-        response = {
-            "draw": draw,
-            "recordsTotal": recordsTotal,
-            "recordsFiltered": filtered_records,
-            "data": logs,
-        }
+    response = {
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": filtered_records,
+        "data": logs,
+    }
 
-        return jsonify(response)
-
-    logs: list[Log] = query.all()
-
-    return jsonify(logs)
+    return jsonify(response)
 
 
+# TODO: Activities
 @resolute_blueprint.route("/api/activities", methods=["GET", "PATCH"])
-@is_admin
+@is_api_admin
 def get_activites():
     db: SQLAlchemy = current_app.config.get("DB")
     activities: list[Activity] = (
@@ -460,34 +504,58 @@ def get_activites():
             return jsonify({"error": "Failed to update activities"}), 500
 
 
-@resolute_blueprint.route("/api/activity_points", methods=["GET", "PATCH"])
-@is_admin
+@resolute_blueprint.route("/api/activity_points", methods=["GET"])
+@is_api_admin
 def get_activity_points():
     db: SQLAlchemy = current_app.config.get("DB")
     points: list[ActivityPoints] = (
         db.session.query(ActivityPoints).order_by(asc(ActivityPoints.id)).all()
     )
 
-    if request.method == "GET":
-        return jsonify(points)
+    if not points:
+        raise NotFound("Activity Points Not Found")
 
-    elif request.method == "PATCH":
-        try:
-            update_data = [ActivityPoints(**a) for a in request.get_json()]
-
-            for act in update_data:
-                activity = next((a for a in points if a.id == act.id), None)
-                activity.points = act.points
-
-            db.session.commit()
-            trigger_compendium_reload()
-
-            return jsonify(200)
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": "Failed to update activity points"}), 500
+    return jsonify(points)
 
 
+@resolute_blueprint.route("/api/activity_points", methods=["PATCH"])
+@is_api_admin
+def update_activity_points():
+    db: SQLAlchemy = current_app.config.get("DB")
+
+    points: list[ActivityPoints] = (
+        db.session.query(ActivityPoints).order_by(asc(ActivityPoints.id)).all()
+    )
+
+    if not points:
+        raise NotFound("Activity Points Not Found")
+
+    payload = request.get_json()
+
+    try:
+        update_data = [ActivityPoints(**a) for a in payload]
+    except:
+        raise BadRequest("Data is malformed/incorrect")
+
+    try:
+        for act in update_data:
+            activity = next((a for a in points if a.id == act.id), None)
+
+            if not activity:
+                raise NotFound(f"Activity f{act.id} not found")
+
+            activity.points = act.points
+
+        db.session.commit()
+        trigger_compendium_reload()
+
+        return jsonify(200)
+    except:
+        db.session.rollback()
+        raise BadRequest()
+
+
+# TODO: CODE CONVERSION
 @resolute_blueprint.route("/api/code_conversion", methods=["GET", "PATCH"])
 @is_admin
 def get_code_conversion():
@@ -516,6 +584,7 @@ def get_code_conversion():
             return jsonify({"error": "Failed to update code conversions"}), 500
 
 
+# TODO: Level Costs
 @resolute_blueprint.route("/api/level_costs", methods=["GET", "PATCH"])
 @is_admin
 def get_level_costs():
@@ -544,6 +613,7 @@ def get_level_costs():
             return jsonify({"error": "Failed to update level costs"}), 500
 
 
+# TODO: Financial
 @resolute_blueprint.route("/api/financial", methods=["GET", "PATCH"])
 @is_admin
 def get_financial():
@@ -570,6 +640,7 @@ def get_financial():
             return jsonify({"error": "Failed to update financials"}), 500
 
 
+# TODO: Store
 @resolute_blueprint.route("/api/store", methods=["GET", "PATCH"])
 @is_admin
 def get_store():
@@ -592,6 +663,7 @@ def get_store():
             return jsonify({"error": "Failed to update store"}), 500
 
 
+# TODO: Entitlements
 @resolute_blueprint.route("/api/entitlements", methods=["GET"])
 @is_admin
 def get_entitlements():

@@ -1,6 +1,8 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
 import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordEntitlement, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
 
+// TODO: Deprecate this
+
 export const apiUrls = {
     guild: "api/guild",
     message: "api/message",
@@ -30,6 +32,8 @@ const store_url = `api/store`
 const enetitlement_url = `api/entitlements`
 
 export async function fetchData<T>(url: string): Promise<T> {
+    const session = document.cookie
+    console.log(session)
     const res = await fetch(url)
     if (res.ok){
         return res.json()

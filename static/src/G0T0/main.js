@@ -1,13 +1,58 @@
+import { ToastError } from '../General/main.js';
 import { initAnnouncementTable, initMessageTable } from './utils.js';
 $('body').addClass("busy");
 let guild = await bot.get_guild(userSession.guild.id);
 buildAnnouncementTable(guild);
+// Announcements
+async function buildAnnouncementTable(guild) {
+    $("body").removeClass("busy");
+    $("#announcement-table-body").html('');
+    $("#announcement-ping").prop("checked", guild.ping_announcement);
+    initAnnouncementTable(guild.weekly_announcement);
+}
 $("#announcement-ping").on("change", async function () {
     await bot.get_guild(userSession.guild.id)
         .then(guild => {
         guild.ping_announcement = $(this).prop("checked");
         bot.update_guild(guild);
     });
+});
+$("#announcement-new-button").on('click', function () {
+    $("#announcement-modal-edit-form").data('id', "new");
+    $(".modal-body #announcement-title").val("");
+    $(".modal-body #announcement-body").val("");
+});
+$(document).on('click', '#announcement-submit-button', function () {
+    var title = $("#announcement-title").val();
+    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : "";
+    var index = $("#announcement-modal-edit-form").data("id");
+    var announcement = title != "" ? `${title}|${body}` : body;
+    if (announcement != "") {
+        bot.get_guild(userSession.guild.id)
+            .then(guild => {
+            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString();
+            bot.update_guild(guild)
+                .then(function () {
+                buildAnnouncementTable(guild);
+            });
+        });
+    }
+});
+$(document).on("click", "#announcement-table tbody tr", function () {
+    const table = $("#announcement-table").DataTable();
+    const row = table.row(this);
+    const modal = $("#announcement-modal-edit-form");
+    const announcement = row.data();
+    if (announcement == undefined) {
+        return;
+    }
+    const parts = announcement.split("|");
+    const title = parts.length > 1 ? parts[0] : "";
+    const body = parts.length > 1 ? parts[1] : parts[0];
+    $(".modal-body #announcement-title").val(title);
+    $(".modal-body #announcement-body").val(body);
+    modal.data("id", row.index())
+        .modal("show");
 });
 $(document).on('click', '.announcement-delete', function (e) {
     e.stopPropagation();
@@ -20,13 +65,72 @@ $(document).on('click', '.announcement-delete', function (e) {
         });
     });
 });
-$(document).on('click', '.message-delete', function (e) {
-    e.stopPropagation();
-    const message_id = $(this).data('id');
-    console.log(message_id);
-    // TODO: This is not working
-    $("#message-modal-delete-form").data('id', message_id)
+// Messages/Posts
+async function buildMessageTab() {
+    const messages = await bot.get_messages(userSession.guild.id);
+    console.log("REBUILDING MESSAGES");
+    console.log(messages);
+    $("body").removeClass("busy");
+    initMessageTable(messages);
+}
+$("#bot-messages-button").on('click', function () {
+    $('body').addClass("busy");
+    buildMessageTab();
+});
+$("#message-new-button").on('click', async function () {
+    $('body').addClass("busy");
+    const channels = await bot.get_channels(userSession.guild.id);
+    channels.sort((a, b) => a.name.localeCompare(b.name));
+    $('body').removeClass("busy");
+    $(".modal-body #message-title").val("");
+    $(".modal-body #message-pin").prop('checked', false);
+    $(".modal-body #message-body").val("");
+    $(".modal-body #message-channel")
+        .html('')
+        .prop("disabled", false);
+    channels.forEach(c => {
+        $(".modal-body #message-channel").append(`<option value="${c.id}">${c.name}</option>`);
+    });
+    $("#message-modal-edit-form")
+        .data('id', "new")
         .modal("show");
+});
+$('#message-save-button').on('click', function (e) {
+    if ($('#message-title').val() == '' || $('#message-body').val() == '') {
+        ToastError("Please fill out a title and a body");
+        return;
+    }
+    const modal = $("#message-modal-edit-form");
+    const message_id = $(modal).data('id');
+    if (message_id == 'new') {
+        var NewMessage = {};
+        NewMessage.channel_id = $('#message-channel').find(':selected').val().toString();
+        NewMessage.channel_name = $('#message-channel').find(':selected').text();
+        NewMessage.message = $("#message-body").val().toString();
+        NewMessage.pin = $("#message-pin").prop('checked');
+        NewMessage.title = $("#message-title").val().toString();
+        $('body').addClass("busy");
+        bot.new_message(userSession.guild.id, NewMessage)
+            .then(function () {
+            buildMessageTab();
+        });
+    }
+    else {
+        var UpdateMessage = {
+            "message_id": message_id,
+            "channel_id": $('#message-channel').find(':selected').val().toString(),
+            "channel_name": $('#message-channel').find(':selected').text(),
+            "content": $("#message-body").val().toString(),
+            "pin": $("#message-pin").prop('checked'),
+            "title": $("#message-title").val().toString()
+        };
+        $('body').addClass("busy");
+        bot.update_message(UpdateMessage)
+            .then(function () {
+            buildMessageTab();
+        });
+    }
+    modal.modal("hide");
 });
 $(document).on('click', '#message-table tbody tr', async function (e) {
     const table = $("#message-table").DataTable();
@@ -45,21 +149,19 @@ $(document).on('click', '#message-table tbody tr', async function (e) {
     modal.data("id", message.message_id)
         .modal("show");
 });
-$(document).on("click", "#announcement-table tbody tr", function () {
-    const table = $("#announcement-table").DataTable();
-    const row = table.row(this);
-    const modal = $("#announcement-modal-edit-form");
-    const announcement = row.data();
-    if (announcement == undefined) {
-        return;
-    }
-    const parts = announcement.split("|");
-    const title = parts.length > 1 ? parts[0] : "";
-    const body = parts.length > 1 ? parts[1] : parts[0];
-    $(".modal-body #announcement-title").val(title);
-    $(".modal-body #announcement-body").val(body);
-    modal.data("id", row.index())
-        .modal("show");
+$(document).on('click', '.message-delete', function (e) {
+    e.stopPropagation();
+    const message_id = $(this).data('id');
+    $("#message-delete-button").data("id", message_id);
+    $("#message-modal-delete-form").modal("show");
+});
+$("#message-delete-button").on('click', async function () {
+    const message_id = $(this).data('id');
+    $('body').addClass("busy");
+    bot.delete_message(message_id)
+        .then(function () {
+        buildMessageTab();
+    });
 });
 // $(document).on("click", "#log-table tbody tr", function(){
 //     const table = $("#log-table").DataTable() 
@@ -129,11 +231,6 @@ $(document).on("click", "#announcement-table tbody tr", function () {
 //     $("#member-overview-button").tab("show")
 //     $("#command-stats-button").tab("show")
 // })
-// $(document).on('click', '.message-delete', function(e) {
-//     e.stopPropagation()
-//     var message_id = $(this).data('id')
-//     $("#message-delete-button").data("id", message_id)
-// })
 // $("#announcement-tab-button").on('click', function() {
 //     $('body').addClass("busy")
 //     buildAnnouncementTable()
@@ -142,10 +239,6 @@ $(document).on("click", "#announcement-table tbody tr", function () {
 //     $('body').addClass("busy")
 //     buildPricingTab()
 // })
-$("#bot-messages-button").on('click', function () {
-    $('body').addClass("busy");
-    buildMessageTab();
-});
 // $("#activity-settings-button").on('click', function(){
 //     $('body').addClass("busy")
 //     $("#activity-button").tab("show")
@@ -160,57 +253,6 @@ $("#bot-messages-button").on('click', function () {
 //     $('body').addClass("busy")
 //     buildLogTable()
 // })
-$("#message-delete-button").on('click', function () {
-    var message_id = $(this).data('id');
-    console.log(`In the click event ${message_id}`);
-    $('body').addClass("busy");
-    bot.delete_message(message_id);
-    buildMessageTab();
-});
-$("#announcement-new-button").on('click', function () {
-    $("#announcement-modal-edit-form").data('id', "new");
-    $(".modal-body #announcement-title").val("");
-    $(".modal-body #announcement-body").val("");
-});
-// $("#message-new-button").on('click', async function(){
-//     $('body').addClass("busy")
-//     const channels = await getChannels()
-//     channels.sort((a, b) => a.name.localeCompare(b.name))
-//     $('body').removeClass("busy")
-//     $(".modal-body #message-title").val("")
-//     $(".modal-body #message-pin").prop('checked', false)
-//     $(".modal-body #message-body").val("")
-//     $(".modal-body #message-channel")
-//         .html('')
-//         .prop("disabled", false)
-//     channels.forEach(c => {
-//         $(".modal-body #message-channel").append(
-//             `<option value="${c.id}">${c.name}</option>`
-//         )
-//     })
-//     $("#message-modal-edit-form")
-//         .data('id', "new")
-//         .modal("show")
-// })
-$(document).on('click', '#announcement-submit-button', function () {
-    var title = $("#announcement-title").val();
-    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : "";
-    var index = $("#announcement-modal-edit-form").data("id");
-    var announcement = title != "" ? `${title}|${body}` : body;
-    console.log(announcement);
-    console.log(index);
-    if (announcement != "") {
-        bot.get_guild(userSession.guild.id)
-            .then(guild => {
-            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString();
-            console.log(guild);
-            bot.update_guild(guild)
-                .then(function () {
-                buildAnnouncementTable(guild);
-            });
-        });
-    }
-});
 // $(document).on('input', '.point-input', function(){
 //     const currentInput = $(this)
 //     const currentValue = parseFloat(currentInput.val())
@@ -226,38 +268,6 @@ $(document).on('click', '#announcement-submit-button', function () {
 //             currentInput.removeClass("is-invalid")
 //         }
 //     }
-// })
-// $('#message-save-button').on('click', function(e){
-//     if ($('#message-title').val() == '' || $('#message-body').val() == ''){
-//         ToastError("Please fill out a title and a body")
-//         return
-//     }
-//     const modal = $("#message-modal-edit-form")
-//     const message_id = $(modal).data('id')
-//     if (message_id == 'new'){
-//         var NewMessage = {} as NewMessage
-//         NewMessage.channel_id = $('#message-channel').find(':selected').val().toString()
-//         NewMessage.channel_name = $('#message-channel').find(':selected').text()
-//         NewMessage.message = $("#message-body").val().toString()
-//         NewMessage.pin = $("#message-pin").prop('checked')
-//         NewMessage.title = $("#message-title").val().toString()
-//         $('body').addClass("busy")
-//         newMessage(NewMessage)
-//         .then(()=> buildMessageTab())
-//     } else {
-//         var UpdateMessage = {
-//             "message_id": message_id,
-//             "channel_id": $('#message-channel').find(':selected').val().toString(),
-//             "channel_name": $('#message-channel').find(':selected').text(),
-//             "content": $("#message-body").val().toString(),
-//             "pin": $("#message-pin").prop('checked'),
-//             "title": $("#message-title").val().toString() 
-//         } as RefMessage
-//         $('body').addClass("busy")
-//         updateMessage(UpdateMessage)
-//         .then(() => buildMessageTab())
-//     }
-//     modal.modal("hide")
 // })
 // $('#guild-settings-button').on('click', async function() {
 //     $('body').addClass("busy")
@@ -412,12 +422,6 @@ $(document).on('click', '#announcement-submit-button', function () {
 //         updateActivityPoints(activities)
 //     })
 // })
-async function buildAnnouncementTable(guild) {
-    $("body").removeClass("busy");
-    $("#announcement-table-body").html('');
-    $("#announcement-ping").prop("checked", guild.ping_announcement);
-    initAnnouncementTable(guild.weekly_announcement);
-}
 // async function buildActivityTable(){
 //     const activities: Activity[] = await getActivities()
 //     const activityPoints: ActivityPoint[] = await getActivityPoints()
@@ -440,11 +444,6 @@ async function buildAnnouncementTable(guild) {
 //     initLogTable()
 //     $("body").removeClass("busy")
 // }
-async function buildMessageTab() {
-    const messages = await bot.get_messages(userSession.guild.id);
-    $("body").removeClass("busy");
-    initMessageTable(messages);
-}
 // async function buildPricingTab(){
 //     const conversions = await getCodeconversions()
 //     const costs = await getLevelCosts()

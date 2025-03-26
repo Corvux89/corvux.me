@@ -255,7 +255,7 @@ def create_ref_message(guild_id: int):
         payload["channel_name"],
         message.title,
         payload["message"],
-        pin=payload["pin"],
+        pin=payload["pin"] if "pin" in payload else False,
     )
 
     return jsonify(data)
@@ -323,7 +323,7 @@ def delete_message(message_id: int):
     return jsonify(200)
 
 
-@G0T0_blueprint.route("/api/channels/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/channels/<int:guild_id>", methods=["GET"])
 def get_channels(guild_id: int):
     channels = get_channels_from_cache(guild_id)
     try:

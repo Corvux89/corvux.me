@@ -26,8 +26,16 @@ export class G0T0Bot extends WebClass {
         }
         return await this.fetch(url);
     }
+    async new_message(guild_id, message) {
+        return this.sendData(`api/message/${guild_id}`, "POST", message);
+    }
+    async update_message(message) {
+        return this.sendData(`api/message/${message.message_id}`, "PATCH", message);
+    }
     async delete_message(message_id) {
-        console.log(`Here we are with ${message_id}`);
-        this.sendData(`/api/message/${message_id}`, "DELETE", { message_id });
+        return this.sendData(`api/message/${message_id}`, "DELETE", { message_id });
+    }
+    async get_channels(guil_id) {
+        return this.fetch(`api/channels/${guil_id}`);
     }
 }

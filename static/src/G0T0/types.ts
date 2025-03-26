@@ -1,4 +1,4 @@
-import { DiscordGuild, WebClass } from "../General/types.js"
+import { DiscordChannel, DiscordGuild, WebClass } from "../General/types.js"
 
 export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 
@@ -221,9 +221,20 @@ export class G0T0Bot extends WebClass{
 
         return await this.fetch(url) as RefMessage[]
     } 
+
+    async new_message(guild_id: string, message: NewMessage): Promise<RefMessage>{
+        return this.sendData(`api/message/${guild_id}`, "POST", message)
+    }
+
+    async update_message(message: RefMessage): Promise<void>{
+        return this.sendData(`api/message/${message.message_id}`, "PATCH", message)
+    }
     
     async delete_message(message_id: number): Promise<void>{
-        console.log(`Here we are with ${message_id}`)
-        this.sendData(`/api/message/${message_id}`, "DELETE", {message_id})
+        return this.sendData(`api/message/${message_id}`, "DELETE", {message_id})
+    }
+
+    async get_channels(guil_id: string): Promise<DiscordChannel[]>{
+        return this.fetch(`api/channels/${guil_id}`)
     }
 }

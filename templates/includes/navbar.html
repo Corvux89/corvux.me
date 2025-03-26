@@ -65,13 +65,13 @@
 
                 {% if session.admin %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('resolute.resolute_main') }}">Resolute Management</a>
+                    <a class="nav-link" href="{{ url_for ('G0T0.main') }}">G0T0 Management</a>
                 </li>
                 {% endif %}
 
                 {% if config.DISCORD_SESSION and config.DISCORD_SESSION.authorized %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('resolute.resolute_profile') }}">Resolute Profile</a>
+                    <a class="nav-link" href="{{ url_for ('G0T0.profile') }}">G0T0 Profile</a>
                 </li>
                 {% endif %}
                 

@@ -5,6 +5,7 @@ from flask_discord.models import Guild
 from constants import DISCORD_ADMINS
 from helpers.general_helpers import get_bot_guilds_from_cache
 from helpers.auth_helper import login_required
+from models.exceptions import NotFound
 
 
 auth_blueprint = Blueprint("auth", __name__)
@@ -87,8 +88,13 @@ def get_guild():
     return jsonify(data)
 
 
-@auth_blueprint.route("/guilds/<guild_id>", methods=["POST"])
+@auth_blueprint.route("/guilds/<guild_id>", methods=["PATCH"])
 @login_required
 def select_guild(guild_id: int):
-    session["guild"] = next((g for g in session["guilds"] if g.id == guild_id), None)
+    try:
+        session["guild"] = next(
+            (g for g in session["guilds"] if str(g["id"]) == guild_id), None
+        )
+    except:
+        raise NotFound("Guild not found")
     return jsonify(200)

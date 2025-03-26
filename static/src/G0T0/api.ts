@@ -1,5 +1,6 @@
 import { ToastError, ToastSuccess } from "../General/main.js"
-import { Activity, ActivityPoint, CodeConversion, DiscordChannel, DiscordEntitlement, DiscordRole as DiscordRole, Financial, LevelCost, Log, NewMessage, Player, RefMessage, ResoluteGuild, Store } from "./types.js"
+import { Activity, ActivityPoint, CodeConversion, Financial, LevelCost, Log, NewMessage, Player, RefMessage, G0T0Guild, Store } from "./types.js"
+import { DiscordChannel, DiscordEntitlement, DiscordRole as DiscordRole } from "../General/types.js"
 
 // TODO: Deprecate this
 
@@ -64,11 +65,11 @@ export async function sendData<T>(url: string, method: string, data: any): Promi
 }
 
 
-export function getGuild(): Promise<ResoluteGuild>{
+export function getGuild(): Promise<G0T0Guild>{
     return fetchData(apiUrls.guild)
 }
 
-export function updateGuild(guild: ResoluteGuild): Promise<ResoluteGuild>{
+export function updateGuild(guild: G0T0Guild): Promise<G0T0Guild>{
     return sendData(apiUrls.guild, 'PATCH', guild)
 }
 

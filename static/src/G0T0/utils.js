@@ -229,7 +229,8 @@ export function initSayTable(player) {
             lines: summary.num_lines,
             words: summary.num_words
         };
-    });
+    })
+        .filter(stat => player.characters.find(c => c.id == parseInt(stat.command))?.name);
     $("#say-table").DataTable({
         orderCellsTop: true,
         pageLength: 25,

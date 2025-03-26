@@ -1,5 +1,5 @@
-import { start } from "repl";
-import { Activity, Character, classString, CodeConversion, DailyStats, DataTableRequest, DiscordChannel, DiscordEntitlement, DiscordRole, GenericDict, LevelCost, NPCStats, Player, playerName, RefMessage, Store } from "./types.js";
+import { Activity, Character, classString, CodeConversion, DailyStats, DataTableRequest, GenericDict, LevelCost, NPCStats, Player, playerName, RefMessage, Store } from "./types.js";
+import { DiscordChannel, DiscordEntitlement, DiscordRole } from "../General/types.js";
 
 function destroyTable(table: string): void{
     if ($.fn.DataTable.isDataTable(table)) {
@@ -262,6 +262,7 @@ export function initSayTable(player: Player): void{
             words: summary.num_words
         }
     })
+    .filter(stat => player.characters.find(c => c.id == parseInt(stat.command))?.name)
 
     $("#say-table").DataTable({
         orderCellsTop: true,

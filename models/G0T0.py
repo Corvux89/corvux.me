@@ -41,6 +41,8 @@ class BaseModel:
                 elif isinstance(value, datetime.datetime):
                     result[attr] = value.isoformat()
 
+                elif value == "None":
+                    result[attr] = ""
                 else:
                     result[attr] = value
             except AttributeError:
@@ -295,7 +297,7 @@ class Financial(db.Model, BaseModel):
         self.last_reset = kwargs.get("last_reset")
 
 
-class ResoluteGuild(db.Model, BaseModel, IntAttributeMixin):
+class G0T0Guild(db.Model, BaseModel, IntAttributeMixin):
     __tablename__ = "guilds"
     _id: Mapped[int] = mapped_column("id", primary_key=True)
     max_level: Mapped[int]
@@ -549,7 +551,7 @@ class ResoluteGuild(db.Model, BaseModel, IntAttributeMixin):
 
     @property
     def dev_channels(self) -> list[str]:
-        return [str(c) for c in self._dev_channels]
+        return [str(c) for c in self._dev_channels] if self._dev_channels else []
 
     @dev_channels.setter
     def dev_channels(self, value):

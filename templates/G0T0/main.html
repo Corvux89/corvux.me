@@ -1,11 +1,11 @@
 {% extends "template.html" %} {% block body %}
 <div class="container m-2 text-center">
-    <h1>Resolute Management</h1>
+    <h1>G0T0 Management</h1>
 </div>
 
 <!-- Nav Tabs-->
 <nav>
-    <div class="nav nav-tabs m-2" id="resoluteTab" role="tablist">
+    <div class="nav nav-tabs m-2" id="G0T0Tab" role="tablist">
 
         <button-tab label-text="Announcements" controls="announcement-tab" custom-id="announcement-tab-button"
             active></button-tab>
@@ -29,11 +29,11 @@
 </nav>
 
 <!-- Tab Content -->
-<div class="tab-content" id="resoluteContent">
+<div class="tab-content" id="G0T0Content">
     {% for tab in tabs %}
         {% include tab %}
     {% endfor %}
 </div>
 
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/main.js') }}" type="module"></script>
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/G0T0/main.js') }}" type="module"></script>
 {% endblock %}

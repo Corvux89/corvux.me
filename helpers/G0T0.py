@@ -4,7 +4,7 @@ import requests
 from sqlalchemy import Date, String, cast, func
 from constants import BOT_API_AUTH_TOKEN, BOT_API_URL
 from helpers.general_helpers import get_members_from_cache
-from models.resolute import Activity, Character, Log
+from models.G0T0 import Activity, Character, Log
 import json
 
 

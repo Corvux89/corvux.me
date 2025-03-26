@@ -1,24 +1,28 @@
 import { ToastError } from "../General/main.js";
-import { Character, G0T0Bot, playerName } from "./types.js";
+import { Character, playerName } from "./types.js";
 import { filterStats, initPlayerCharacterTable, initSayTable } from "./utils.js";
-// TODO: Cleanup 
+
 $('body').addClass("busy")
-const bot = new G0T0Bot()
-const memberID = $("#member-id").val().toString()
-const guild = await bot.get_guild()
-const playerData = await bot.get_player(guild.id, memberID)
-$('body').removeClass("busy")
-if (!playerData) {
-    ToastError("Player not found")
+await setupProfile()
+
+async function setupProfile(){
+    const playerData = await bot.get_player(userSession.guild.id, userSession.user_id)
+
+    $('body').removeClass("busy")
+
+    if (!playerData) {
+        ToastError("Player not found")
+    }
+
+    $("#member-name").val(`${playerName(playerData.member)}`)
+    $("#member-id").val(`${playerData.id}`)
+    $("#player-cc").val(playerData.cc)
+    $("#player-div-cc").val(playerData.div_cc)
+    $("#player-act-points").val(playerData.activity_points)
+
+    initPlayerCharacterTable(playerData.characters)
+    initSayTable(playerData)
 }
-
-$("#member-name").val(`${playerName(playerData.member)}`)
-$("#player-cc").val(playerData.cc)
-$("#player-div-cc").val(playerData.div_cc)
-$("#player-act-points").val(playerData.activity_points)
-
-initPlayerCharacterTable(playerData.characters)
-initSayTable(playerData)
 
 $(document).on("click", "#player-character-table tbody tr", function(){
     const table = $("#player-character-table").DataTable() 
@@ -51,8 +55,17 @@ $("#say-start-date, #say-end-date").on("change", function(){
     $("#say-table").DataTable().draw()
 })
 
+$(document).on("guildUpdated", async function() {
+    $('body').addClass("busy")
+    await setupProfile()
+})
+
+
+
 // Filter Functions
-$.fn.dataTable.ext.search.push(function (settings, data, dataIndex){
+$.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
+    const playerData = await bot.get_player(userSession.guild.id.toString(), userSession.user_id)
+
     if (settings.nTable.id == 'say-table'){
             const sayTable = $("#say-table").DataTable()
             const startDate = $("#say-start-date").val() as string

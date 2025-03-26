@@ -1,11 +1,8 @@
-import json
 import os
 
 from flask import (
     Blueprint,
     Flask,
-    Response,
-    abort,
     current_app,
     redirect,
     render_template,
@@ -16,7 +13,6 @@ from flask import (
 from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
-from constants import DISCORD_GUILD_ID
 from helpers.auth_helper import is_admin, is_api_admin, login_required
 from helpers.general_helpers import (
     bot_request_with_retry,
@@ -24,13 +20,13 @@ from helpers.general_helpers import (
     get_entitlements_from_cache,
     get_roles_from_cache,
 )
-from helpers.resolute_helpers import (
+from helpers.G0T0 import (
     log_search_filter,
     trigger_compendium_reload,
     trigger_guild_reload,
 )
 from models.exceptions import BadRequest, NotFound
-from models.resolute import (
+from models.G0T0 import (
     Activity,
     ActivityPoints,
     BotMessage,
@@ -46,7 +42,7 @@ from models.resolute import (
     Log,
     Player,
     RefMessage,
-    ResoluteGuild,
+    G0T0Guild,
     Store,
 )
 from sqlalchemy.orm import joinedload
@@ -54,64 +50,64 @@ from sqlalchemy.orm import joinedload
 # TODO: Cleanup API Funcitons
 
 
-resolute_blueprint = Blueprint("resolute", __name__)
+G0T0_blueprint = Blueprint("G0T0", __name__)
 app = Flask(__name__)
 
 
-@resolute_blueprint.route("/", methods=["GET"])
+@G0T0_blueprint.route("/", methods=["GET"])
 @login_required
-def resolute_main():
+def main():
     if is_admin():
-        tab_folder = "templates/Resolute/tabs"
+        tab_folder = "templates/G0T0/tabs"
 
         tabs = [
-            f"/Resolute/tabs/{file}"
+            f"/G0T0/tabs/{file}"
             for file in os.listdir(tab_folder)
             if file.endswith(".html")
         ]
 
-        return render_template("Resolute/resolute_main.html", tabs=tabs)
+        return render_template("G0T0/main.html", tabs=tabs)
 
-    return redirect(url_for("resolute.resolute_profile"))
-
-
-@resolute_blueprint.route("/profile", methods=["GET"])
-def resolute_profile():
-    try:
-        discord_session = current_app.config.get("DISCORD_SESSION")
-        user = discord_session.fetch_user()
-    except:
-        return redirect(url_for("auth.login", next="resolute.resolute_profile"))
-    return render_template("Resolute/resolute_profile.html", user=user)
+    return redirect(url_for("G0T0.profile"))
 
 
-@resolute_blueprint.route("/terms")
+@G0T0_blueprint.route("/profile", methods=["GET"])
+@login_required
+def profile():
+    return render_template("G0T0/profile.html")
+
+
+@G0T0_blueprint.route("/terms")
 def terms():
-    return render_template("Resolute/terms.html")
+    return render_template("G0T0/terms.html")
 
 
-@resolute_blueprint.route("/privacy")
+@G0T0_blueprint.route("/privacy")
 def privacy():
-    return render_template("Resolute/privacy.html")
+    return render_template("G0T0/privacy.html")
 
 
-@resolute_blueprint.route("/api/guild/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/guild/<int:guild_id>", methods=["GET"])
 def get_guild(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
-    guild: ResoluteGuild = (
-        db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
-    )
+    try:
+        guild: G0T0Guild = (
+            db.session.query(G0T0Guild).filter(G0T0Guild._id == guild_id).first()
+        )
+    except:
+        raise BadRequest()
+
     if not guild:
         raise NotFound("Guild not found")
     return jsonify(guild)
 
 
-@resolute_blueprint.route("/api/guild/<guild_id>", methods=["PATCH"])
+@G0T0_blueprint.route("/api/guild/<int:guild_id>", methods=["PATCH"])
 @is_api_admin
 def update_guild(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
-    guild: ResoluteGuild = (
-        db.session.query(ResoluteGuild).filter(ResoluteGuild._id == guild_id).first()
+    guild: G0T0Guild = (
+        db.session.query(G0T0Guild).filter(G0T0Guild._id == guild_id).first()
     )
     update_data = request.get_json()
 
@@ -155,16 +151,30 @@ def update_guild(guild_id: int):
         )
 
     for key, value in update_data.items():
-        if hasattr(guild, key):
-            setattr(guild, key, value)
+        if hasattr(guild, key) and key not in ["id", "last_reset"]:
+            current_value = getattr(guild, key)
+            expected_type = type(current_value)
+
+            try:
+                if current_value is not None:
+                    value = expected_type(value)
+
+                if current_value is None or current_value == "None" and value == "":
+                    continue
+
+                setattr(guild, key, value)
+            except (ValueError, TypeError):
+                raise BadRequest(
+                    f"Type mismatch for '{key}': expected {expected_type.__name__}, got {type(value).__name__}"
+                )
 
     db.session.commit()
     trigger_guild_reload(guild.id)
     return jsonify(200)
 
 
-@resolute_blueprint.route("/api/message/<guild_id>", methods=["GET"])
-@resolute_blueprint.route("/api/message/<guild_id>/<message_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/message/<int:guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/message/<int:guild_id>/<int:message_id>", methods=["GET"])
 @is_api_admin
 def ref_messages(guild_id: int, message_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -211,7 +221,7 @@ def ref_messages(guild_id: int, message_id: int = None):
         return jsonify(messages)
 
 
-@resolute_blueprint.route("/api/message/<guild_id>", methods=["POST"])
+@G0T0_blueprint.route("/api/message/<int:guild_id>", methods=["POST"])
 @is_api_admin
 def create_ref_message(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -251,7 +261,7 @@ def create_ref_message(guild_id: int):
     return jsonify(data)
 
 
-@resolute_blueprint.route("/api/message/<message_id>", methods=["PATCH"])
+@G0T0_blueprint.route("/api/message/<int:message_id>", methods=["PATCH"])
 @is_api_admin
 def update_message(message_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -290,7 +300,7 @@ def update_message(message_id: int = None):
     return jsonify(200)
 
 
-@resolute_blueprint.route("/api/message/<message_id>", methods=["DELETE"])
+@G0T0_blueprint.route("/api/message/<int:message_id>", methods=["DELETE"])
 @is_api_admin
 def delete_message(message_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -313,7 +323,7 @@ def delete_message(message_id: int):
     return jsonify(200)
 
 
-@resolute_blueprint.route("/api/channels/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/channels/<guild_id>", methods=["GET"])
 def get_channels(guild_id: int):
     channels = get_channels_from_cache(guild_id)
     try:
@@ -324,7 +334,7 @@ def get_channels(guild_id: int):
     return jsonify(channels)
 
 
-@resolute_blueprint.route("/api/roles/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/roles/<guild_id>", methods=["GET"])
 def get_roles(guild_id: int):
     roles = get_roles_from_cache(guild_id)
     try:
@@ -335,8 +345,8 @@ def get_roles(guild_id: int):
     return jsonify(roles)
 
 
-@resolute_blueprint.route("/api/players/<guild_id>", methods=["GET"])
-@resolute_blueprint.route("/api/players/<guild_id>/<player_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/players/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/players/<guild_id>/<player_id>", methods=["GET"])
 def get_players(guild_id: int, player_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
     if player_id:
@@ -360,7 +370,7 @@ def get_players(guild_id: int, player_id: int = None):
     return jsonify(players)
 
 
-@resolute_blueprint.route("/api/logs/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/logs/<guild_id>", methods=["GET"])
 @is_api_admin
 def get_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -386,7 +396,7 @@ def get_logs(guild_id: int):
     return jsonify(logs)
 
 
-@resolute_blueprint.route("/api/logs/<guild_id>", methods=["POST"])
+@G0T0_blueprint.route("/api/logs/<guild_id>", methods=["POST"])
 @is_api_admin
 def sort_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -471,7 +481,7 @@ def sort_logs(guild_id: int):
     return jsonify(response)
 
 
-@resolute_blueprint.route("/api/activities", methods=["GET"])
+@G0T0_blueprint.route("/api/activities", methods=["GET"])
 @is_api_admin
 def get_activites():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -481,7 +491,7 @@ def get_activites():
     return jsonify(activities)
 
 
-@resolute_blueprint.route("/api/activities", methods=["PATCH"])
+@G0T0_blueprint.route("/api/activities", methods=["PATCH"])
 @is_api_admin
 def update_activities():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -518,7 +528,7 @@ def update_activities():
         raise BadRequest()
 
 
-@resolute_blueprint.route("/api/activity_points", methods=["GET"])
+@G0T0_blueprint.route("/api/activity_points", methods=["GET"])
 @is_api_admin
 def get_activity_points():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -532,7 +542,7 @@ def get_activity_points():
     return jsonify(points)
 
 
-@resolute_blueprint.route("/api/activity_points", methods=["PATCH"])
+@G0T0_blueprint.route("/api/activity_points", methods=["PATCH"])
 @is_api_admin
 def update_activity_points():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -570,7 +580,7 @@ def update_activity_points():
         raise BadRequest()
 
 
-@resolute_blueprint.route("/api/code_conversion", methods=["GET"])
+@G0T0_blueprint.route("/api/code_conversion", methods=["GET"])
 @is_api_admin
 def get_code_conversion():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -581,7 +591,7 @@ def get_code_conversion():
     return jsonify(points)
 
 
-@resolute_blueprint.route("/api/code_conversion", methods=["PATCH"])
+@G0T0_blueprint.route("/api/code_conversion", methods=["PATCH"])
 @is_api_admin
 def update_code_conversion():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -614,7 +624,7 @@ def update_code_conversion():
         raise BadRequest()
 
 
-@resolute_blueprint.route("/api/level_costs", methods=["GET"])
+@G0T0_blueprint.route("/api/level_costs", methods=["GET"])
 @is_api_admin
 def get_level_costs():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -624,7 +634,7 @@ def get_level_costs():
     return jsonify(costs)
 
 
-@resolute_blueprint.route("/api/level_costs", methods=["PATCH"])
+@G0T0_blueprint.route("/api/level_costs", methods=["PATCH"])
 @is_api_admin
 def update_level_costs():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -658,7 +668,7 @@ def update_level_costs():
         raise BadRequest()
 
 
-@resolute_blueprint.route("/api/financial", methods=["GET"])
+@G0T0_blueprint.route("/api/financial", methods=["GET"])
 @is_api_admin
 def get_financial():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -666,7 +676,7 @@ def get_financial():
     return jsonify(fin)
 
 
-@resolute_blueprint.route("/api/financial", methods=["PATCH"])
+@G0T0_blueprint.route("/api/financial", methods=["PATCH"])
 @is_api_admin
 def update_financial():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -690,7 +700,7 @@ def update_financial():
 
 
 # TODO: Store
-@resolute_blueprint.route("/api/store", methods=["GET"])
+@G0T0_blueprint.route("/api/store", methods=["GET"])
 @is_api_admin
 def get_store():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -698,7 +708,7 @@ def get_store():
     return jsonify(store)
 
 
-@resolute_blueprint.route("/api/store", methods=["PATCH"])
+@G0T0_blueprint.route("/api/store", methods=["PATCH"])
 @is_api_admin
 def udpate_store():
     db: SQLAlchemy = current_app.config.get("DB")
@@ -726,7 +736,7 @@ def udpate_store():
         raise BadRequest()
 
 
-@resolute_blueprint.route("/api/entitlements", methods=["GET"])
+@G0T0_blueprint.route("/api/entitlements", methods=["GET"])
 @is_api_admin
 def get_entitlements():
     entitlements = get_entitlements_from_cache()

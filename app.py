@@ -8,9 +8,9 @@ from flask import Flask, render_template, request, make_response
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
+from blueprints.G0T0.G0T0 import G0T0_blueprint
 from blueprints.combat_planner import combat_planner_blueprint
 from blueprints.auth import auth_blueprint
-from blueprints.Resolute.resolute import resolute_blueprint
 from constants import (
     DB_URI,
     DISCORD_BOT_TOKEN,
@@ -22,7 +22,7 @@ from constants import (
 )
 from helpers import get_csp
 from helpers.error_handlers import register_handlers
-from models.resolute import CustomJSONProvider
+from models.G0T0 import CustomJSONProvider
 
 app = Flask(__name__)
 
@@ -83,7 +83,7 @@ talisman = Talisman(
 
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
 app.register_blueprint(auth_blueprint, url_prefix="/auth")
-app.register_blueprint(resolute_blueprint, url_prefix="/resolute")
+app.register_blueprint(G0T0_blueprint, url_prefix="/G0T0")
 register_handlers(app)
 
 if __name__ == "__main__":

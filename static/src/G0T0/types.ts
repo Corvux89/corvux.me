@@ -1,8 +1,8 @@
-import { ToastError } from "../General/main.js"
+import { DiscordGuild, WebClass } from "../General/types.js"
 
 export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 
-export interface ResoluteGuild {
+export interface G0T0Guild {
     id: string
     max_level: number
     handicap_cc: number
@@ -51,26 +51,6 @@ export interface NewMessage{
     message: string,
     title: string,
     pin: boolean
-}
-
-export interface DiscordChannel {
-    id: string,
-    name: string   
-}
-
-export interface DiscordRole {
-    id: string,
-    name: string   
-}
-
-export interface DiscordEntitlement {
-    id: string
-    sku_id: string
-    type: number
-    deleted: boolean
-    consumed: boolean
-    user_id: string
-    member: GenericDict
 }
 
 export interface Activity{
@@ -216,34 +196,34 @@ export type statistics = {
 }
 
 // TODO: Finish flushing this out
-export class G0T0Bot{
-    async fetch<T>(url: string): Promise<T>{               
-        const res = await fetch(url)
-        if (res.ok){
-            return res.json()
-        } else{
-            const err = await res.json()
-            ToastError(err.error)
-            throw new Error(err.error)
-        }
-    }
-
-    async get_guild(guild_id?: number): Promise<ResoluteGuild>{
-        let url = 'api/guild'
-
-        if (guild_id){
-            url = `${url}/${guild_id}`
-        }
-        
-
-        const guild = await this.fetch(url) as ResoluteGuild
+export class G0T0Bot extends WebClass{
+    async get_guild(guild_id: string): Promise<G0T0Guild>{
+        const guild = await this.fetch(`api/guild/${guild_id}`) as G0T0Guild
 
         return guild
     }
 
+    async update_guild(guild: G0T0Guild){
+        return this.sendData(`api/guild/${guild.id}`, "PATCH", guild)
+    }
+
     async get_player(guild_id: string, player_id: string): Promise<Player>{
         const player = await this.fetch(`api/players/${guild_id}/${player_id}`) as Player
-
         return player
+    }
+
+    async get_messages(guild_id: string, message_id?: string): Promise<RefMessage[] | RefMessage>{
+        let url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`
+
+        if (message_id){
+            return await this.fetch(url) as RefMessage
+        }
+
+        return await this.fetch(url) as RefMessage[]
+    } 
+    
+    async delete_message(message_id: number): Promise<void>{
+        console.log(`Here we are with ${message_id}`)
+        this.sendData(`/api/message/${message_id}`, "DELETE", {message_id})
     }
 }

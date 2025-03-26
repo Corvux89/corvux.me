@@ -1,5 +1,4 @@
 import { ToastError } from "../General/main.js"
-import { fetchData } from "./api.js"
 
 export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 

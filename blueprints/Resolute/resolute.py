@@ -17,7 +17,7 @@ from flask_discord import DiscordOAuth2Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
 from constants import DISCORD_GUILD_ID
-from helpers.auth_helper import is_admin, is_api_admin, login_requred
+from helpers.auth_helper import is_admin, is_api_admin, login_required
 from helpers.general_helpers import (
     bot_request_with_retry,
     get_channels_from_cache,
@@ -59,7 +59,7 @@ app = Flask(__name__)
 
 
 @resolute_blueprint.route("/", methods=["GET"])
-@login_requred
+@login_required
 def resolute_main():
     if is_admin():
         tab_folder = "templates/Resolute/tabs"

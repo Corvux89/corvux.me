@@ -1,9 +1,10 @@
 from flask import Blueprint, current_app, jsonify, redirect, request, session, url_for
 from flask_discord import DiscordOAuth2Session
+from flask_discord.models import Guild
 
 from constants import DISCORD_ADMINS
 from helpers.general_helpers import get_bot_guilds_from_cache
-from models.exceptions import NotFound
+from helpers.auth_helper import login_required
 
 
 auth_blueprint = Blueprint("auth", __name__)
@@ -36,12 +37,13 @@ def callback():
 
         user = discord_session.fetch_user()
         bot_guilds = get_bot_guilds_from_cache()
-        session["guilds"] = [
+        combined_guilds = [
             g
             for g in discord_session.fetch_guilds()
             if g.id in {g.id for g in bot_guilds}
         ]
-        session["guild"] = session["guilds"][0]
+        session["guilds"] = combined_guilds
+        session["guild"] = combined_guilds[0]
 
         if user.id in DISCORD_ADMINS:
             session["admin"] = True
@@ -67,15 +69,26 @@ def logout():
     return redirect(url_for("homepage"))
 
 
-@auth_blueprint.route("/select_guild", methods=["GET"])
+@auth_blueprint.route("/session", methods=["GET"])
+@login_required
 def get_guild():
-    guild = next(
-        (g for g in get_bot_guilds_from_cache() if session["guild"] == g["id"]), None
-    )
-    return jsonify(guild)
+    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
+    bot_guilds = get_bot_guilds_from_cache()
+
+    session["guilds"] = [
+        g for g in discord_session.fetch_guilds() if g.id in {g.id for g in bot_guilds}
+    ]
+
+    data = {
+        "guilds": session["guilds"],
+        "guild": session["guild"],
+        "user_id": str(discord_session.user_id),
+    }
+    return jsonify(data)
 
 
-@auth_blueprint.route("/select_guild/<guild_id>", methods=["POST"])
+@auth_blueprint.route("/guilds/<guild_id>", methods=["POST"])
+@login_required
 def select_guild(guild_id: int):
     session["guild"] = next((g for g in session["guilds"] if g.id == guild_id), None)
     return jsonify(200)

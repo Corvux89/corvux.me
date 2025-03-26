@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import current_app, jsonify, redirect, request, url_for
+from flask import current_app, jsonify, redirect, request, session, url_for
 from flask_discord import DiscordOAuth2Session
 from flask_discord.models import User
 
@@ -62,7 +62,7 @@ def is_api_admin(f=None):
     return decorated_function
 
 
-def login_requred(f=None):
+def login_required(f=None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
@@ -76,19 +76,12 @@ def login_requred(f=None):
         return decorated_function
 
     def _is_logged_in():
-        discord_session = current_app.config.get("DISCORD_SESSION")
+        discord_session: DiscordOAuth2Session = current_app.config.get(
+            "DISCORD_SESSION"
+        )
         if not discord_session or not discord_session.authorized:
             return False
-
-        try:
-            user = discord_session.fetch_user()
-            guilds = user.fetch_guilds()
-            bot_guilds = get_bot_guilds_from_cache()
-            return bool(
-                set([g["id"] for g in bot_guilds]) & set([str(g.id) for g in guilds])
-            )
-        except:
-            return False
+        return True
 
     # Callable functionality
     if f is None:

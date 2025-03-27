@@ -147,3 +147,25 @@ body:not(.busy) .loading-overlay {
     display: flex;
     align-items: center;
 }
+
+/* Default: Show both icon and name */
+.guild-name {
+    display: inline;
+}
+
+/* For larger screens: Hide the abbreviation */
+.guild-abbreviation {
+    display: none;
+}
+
+/* For smaller screens: Hide the full name */
+@media (max-width: 768px) {
+    .guild-name {
+        display: none;
+    }
+
+    .guild-abbreviation {
+        display: inline;
+    }
+}
+

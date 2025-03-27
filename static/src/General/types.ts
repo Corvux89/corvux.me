@@ -1,5 +1,6 @@
-import { GenericDict } from "../G0T0/types.js"
 import { ToastError, ToastSuccess } from "./main.js"
+
+export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
 
 export class WebClass{
     async fetch<T>(url: string): Promise<T>{               

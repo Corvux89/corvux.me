@@ -1,5 +1,5 @@
-import { Activity, Character, classString, CodeConversion, DailyStats, DataTableRequest, GenericDict, LevelCost, NPCStats, Player, playerName, RefMessage, Store } from "./types.js";
-import { DiscordChannel, DiscordEntitlement, DiscordRole } from "../General/types.js";
+import { Activity, Character, classString, CodeConversion, DailyStats, DataTableRequest, LevelCost, NPCStats, Player, playerName, RefMessage, Store } from "./types.js";
+import { DiscordChannel, DiscordEntitlement, DiscordRole, GenericDict } from "../General/types.js";
 
 function destroyTable(table: string): void{
     if ($.fn.DataTable.isDataTable(table)) {

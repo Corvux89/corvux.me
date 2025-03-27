@@ -1,3 +1,4 @@
+
 import { G0T0Bot } from "../G0T0/types.js"
 import { UserSession } from "./types.js"
 
@@ -16,6 +17,8 @@ declare global{
     var bot: G0T0Bot
 }
 
-globalThis.bot = new G0T0Bot
+
+
 globalThis.userSession = new UserSession()
+globalThis.bot = new G0T0Bot()
 await globalThis.userSession.build()

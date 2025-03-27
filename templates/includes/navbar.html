@@ -18,10 +18,12 @@
         <a class="navbar-brand ms-auto" href="{{ url_for('auth.logout') }}" id="user-badge">
             {% set active_user = config.DISCORD_SESSION.fetch_user() %}
                 <p class="text-muted d-inline">{{active_user.username}}</p>
+                {% if active_user.avatar_url %}
                 <img src="{{ active_user.avatar_url}}"
                     class="rounded-circle"
                      width="35"
                      height="auto">
+                {% endif %}
         </a>
     </div>
     {% endif %}

@@ -8,6 +8,6 @@ export function ToastSuccess(message) {
     $("#confirm-toast .toast-body").html(message);
     $("#confirm-toast").toast("show");
 }
-globalThis.bot = new G0T0Bot;
 globalThis.userSession = new UserSession();
+globalThis.bot = new G0T0Bot();
 await globalThis.userSession.build();

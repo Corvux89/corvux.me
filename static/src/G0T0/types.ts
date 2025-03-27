@@ -1,6 +1,4 @@
-import { DiscordChannel, DiscordGuild, WebClass } from "../General/types.js"
-
-export interface GenericDict {[key: string]: string | number | boolean | GenericDict}
+import { DiscordChannel, DiscordRole, GenericDict, WebClass } from "../General/types.js"
 
 export interface G0T0Guild {
     id: string
@@ -234,7 +232,27 @@ export class G0T0Bot extends WebClass{
         return this.sendData(`api/message/${message_id}`, "DELETE", {message_id})
     }
 
-    async get_channels(guil_id: string): Promise<DiscordChannel[]>{
-        return this.fetch(`api/channels/${guil_id}`)
+    async get_activities(): Promise<Activity[]>{
+        return this.fetch(`api/activities`)
+    }
+
+    async update_activities(activities: Activity[]): Promise<void>{
+        return this.sendData(`api/activities`, "PATCH", activities)
+    }
+
+    async get_activity_points(): Promise<ActivityPoint[]>{
+        return this.fetch(`api/activity_points`)
+    }
+
+    async update_activity_points(activity_points: ActivityPoint[]): Promise<void>{
+        return this.sendData(`api/activity_points`, "PATCH", activity_points)
+    } 
+
+    async get_channels(guild_id: string): Promise<DiscordChannel[]>{
+        return this.fetch(`api/channels/${guild_id}`)
+    }
+
+    async get_roles(guild_id: string): Promise<DiscordRole[]>{
+        return this.fetch(`api/roles/${guild_id}`)
     }
 }

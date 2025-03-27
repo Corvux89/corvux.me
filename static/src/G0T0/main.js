@@ -1,5 +1,5 @@
 import { ToastError } from '../General/main.js';
-import { initAnnouncementTable, initMessageTable } from './utils.js';
+import { initActivityPointsTable, initActivityTable, initAnnouncementTable, initMessageTable, populateSelectOption } from './utils.js';
 $('body').addClass("busy");
 let guild = await bot.get_guild(userSession.guild.id);
 buildAnnouncementTable(guild);
@@ -163,6 +163,126 @@ $("#message-delete-button").on('click', async function () {
         buildMessageTab();
     });
 });
+// Guild Settings
+$('#guild-settings-button').on('click', async function () {
+    $('body').addClass("busy");
+    const guild = await bot.get_guild(userSession.guild.id);
+    const roles = await bot.get_roles(userSession.guild.id);
+    const channels = await bot.get_channels(userSession.guild.id);
+    roles.sort((a, b) => a.name.localeCompare(b.name));
+    channels.sort((a, b) => a.name.localeCompare(b.name));
+    $('body').removeClass("busy");
+    const roleSelectors = [
+        { selector: '#guild-entry-role', value: [guild.entry_role] },
+        { selector: '#guild-member-role', value: [guild.member_role] },
+        { selector: '#guild-admin-role', value: [guild.admin_role] },
+        { selector: '#guild-staff-role', value: [guild.staff_role] },
+        { selector: '#guild-bot-role', value: [guild.bot_role] },
+        { selector: '#guild-quest-role', value: [guild.quest_role] },
+        { selector: '#tier-2-role', value: [guild.tier_2_role] },
+        { selector: '#tier-3-role', value: [guild.tier_3_role] },
+        { selector: '#tier-4-role', value: [guild.tier_4_role] },
+        { selector: '#tier-5-role', value: [guild.tier_5_role] },
+        { selector: '#tier-6-role', value: [guild.tier_6_role] }
+    ];
+    const channelSelectors = [
+        { selector: '#guild-application-channel', value: [guild.application_channel] },
+        { selector: '#guild-market-channel', value: [guild.market_channel] },
+        { selector: '#guild-announcement-channel', value: [guild.announcement_channel] },
+        { selector: '#guild-staff-channel', value: [guild.staff_channel] },
+        { selector: '#guild-help-channel', value: [guild.help_channel] },
+        { selector: '#guild-arena-board-channel', value: [guild.arena_board_channel] },
+        { selector: '#guild-exit-channel', value: [guild.exit_channel] },
+        { selector: '#guild-entrance-channel', value: [guild.entrance_channel] },
+        { selector: '#guild-activity-points-channel', value: [guild.activity_points_channel] },
+        { selector: '#guild-rp-post-channel', value: [guild.rp_post_channel] },
+        { selector: '#guild-dev-channels', value: guild.dev_channels }
+    ];
+    $('#guild-max-level').val(guild.max_level.toString());
+    $('#guild-handicap-cc').val(guild.handicap_cc.toString());
+    $('#guild-max-characters').val(guild.max_characters.toString());
+    $('#guild-div-cc').val(guild.div_limit.toString());
+    $('#guild-reward-threshold').val(guild.reward_threshold ? guild.reward_threshold.toString() : "");
+    roleSelectors.forEach(selector => {
+        populateSelectOption(selector.selector, roles, selector.value, "Select a role");
+    });
+    channelSelectors.forEach(selector => {
+        populateSelectOption(selector.selector, channels, selector.value, "Select a channel");
+    });
+});
+$('#guild-settings-save-button').on('click', function () {
+    bot.get_guild(userSession.guild.id)
+        .then(guild => {
+        if (!$('#guild-max-level').val())
+            ToastError("Please enter in a max level");
+        guild.max_level = Number($('#guild-max-level').val());
+        guild.max_characters = $("#guild-max-characters").val() ? Number($("#guild-max-characters").val()) : 1;
+        guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0;
+        guild.div_limit = $("#guild-div-cc").val() ? Number($("#guild-div-cc").val()) : 0;
+        guild.reward_threshold = $("#guild-reward-threshold").val() ? Number($("#guild-reward-threshold").val()) : 0;
+        guild.entry_role = $('#guild-entry-role').find(':selected').val().toString();
+        guild.member_role = $('#guild-member-role').find(':selected').val().toString();
+        guild.admin_role = $('#guild-admin-role').find(':selected').val().toString();
+        guild.staff_role = $('#guild-staff-role').find(':selected').val().toString();
+        guild.bot_role = $('#guild-bot-role').find(':selected').val().toString();
+        guild.quest_role = $('#guild-quest-role').find(':selected').val().toString();
+        guild.tier_2_role = $('#tier-2-role').find(':selected').val().toString();
+        guild.tier_3_role = $('#tier-3-role').find(':selected').val().toString();
+        guild.tier_4_role = $('#tier-4-role').find(':selected').val().toString();
+        guild.tier_5_role = $('#tier-5-role').find(':selected').val().toString();
+        guild.tier_6_role = $('#tier-6-role').find(':selected').val().toString();
+        guild.application_channel = $('#guild-application-channel').find(':selected').val().toString();
+        guild.market_channel = $('#guild-market-channel').find(':selected').val().toString();
+        guild.announcement_channel = $('#guild-announcement-channel').find(':selected').val().toString();
+        guild.staff_channel = $('#guild-staff-channel').find(':selected').val().toString();
+        guild.help_channel = $('#guild-help-channel').find(':selected').val().toString();
+        guild.arena_board_channel = $('#guild-arena-board-channel').find(':selected').val().toString();
+        guild.exit_channel = $('#guild-exit-channel').find(':selected').val().toString();
+        guild.entrance_channel = $('#guild-entrance-channel').find(':selected').val().toString();
+        guild.activity_points_channel = $('#guild-activity-points-channel').find(':selected').val().toString();
+        guild.rp_post_channel = $('#guild-rp-post-channel').find(':selected').val().toString();
+        guild.dev_channels = $('#guild-dev-channels').find(':selected').toArray().map(e => $(e).val().toString());
+        bot.update_guild(guild);
+    });
+});
+// Activities
+$("#activity-settings-button").on('click', function () {
+    $('body').addClass("busy");
+    $("#activity-button").tab("show");
+    buildActivityTable();
+});
+async function buildActivityTable() {
+    const activities = await bot.get_activities();
+    const activityPoints = await bot.get_activity_points();
+    $("body").removeClass("busy");
+    initActivityTable(activities);
+    initActivityPointsTable(activityPoints);
+}
+$('#activity-submit-button').on('click', function () {
+    bot.get_activities()
+        .then(activities => {
+        activities.forEach(activity => {
+            let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val();
+            let pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
+            activity.cc = ccInputValue ? parseInt(ccInputValue.toString()) : null;
+            activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked');
+            activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0;
+        });
+        bot.update_activities(activities);
+    });
+});
+$("#activity-points-submit-button").on('click', function () {
+    if ($(".point-input.is-invalid").length > 0) {
+        return ToastError("Please resolve erorrs before submitting");
+    }
+    bot.get_activity_points()
+        .then(activities => {
+        activities.forEach(activity => {
+            activity.points = parseInt($(`.point-input[data-id="${activity.id}"`).val().toString());
+        });
+        bot.update_activity_points(activities);
+    });
+});
 // $(document).on("click", "#log-table tbody tr", function(){
 //     const table = $("#log-table").DataTable() 
 //     const row = table.row(this);
@@ -239,11 +359,6 @@ $("#message-delete-button").on('click', async function () {
 //     $('body').addClass("busy")
 //     buildPricingTab()
 // })
-// $("#activity-settings-button").on('click', function(){
-//     $('body').addClass("busy")
-//     $("#activity-button").tab("show")
-//     buildActivityTable()
-// })
 // $("#census-button").on('click', function(){
 //     $('body').addClass("busy")
 //     $("#players-tab-button").tab("show")
@@ -268,52 +383,6 @@ $("#message-delete-button").on('click', async function () {
 //             currentInput.removeClass("is-invalid")
 //         }
 //     }
-// })
-// $('#guild-settings-button').on('click', async function() {
-//     $('body').addClass("busy")
-//     const guild = await getGuild()
-//     const roles = await getRoles()
-//     const channels = await getChannels()
-//     roles.sort((a, b) => a.name.localeCompare(b.name))
-//     channels.sort((a, b) => a.name.localeCompare(b.name))
-//     $('body').removeClass("busy")
-//     const roleSelectors = [
-//         {selector: '#guild-entry-role', value: [guild.entry_role]},
-//         {selector: '#guild-member-role', value: [guild.member_role]},
-//         {selector: '#guild-admin-role', value: [guild.admin_role]},
-//         {selector: '#guild-staff-role', value: [guild.staff_role]},
-//         {selector: '#guild-bot-role', value: [guild.bot_role]},
-//         {selector: '#guild-quest-role', value: [guild.quest_role]},
-//         {selector: '#tier-2-role', value: [guild.tier_2_role]},
-//         {selector: '#tier-3-role', value: [guild.tier_3_role]},
-//         {selector: '#tier-4-role', value: [guild.tier_4_role]},
-//         {selector: '#tier-5-role', value: [guild.tier_5_role]},
-//         {selector: '#tier-6-role', value: [guild.tier_6_role]}
-//     ]
-//     const channelSelectors = [
-//         {selector: '#guild-application-channel', value: [guild.application_channel]},
-//         {selector: '#guild-market-channel', value: [guild.market_channel]},
-//         {selector: '#guild-announcement-channel', value: [guild.announcement_channel]},
-//         {selector: '#guild-staff-channel', value: [guild.staff_channel]},
-//         {selector: '#guild-help-channel', value: [guild.help_channel]},
-//         {selector: '#guild-arena-board-channel', value: [guild.arena_board_channel]},
-//         {selector: '#guild-exit-channel', value: [guild.exit_channel]},
-//         {selector: '#guild-entrance-channel', value: [guild.entrance_channel]},
-//         {selector: '#guild-activity-points-channel', value: [guild.activity_points_channel]},
-//         {selector: '#guild-rp-post-channel', value: [guild.rp_post_channel]},
-//         {selector: '#guild-dev-channels', value: guild.dev_channels}
-//     ]
-//     $('#guild-max-level').val(guild.max_level.toString()) 
-//     $('#guild-handicap-cc').val(guild.handicap_cc.toString())
-//     $('#guild-max-characters').val(guild.max_characters.toString())
-//     $('#guild-div-cc').val(guild.div_limit.toString())
-//     $('#guild-reward-threshold').val(guild.reward_threshold ? guild.reward_threshold.toString() : "")
-//     roleSelectors.forEach(selector => {
-//         populateSelectOption(selector.selector, roles, selector.value, "Select a role")
-//     })
-//     channelSelectors.forEach(selector => {
-//         populateSelectOption(selector.selector, channels, selector.value, "Select a channel")
-//     })
 // })
 // $('#financial-settings-button').on('click', async function(){
 //     $('body').addClass("busy")
@@ -345,53 +414,6 @@ $("#message-delete-button").on('click', async function () {
 //         updateStores(stores)
 //     })
 // })
-// $('#guild-settings-save-button').on('click', function(){
-//     getGuild()
-//     .then(guild => {
-//         if (!$('#guild-max-level').val()) ToastError("Please enter in a max level")
-//         guild.max_level = Number($('#guild-max-level').val())
-//         guild.max_characters = $("#guild-max-characters").val() ? Number($("#guild-max-characters").val()) : 1
-//         guild.handicap_cc = $("#guild-handicap-cc").val() ? Number($("#guild-handicap-cc").val()) : 0
-//         guild.div_limit = $("#guild-div-cc").val() ? Number($("#guild-div-cc").val()) : 0
-//         guild.reward_threshold = $("#guild-reward-threshold").val() ? Number($("#guild-reward-threshold").val()) : 0
-//         guild.entry_role = $('#guild-entry-role').find(':selected').val().toString()
-//         guild.member_role = $('#guild-member-role').find(':selected').val().toString()
-//         guild.admin_role = $('#guild-admin-role').find(':selected').val().toString()
-//         guild.staff_role = $('#guild-staff-role').find(':selected').val().toString()
-//         guild.bot_role = $('#guild-bot-role').find(':selected').val().toString()
-//         guild.quest_role = $('#guild-quest-role').find(':selected').val().toString()
-//         guild.tier_2_role = $('#tier-2-role').find(':selected').val().toString()
-//         guild.tier_3_role = $('#tier-3-role').find(':selected').val().toString()
-//         guild.tier_4_role = $('#tier-4-role').find(':selected').val().toString()
-//         guild.tier_5_role = $('#tier-5-role').find(':selected').val().toString()
-//         guild.tier_6_role = $('#tier-6-role').find(':selected').val().toString()
-//         guild.application_channel = $('#guild-application-channel').find(':selected').val().toString()
-//         guild.market_channel = $('#guild-market-channel').find(':selected').val().toString()
-//         guild.announcement_channel = $('#guild-announcement-channel').find(':selected').val().toString()
-//         guild.staff_channel = $('#guild-staff-channel').find(':selected').val().toString()
-//         guild.help_channel = $('#guild-help-channel').find(':selected').val().toString()
-//         guild.arena_board_channel = $('#guild-arena-board-channel').find(':selected').val().toString()
-//         guild.exit_channel = $('#guild-exit-channel').find(':selected').val().toString()
-//         guild.entrance_channel = $('#guild-entrance-channel').find(':selected').val().toString()
-//         guild.activity_points_channel = $('#guild-activity-points-channel').find(':selected').val().toString()
-//         guild.rp_post_channel = $('#guild-rp-post-channel').find(':selected').val().toString()
-//         guild.dev_channels = $('#guild-dev-channels').find(':selected').toArray().map(e => $(e).val().toString())
-//         updateGuild(guild)
-//     })
-// })
-// $('#activity-submit-button').on('click', function(){
-//     getActivities()
-//     .then(activities => {
-//         activities.forEach(activity => {
-//             let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val()
-//             let pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
-//             activity.cc = ccInputValue ? parseInt(ccInputValue.toString()) : null
-//             activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked')
-//             activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0
-//         })
-//         updateActivities(activities)
-//     })
-// })
 // $("#conversion-submit-button").on('click', function(){
 //     getCodeconversions()
 //     .then(conversions => {
@@ -410,25 +432,6 @@ $("#message-delete-button").on('click', async function () {
 //         updateLevelCosts(costs)
 //     })
 // })
-// $("#activity-points-submit-button").on('click', function(){
-//     if ($(".point-input.is-invalid").length > 0){
-//         return ToastError("Please resolve erorrs before submitting")
-//     }
-//     getActivityPoints()
-//     .then(activities => {
-//         activities.forEach(activity => {
-//             activity.points = parseInt($(`.point-input[data-id="${activity.id}"`).val().toString())
-//         })
-//         updateActivityPoints(activities)
-//     })
-// })
-// async function buildActivityTable(){
-//     const activities: Activity[] = await getActivities()
-//     const activityPoints: ActivityPoint[] = await getActivityPoints()
-//     $("body").removeClass("busy")
-//     initActivityTable(activities)
-//     initActivityPointsTable(activityPoints)
-// }
 // async function buildCensusTable(){
 //     const players = await getPlayers() as Player[]
 //     const characters: Character[] = players.flatMap(player => player.characters.map(character => ({

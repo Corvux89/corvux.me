@@ -12,7 +12,7 @@
     "@types/datatables.net": "^1.12.3",
     "@types/jquery": "^3.5.32",
     "@types/node": "^22.13.14",
-    "datatables.net-responsive": "^3.0.3",
+    "datatables.net-responsive": "^3.0.4",
     "mathjs": "^14.3.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",

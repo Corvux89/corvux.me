@@ -5,14 +5,27 @@
     </button>
 
     {% if config.DISCORD_SESSION and config.DISCORD_SESSION.authorized %}
-    <a class="navbar-brand ms-auto" href="{{ url_for('auth.logout') }}">
-    {% set active_user = config.DISCORD_SESSION.fetch_user() %}
-        <p class="text-muted d-inline">{{active_user.username}}</p>
-        <img src="{{ active_user.avatar_url}}"
-            class="rounded-circle"
-             width="35"
-             height="auto">
-    </a>
+    <div class="d-flex ms-auto align-items-center" id="user-info-container">
+        <!-- Guilds Dropdown -->
+        <div class="dropdown me-3">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="guild-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="guild-dropdown" id="guild-list">
+            </ul>
+        </div>
+
+        <!-- User Badge -->
+        <a class="navbar-brand ms-auto" href="{{ url_for('auth.logout') }}" id="user-badge">
+            {% set active_user = config.DISCORD_SESSION.fetch_user() %}
+                <p class="text-muted d-inline">{{active_user.username}}</p>
+                {% if active_user.avatar_url %}
+                <img src="{{ active_user.avatar_url}}"
+                    class="rounded-circle"
+                     width="35"
+                     height="auto">
+                {% endif %}
+        </a>
+    </div>
     {% endif %}
 
     <a class="navbar-brand" href="/">
@@ -52,15 +65,15 @@
                     <a class="nav-link" href="{{ url_for('complanner.planner') }}">Avrae Combat Planner</a>
                 </li>
 
-                {% if session.resolute_admin %}
+                {% if session.admin %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('resolute.resolute_main') }}">Resolute Management</a>
+                    <a class="nav-link" href="{{ url_for ('G0T0.main') }}">G0T0 Management</a>
                 </li>
                 {% endif %}
 
-                {% if session.resolute_member %}
+                {% if config.DISCORD_SESSION and config.DISCORD_SESSION.authorized %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('resolute.resolute_profile') }}">Resolute Profile</a>
+                    <a class="nav-link" href="{{ url_for ('G0T0.profile') }}">G0T0 Profile</a>
                 </li>
                 {% endif %}
                 
@@ -78,3 +91,5 @@
         </div>
     </div>
 </nav>
+
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/General/navbar.js') }}" type="module"></script>

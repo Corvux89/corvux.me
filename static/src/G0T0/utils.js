@@ -229,7 +229,8 @@ export function initSayTable(player) {
             lines: summary.num_lines,
             words: summary.num_words
         };
-    });
+    })
+        .filter(stat => player.characters.find(c => c.id == parseInt(stat.command))?.name);
     $("#say-table").DataTable({
         orderCellsTop: true,
         pageLength: 25,
@@ -546,7 +547,7 @@ export function initActivityPointsTable(activityPoints) {
         ]
     });
 }
-export function initLogTable() {
+export function initLogTable(guild_id) {
     const tableName = "#log-table";
     destroyTable(tableName);
     $(tableName).DataTable({
@@ -557,7 +558,7 @@ export function initLogTable() {
             emptyTable: "No logs to display."
         },
         ajax: {
-            url: 'api/logs',
+            url: `api/logs/${guild_id}`,
             type: 'POST',
             contentType: 'application/json',
             data: (d) => {

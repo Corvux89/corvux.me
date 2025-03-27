@@ -1,59 +1,56 @@
-import { stat } from 'fs'
 import { ToastError } from '../General/main.js'
-import { deleteMessage, getActivities, getActivityPoints, getChannels, getCodeconversions, getEntitlements, getFinancial, getGuild, getLevelCosts, getMessages, getPlayers, getRoles, getStores, newMessage, udpateCodeConversion, updateActivities, updateActivityPoints, updateFinancial, updateGuild, updateLevelCosts, updateMessage, updateStores } from './api.js'
-import { RefMessage, NewMessage, Log, Activity, Player, Character, ActivityPoint, playerName } from './types.js'
+import { Activity, ActivityPoint, Character, G0T0Guild, Log, NewMessage, Player, playerName, RefMessage } from './types.js'
 import { buildSaySummaryData, filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initEntitlementTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSaySummaryTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js'
-
 $('body').addClass("busy")
-buildAnnouncementTable()
+let guild = await bot.get_guild(userSession.guild.id)
+buildAnnouncementTable(guild)
 
-$("#announcement-ping").on("change", function (){
-    getGuild()
+// Announcements
+$("#announcement-tab-button").on('click', async function() {
+    $('body').addClass("busy")
+    let guild = await bot.get_guild(userSession.guild.id)
+    buildAnnouncementTable(guild)
+})
+
+async function buildAnnouncementTable(guild: G0T0Guild){
+    $("body").removeClass("busy")
+    $("#announcement-table-body").html('')
+    $("#announcement-ping").prop("checked", guild.ping_announcement)
+
+    initAnnouncementTable(guild.weekly_announcement)
+}
+
+$("#announcement-ping").on("change", async function (){
+    await bot.get_guild(userSession.guild.id)
     .then(guild => {
         guild.ping_announcement = $(this).prop("checked")
-        updateGuild(guild)
+        bot.update_guild(guild)
     })
 })
 
-$(document).on('click', '.announcement-delete', function(e){
-    e.stopPropagation()
-    getGuild()
-    .then(guild => {
-        guild.weekly_announcement.splice($(this).data('id'),1)
+$("#announcement-new-button").on('click', function(){
+    $("#announcement-modal-edit-form").data('id', "new")
+    $(".modal-body #announcement-title").val("")
+    $(".modal-body #announcement-body").val("")
+})
 
-        updateGuild(guild)
-        .then(function(){
-            buildAnnouncementTable()
+$(document).on('click', '#announcement-submit-button', function(){
+    var title = $("#announcement-title").val()
+    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : ""
+    var index = $("#announcement-modal-edit-form").data("id") 
+
+    var announcement = title != "" ? `${title}|${body}` : body
+
+    if (announcement != ""){
+        bot.get_guild(userSession.guild.id)
+        .then(guild => {
+            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString()
+            bot.update_guild(guild)
+            .then(function() {
+                buildAnnouncementTable(guild)
+            })
         })
-    })
-})
-
-$(document).on('click', '.message-delete', function(e){
-    e.stopPropagation()
-    const message_id = $(this).data('id')
-    $("#message-modal-delete-form").data('id', message_id)
-    .modal("show")
-})
-
-$(document).on('click', '#message-table tbody tr', async function(e){
-    const table = $("#message-table").DataTable()
-    const row = table.row(this)
-    const modal = $("#message-modal-edit-form")
-    const msg: RefMessage = row.data()
-    const guild = await getGuild()
-    const message = await getMessages(guild.id, msg.message_id) as RefMessage
-    
-    $("#message-title").val(message.title)
-    $("#message-channel").html('')
-        .prop("disabled", true)
-        .append(`
-            <option selected value="${message.channel_id}">${message.channel_name}</option>
-            `)
-    $("#message-pin").prop("checked", message.pin)
-    $("#message-body").val(message.content)
-
-    modal.data("id", message.message_id)
-    .modal("show")
+    }
 })
 
 $(document).on("click", "#announcement-table tbody tr", function(){
@@ -77,146 +74,37 @@ $(document).on("click", "#announcement-table tbody tr", function(){
     .modal("show")
 })
 
-$(document).on("click", "#log-table tbody tr", function(){
-    const table = $("#log-table").DataTable() 
-    const row = table.row(this);
-    const rowData: Log = row.data();
-
-    // Check if a dropdown row already exists and remove it
-    if ($(this).next().hasClass('dropdown-row')) {
-        $(this).next().remove();
-        return;
-    }
-
-    // Remove any existing dropdown rows
-    $('.dropdown-row').remove();
-
-    // Create a new dropdown row
-    const additionalInfo = `
-        <tr class="dropdown-row">
-            <td colspan="${table.columns().count()}">
-                <div class="p-3">
-                    <strong>Chain Codes:</strong> ${rowData.cc ?? '0'}<br>
-                    <strong>Credits:</strong> ${rowData.credits ?? '0'}<br>
-                    <strong>Faction:</strong> ${rowData.faction?.value ?? ''}<br>
-                    <strong>Renown:</strong> ${rowData.renown ?? '0'}
-                </div>
-            </td>
-        </tr>
-    `;
-
-    // Insert the dropdown row after the clicked row
-    $(this).after(additionalInfo);
-});
-
-$(document).on("click", "#player-character-table tbody tr", function(){
-    const table = $("#player-character-table").DataTable() 
-    const row = table.row(this);
-    const rowData: Character = row.data();
-    const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
-
-    if ($(this).next().hasClass('dropdown-row')) {
-        $(this).next().remove();
-        return;
-    }
-
-    $('.dropdown-row').remove();
-
-    const additionalInfo = `
-        <tr class="dropdown-row">
-            <td colspan="${table.columns().count()}">
-                <div class="p-3">
-                    <strong>Primary Faction:</strong> ${rowData.faction?.value ?? ''}<br>
-                    <strong>Credits:</strong> ${credits}<br>
-                </div>
-            </td>
-        </tr>
-    `;
-
-    $(this).after(additionalInfo);
-});
-
-$(document).on('click', '#player-table tbody tr', function(){
-    const table = $("#player-table").DataTable()
-    const playerData = table.row(this).data() as Player
-
-    $("#member-id").val(playerData.id)
-    $("#member-name").val(`${playerName(playerData.member)}`)
-
-    $("#player-cc").val(playerData.cc)
-    $("#player-div-cc").val(playerData.div_cc)
-    $("#player-act-points").val(playerData.activity_points)
-
-    initPlayerCharacterTable(playerData.characters)
-
-    initStatsTable(Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
-        command: key,
-        value: value
-    })))
-
-    initSayTable(playerData)
-
-    initGlobalNPCTable(playerData)
-
-    $("#player-modal").modal("show")
-    $("#member-overview-button").tab("show")
-    $("#command-stats-button").tab("show")
-})
-
-$(document).on('click', '.message-delete', function(e) {
+$(document).on('click', '.announcement-delete', function(e){
     e.stopPropagation()
-    var message_id = $(this).data('id')
-    $("#message-delete-button").data("id", message_id)
+    bot.get_guild(userSession.guild.id)
+    .then(guild => {
+        guild.weekly_announcement.splice($(this).data('id'),1)
+
+        bot.update_guild(guild)
+        .then(function(){
+            buildAnnouncementTable(guild)
+        })
+    })
 })
 
-$("#announcement-tab-button").on('click', function() {
-    $('body').addClass("busy")
-    buildAnnouncementTable()
-})
+// Messages/Posts
+async function buildMessageTab(){
+    const messages = await bot.get_messages(userSession.guild.id) as RefMessage[]
+    console.log("REBUILDING MESSAGES")
+    console.log(messages)
+    $("body").removeClass("busy")
 
-$("#price-settings-button").on('click', function(){
-    $('body').addClass("busy")
-    buildPricingTab()
-})
+    initMessageTable(messages)
+}
 
 $("#bot-messages-button").on('click', function(){
     $('body').addClass("busy")
     buildMessageTab()
 })
 
-$("#activity-settings-button").on('click', function(){
-    $('body').addClass("busy")
-    $("#activity-button").tab("show")
-    buildActivityTable()
-})
-
-$("#census-button").on('click', function(){
-    $('body').addClass("busy")
-    $("#players-tab-button").tab("show")
-    buildCensusTable()
-})
-
-$("#log-review-button").on('click', function(){
-    $('body').addClass("busy")
-    buildLogTable()
-})
-
-$("#message-delete-button").on('click', function(){
-    var message_id = $(this).data('id')
-    $('body').addClass("busy")
-    deleteMessage(message_id)
-    buildMessageTab()
-})
-
-$("#announcement-new-button").on('click', function(){
-    $("#announcement-modal-edit-form").data('id', "new")
-    $(".modal-body #announcement-title").val("")
-    $(".modal-body #announcement-body").val("")
-})
-
 $("#message-new-button").on('click', async function(){
     $('body').addClass("busy")
-    const channels = await getChannels()
+    const channels = await bot.get_channels(userSession.guild.id)
     channels.sort((a, b) => a.name.localeCompare(b.name))
     $('body').removeClass("busy")
     $(".modal-body #message-title").val("")
@@ -238,45 +126,6 @@ $("#message-new-button").on('click', async function(){
         .modal("show")
 })
 
-$(document).on('click', '#announcement-submit-button', function(){
-    var title = $("#announcement-title").val()
-    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : ""
-    var index = $("#announcement-modal-edit-form").data("id") 
-
-    var announcement = title != "" ? `${title}|${body}` : body
-
-    if (announcement != ""){
-        getGuild()
-        .then(guild => {
-            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString()
-
-            updateGuild(guild)
-            .then(function() {
-                buildAnnouncementTable()
-            })
-        })
-    }
-})
-
-$(document).on('input', '.point-input', function(){
-    const currentInput = $(this)
-    const currentValue = parseFloat(currentInput.val())
-    const currentRow = currentInput.closest("tr")
-    const nextRow = currentRow.next()
-    const nextInput = nextRow.find(".point-input")
-
-    if (nextInput.length > 0){
-        const nextValue = parseFloat(nextInput.val().toString())
-
-        if (!isNaN(nextValue) && currentValue >= nextValue){
-            currentInput.addClass('is-invalid')
-            ToastError("Points must be less than the next value")
-        } else{
-            currentInput.removeClass("is-invalid")
-        }
-    }
-})
-
 $('#message-save-button').on('click', function(e){
     if ($('#message-title').val() == '' || $('#message-body').val() == ''){
         ToastError("Please fill out a title and a body")
@@ -295,8 +144,10 @@ $('#message-save-button').on('click', function(e){
         NewMessage.title = $("#message-title").val().toString()
         
         $('body').addClass("busy")
-        newMessage(NewMessage)
-        .then(()=> buildMessageTab())
+        bot.new_message(userSession.guild.id, NewMessage)
+        .then(function(){
+            buildMessageTab()
+        })
     } else {
         var UpdateMessage = {
             "message_id": message_id,
@@ -308,19 +159,57 @@ $('#message-save-button').on('click', function(e){
         } as RefMessage
 
         $('body').addClass("busy")
-        updateMessage(UpdateMessage)
-        .then(() => buildMessageTab())
+        bot.update_message(UpdateMessage)
+        .then(function(){
+            buildMessageTab()
+        })
     }
 
     modal.modal("hide")
 })
 
+$(document).on('click', '#message-table tbody tr', async function(e){
+    const table = $("#message-table").DataTable()
+    const row = table.row(this)
+    const modal = $("#message-modal-edit-form")
+    const msg: RefMessage = row.data()
+    const message = await bot.get_messages(userSession.guild.id, msg.message_id) as RefMessage
+    
+    $("#message-title").val(message.title)
+    $("#message-channel").html('')
+        .prop("disabled", true)
+        .append(`
+            <option selected value="${message.channel_id}">${message.channel_name}</option>
+            `)
+    $("#message-pin").prop("checked", message.pin)
+    $("#message-body").val(message.content)
 
+    modal.data("id", message.message_id)
+    .modal("show")
+})
+
+$(document).on('click', '.message-delete', function(e){
+    e.stopPropagation()
+    const message_id = $(this).data('id')
+    $("#message-delete-button").data("id", message_id)
+    $("#message-modal-delete-form").modal("show")
+})
+
+$("#message-delete-button").on('click', async function(){
+    const message_id = $(this).data('id')
+    $('body').addClass("busy")
+    bot.delete_message(message_id)
+    .then(function(){
+        buildMessageTab()
+    })
+})
+
+// Guild Settings
 $('#guild-settings-button').on('click', async function() {
     $('body').addClass("busy")
-    const guild = await getGuild()
-    const roles = await getRoles()
-    const channels = await getChannels()
+    const guild = await bot.get_guild(userSession.guild.id)
+    const roles = await bot.get_roles(userSession.guild.id)
+    const channels = await bot.get_channels(userSession.guild.id)
     roles.sort((a, b) => a.name.localeCompare(b.name))
     channels.sort((a, b) => a.name.localeCompare(b.name))
     $('body').removeClass("busy")
@@ -369,45 +258,9 @@ $('#guild-settings-button').on('click', async function() {
     
 })
 
-$('#financial-settings-button').on('click', async function(){
-    $('body').addClass("busy")
-    const fin = await getFinancial()
-    const store = await getStores()
-    const entitlements = await getEntitlements()
-    $("body").removeClass("busy")
-
-    $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`)
-    $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`)
-    $('#reserve').val(`${fin.reserve.toFixed(2)}`)
-
-    initSKUTable(store)
-    initEntitlementTable(entitlements, store)
-})
-
-$('#financial-submit-button').on('click', function(){
-    getFinancial()
-    .then(fin => {
-        fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0
-        fin.monthly_total = Number($('#monthly-total').val()) ?? 0
-        fin.reserve = Number($('#reserve').val()) ?? 0
-
-        updateFinancial(fin)
-    })
-})
-
-$('#sku-submit-button').on('click', function(){
-    getStores()
-    .then(stores => {
-        stores.forEach(sku => {
-            sku.user_cost = parseFloat($(`.sku-cost-input[data-id="${sku.sku}"]`).val().toString())
-        })
-
-        updateStores(stores)
-    })
-})
 
 $('#guild-settings-save-button').on('click', function(){
-    getGuild()
+    bot.get_guild(userSession.guild.id)
     .then(guild => {
         if (!$('#guild-max-level').val()) ToastError("Please enter in a max level")
         
@@ -438,12 +291,28 @@ $('#guild-settings-save-button').on('click', function(){
         guild.activity_points_channel = $('#guild-activity-points-channel').find(':selected').val().toString()
         guild.rp_post_channel = $('#guild-rp-post-channel').find(':selected').val().toString()
         guild.dev_channels = $('#guild-dev-channels').find(':selected').toArray().map(e => $(e).val().toString())
-        updateGuild(guild)
+        bot.update_guild(guild)
     })
 })
 
+// Activities Tab
+$("#activity-settings-button").on('click', function(){
+    $('body').addClass("busy")
+    $("#activity-button").tab("show")
+    buildActivityTable()
+})
+
+async function buildActivityTable(){
+    const activities: Activity[] = await bot.get_activities() as Activity[]
+    const activityPoints: ActivityPoint[] = await bot.get_activity_points() as ActivityPoint[]
+    $("body").removeClass("busy")
+
+    initActivityTable(activities)
+    initActivityPointsTable(activityPoints)
+}
+
 $('#activity-submit-button').on('click', function(){
-    getActivities()
+    bot.get_activities()
     .then(activities => {
         activities.forEach(activity => {
             let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val()
@@ -454,30 +323,7 @@ $('#activity-submit-button').on('click', function(){
             activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0
         })
 
-        updateActivities(activities)
-
-    })
-})
-
-$("#conversion-submit-button").on('click', function(){
-    getCodeconversions()
-    .then(conversions => {
-        conversions.forEach(conversion => {
-            conversion.value = parseInt($(`.credit-input[data-id="${conversion.id}"]`).val().toString())
-        })
-
-        udpateCodeConversion(conversions)
-    })
-})
-
-$("#level-cost-submit-button").on('click', function(){
-    getLevelCosts()
-    .then(costs => {
-        costs.forEach(cost => {
-            cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString())
-        })
-        console.log(costs)
-        updateLevelCosts(costs)
+        bot.update_activities(activities)
     })
 })
 
@@ -486,64 +332,44 @@ $("#activity-points-submit-button").on('click', function(){
         return ToastError("Please resolve erorrs before submitting")
     }
 
-    getActivityPoints()
+    bot.get_activity_points()
     .then(activities => {
         activities.forEach(activity => {
             activity.points = parseInt($(`.point-input[data-id="${activity.id}"`).val().toString())
         })
 
-        updateActivityPoints(activities)
+        bot.update_activity_points(activities)
     })
 })
 
-async function buildAnnouncementTable(){
-    const guild = await getGuild()
-    $("body").removeClass("busy")
-    $("#announcement-table-body").html('')
-    $("#announcement-ping").prop("checked", guild.ping_announcement)
+$(document).on('input', '.point-input', function(){
+    const currentInput = $(this)
+    const currentValue = parseFloat(currentInput.val())
+    const currentRow = currentInput.closest("tr")
+    const nextRow = currentRow.next()
+    const nextInput = nextRow.find(".point-input")
 
-    initAnnouncementTable(guild.weekly_announcement)
-}
+    if (nextInput.length > 0){
+        const nextValue = parseFloat(nextInput.val().toString())
 
-async function buildActivityTable(){
-    const activities: Activity[] = await getActivities()
-    const activityPoints: ActivityPoint[] = await getActivityPoints()
-    $("body").removeClass("busy")
+        if (!isNaN(nextValue) && currentValue >= nextValue){
+            currentInput.addClass('is-invalid')
+            ToastError("Points must be less than the next value")
+        } else{
+            currentInput.removeClass("is-invalid")
+        }
+    }
+})
 
-    initActivityTable(activities)
-    initActivityPointsTable(activityPoints)
-}
-
-async function buildCensusTable(){
-    const players: Player[] = await getPlayers()
-    const characters: Character[] = players.flatMap(player => player.characters.map(character => ({
-        ...character,
-        player_name: playerName(player.member)
-    })))
-
-    $("body").removeClass("busy")
-
-    initPlayerTable(players)
-    initCharacterTable(characters)
-    initSaySummaryTable(players)
-}
-
-async function buildLogTable(){
-    initLogTable()
-    
-    $("body").removeClass("busy")
-}
-
-async function buildMessageTab(){
-    const messages = await getMessages() as RefMessage[]
-    $("body").removeClass("busy")
-
-    initMessageTable(messages)
-}
+// Pricing Tab
+$("#price-settings-button").on('click', function(){
+    $('body').addClass("busy")
+    buildPricingTab()
+})
 
 async function buildPricingTab(){
-    const conversions = await getCodeconversions()
-    const costs = await getLevelCosts()
+    const conversions = await bot.get_code_conversions()
+    const costs = await bot.get_level_costs()
     $("body").removeClass("busy")
 
     initConversionTable(conversions)
@@ -616,4 +442,183 @@ $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
     }
 
     return true
+})
+
+$("#conversion-submit-button").on('click', function(){
+    bot.get_code_conversions()
+    .then(conversions => {
+        conversions.forEach(conversion => {
+            conversion.value = parseInt($(`.credit-input[data-id="${conversion.id}"]`).val().toString())
+        })
+
+        bot.update_code_conversions(conversions)
+    })
+})
+
+
+$("#level-cost-submit-button").on('click', function(){
+    bot.get_level_costs()
+    .then(costs => {
+        costs.forEach(cost => {
+            cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString())
+        })
+        bot.update_level_costs(costs)
+    })
+})
+
+// Census Tab
+$("#census-button").on('click', function(){
+    $('body').addClass("busy")
+    $("#players-tab-button").tab("show")
+    buildCensusTable()
+})
+
+async function buildCensusTable(){
+    const players = await bot.get_player(userSession.guild.id) as Player[]
+    const characters: Character[] = players.flatMap(player => player.characters.map(character => ({
+        ...character,
+        player_name: playerName(player.member)
+    })))
+
+    $("body").removeClass("busy")
+
+    initPlayerTable(players)
+    initCharacterTable(characters)
+    initSaySummaryTable(players)
+}
+
+$(document).on('click', '#player-table tbody tr', function(){
+    const table = $("#player-table").DataTable()
+    const playerData = table.row(this).data() as Player
+
+    $("#member-id").val(playerData.id)
+    $("#member-name").val(`${playerName(playerData.member)}`)
+
+    $("#player-cc").val(playerData.cc)
+    $("#player-div-cc").val(playerData.div_cc)
+    $("#player-act-points").val(playerData.activity_points)
+
+    initPlayerCharacterTable(playerData.characters)
+
+    initStatsTable(Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
+        command: key,
+        value: value
+    })))
+
+    initSayTable(playerData)
+
+    initGlobalNPCTable(playerData)
+
+    $("#player-modal").modal("show")
+    $("#member-overview-button").tab("show")
+    $("#command-stats-button").tab("show")
+})
+
+$(document).on("click", "#player-character-table tbody tr", function(){
+    const table = $("#player-character-table").DataTable() 
+    const row = table.row(this);
+    const rowData: Character = row.data();
+    const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
+
+    if ($(this).next().hasClass('dropdown-row')) {
+        $(this).next().remove();
+        return;
+    }
+
+    $('.dropdown-row').remove();
+
+    const additionalInfo = `
+        <tr class="dropdown-row">
+            <td colspan="${table.columns().count()}">
+                <div class="p-3">
+                    <strong>Primary Faction:</strong> ${rowData.faction?.value ?? ''}<br>
+                    <strong>Credits:</strong> ${credits}<br>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    $(this).after(additionalInfo);
+});
+
+// Logs
+$("#log-review-button").on('click', function(){
+    $('body').addClass("busy")
+    buildLogTable()
+})
+
+async function buildLogTable(){
+    initLogTable(userSession.guild.id)
+    
+    $("body").removeClass("busy")
+}
+
+$(document).on("click", "#log-table tbody tr", function(){
+    const table = $("#log-table").DataTable() 
+    const row = table.row(this);
+    const rowData: Log = row.data();
+
+    // Check if a dropdown row already exists and remove it
+    if ($(this).next().hasClass('dropdown-row')) {
+        $(this).next().remove();
+        return;
+    }
+
+    // Remove any existing dropdown rows
+    $('.dropdown-row').remove();
+
+    // Create a new dropdown row
+    const additionalInfo = `
+        <tr class="dropdown-row">
+            <td colspan="${table.columns().count()}">
+                <div class="p-3">
+                    <strong>Chain Codes:</strong> ${rowData.cc ?? '0'}<br>
+                    <strong>Credits:</strong> ${rowData.credits ?? '0'}<br>
+                    <strong>Faction:</strong> ${rowData.faction?.value ?? ''}<br>
+                    <strong>Renown:</strong> ${rowData.renown ?? '0'}
+                </div>
+            </td>
+        </tr>
+    `;
+
+    // Insert the dropdown row after the clicked row
+    $(this).after(additionalInfo);
+});
+
+// Financial Tab
+$('#financial-settings-button').on('click', async function(){
+    $('body').addClass("busy")
+    const fin = await bot.get_financials()
+    const store = await bot.get_store_items()
+    const entitlements = await bot.get_entitlements()
+    $("body").removeClass("busy")
+
+    $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`)
+    $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`)
+    $('#reserve').val(`${fin.reserve.toFixed(2)}`)
+
+    initSKUTable(store)
+    initEntitlementTable(entitlements, store)
+})
+
+$('#financial-submit-button').on('click', function(){
+    bot.get_financials()
+    .then(fin => {
+        fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0
+        fin.monthly_total = Number($('#monthly-total').val()) ?? 0
+        fin.reserve = Number($('#reserve').val()) ?? 0
+
+        bot.update_financials(fin)
+    })
+})
+
+$('#sku-submit-button').on('click', function(){
+    bot.get_store_items()
+    .then(stores => {
+        stores.forEach(sku => {
+            sku.user_cost = parseFloat($(`.sku-cost-input[data-id="${sku.sku}"]`).val().toString())
+        })
+
+        bot.update_store_items(stores)
+    })
 })

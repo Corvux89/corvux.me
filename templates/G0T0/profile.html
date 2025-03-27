@@ -7,7 +7,7 @@
 <div class="container-fluid">
     <div class="row mb-2">
         <div class="col">
-            <text-input label-text="Member ID" custom-id="member-id" disabled value="{{user.id}}"></text-input>
+            <text-input label-text="Member ID" custom-id="member-id" disabled></text-input>
         </div>
         <div class="col">
             <text-input label-text="Name" custom-id="member-name" disabled></text-input>
@@ -62,5 +62,5 @@
 </div>
 
 
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/Resolute/profile.js') }}" type="module"></script>
+<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/G0T0/profile.js') }}" type="module"></script>
 {% endblock %}

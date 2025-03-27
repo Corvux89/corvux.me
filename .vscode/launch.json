@@ -18,12 +18,22 @@
             "name": "Chrome Debug",
             "url": "http://127.0.0.1:5000",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "node",
+            "name": "Typescript Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/static/src/Resolute/profile.ts",
+            "outFiles": [
+                "${workspaceFolder}/**/*.(m|c|)js",
+                "!**/node_modules/**"
+            ]
         }
     ],
     "compounds": [
         {
             "name": "Full Stack",
-            "configurations": ["Flask App", "Chrome Debug",]
+            "configurations": ["Flask App", "Chrome Debug", "Typescript Debug"]
         }
     ]
 }

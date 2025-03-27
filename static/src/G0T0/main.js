@@ -74,8 +74,6 @@ $(document).on('click', '.announcement-delete', function (e) {
 // Messages/Posts
 async function buildMessageTab() {
     const messages = await bot.get_messages(userSession.guild.id);
-    console.log("REBUILDING MESSAGES");
-    console.log(messages);
     $("body").removeClass("busy");
     initMessageTable(messages);
 }
@@ -270,9 +268,11 @@ $('#activity-submit-button').on('click', function () {
         activities.forEach(activity => {
             let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val();
             let pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
+            let crInputValue = $(`.cr-input[data-id="${activity.id}"]`).val();
             activity.cc = ccInputValue ? parseInt(ccInputValue.toString()) : null;
             activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked');
             activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0;
+            activity.credit_ratio = crInputValue ? parseFloat(crInputValue.toString()) : null;
         });
         bot.update_activities(activities);
     });

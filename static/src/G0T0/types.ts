@@ -56,7 +56,8 @@ export interface Activity{
     value: string,
     cc: number,
     diversion: boolean,
-    points: number
+    points: number,
+    credit_ratio: number
 }
 
 export interface ActivityPoint{

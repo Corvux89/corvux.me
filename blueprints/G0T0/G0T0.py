@@ -47,8 +47,6 @@ from models.G0T0 import (
 )
 from sqlalchemy.orm import joinedload
 
-# TODO: Cleanup API Funcitons
-
 
 G0T0_blueprint = Blueprint("G0T0", __name__)
 app = Flask(__name__)
@@ -518,6 +516,7 @@ def update_activities():
                 activity.cc = act.cc
                 activity.diversion = act.diversion
                 activity.points = act.points
+                activity.credit_ratio = act.credit_ratio
 
         db.session.commit()
         trigger_compendium_reload()

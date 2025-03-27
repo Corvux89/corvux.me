@@ -496,6 +496,16 @@ export function initActivityTable(activities) {
                 }
             },
             {
+                data: "credit_ratio",
+                "title": "Credit Ratio",
+                orderable: false,
+                searchable: false,
+                width: "20%",
+                render: function (data, type, row) {
+                    return `<input type="number" class="form-control cr-input" data-id="${row.id}" step="0.25" value="${data != null ? data : ''}"/>`;
+                }
+            },
+            {
                 data: "diversion",
                 title: "Diversion",
                 orderable: false,

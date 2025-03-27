@@ -50,7 +50,6 @@ export class UserSession extends WebClass {
             this.initialised = true;
             const event = new CustomEvent("userSessionReady");
             document.dispatchEvent(event);
-            console.log("dispatched");
         }
     }
     async update(guild_id) {

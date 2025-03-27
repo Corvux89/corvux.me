@@ -8,7 +8,6 @@ async function buildGuildDropdown() {
     let guild_list = $("#guild-list");
     guild_list.html('');
     userSession.guilds.forEach(g => {
-        console.log(guildAbbreviation(g));
         guild_list.append(`
             <li>
                 <div class="dropdown-item d-flex align-items-center guild-id" data-id="${g.id}">

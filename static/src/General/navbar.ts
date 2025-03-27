@@ -12,7 +12,6 @@ async function buildGuildDropdown(){
     guild_list.html('')
 
     userSession.guilds.forEach(g => {
-        console.log(guildAbbreviation(g))
         guild_list.append(
             `
             <li>

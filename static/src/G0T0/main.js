@@ -1,9 +1,15 @@
 import { ToastError } from '../General/main.js';
-import { initActivityPointsTable, initActivityTable, initAnnouncementTable, initMessageTable, populateSelectOption } from './utils.js';
+import { playerName } from './types.js';
+import { buildSaySummaryData, filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initEntitlementTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSaySummaryTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js';
 $('body').addClass("busy");
 let guild = await bot.get_guild(userSession.guild.id);
 buildAnnouncementTable(guild);
 // Announcements
+$("#announcement-tab-button").on('click', async function () {
+    $('body').addClass("busy");
+    let guild = await bot.get_guild(userSession.guild.id);
+    buildAnnouncementTable(guild);
+});
 async function buildAnnouncementTable(guild) {
     $("body").removeClass("busy");
     $("#announcement-table-body").html('');
@@ -245,7 +251,7 @@ $('#guild-settings-save-button').on('click', function () {
         bot.update_guild(guild);
     });
 });
-// Activities
+// Activities Tab
 $("#activity-settings-button").on('click', function () {
     $('body').addClass("busy");
     $("#activity-button").tab("show");
@@ -283,222 +289,229 @@ $("#activity-points-submit-button").on('click', function () {
         bot.update_activity_points(activities);
     });
 });
-// $(document).on("click", "#log-table tbody tr", function(){
-//     const table = $("#log-table").DataTable() 
-//     const row = table.row(this);
-//     const rowData: Log = row.data();
-//     // Check if a dropdown row already exists and remove it
-//     if ($(this).next().hasClass('dropdown-row')) {
-//         $(this).next().remove();
-//         return;
-//     }
-//     // Remove any existing dropdown rows
-//     $('.dropdown-row').remove();
-//     // Create a new dropdown row
-//     const additionalInfo = `
-//         <tr class="dropdown-row">
-//             <td colspan="${table.columns().count()}">
-//                 <div class="p-3">
-//                     <strong>Chain Codes:</strong> ${rowData.cc ?? '0'}<br>
-//                     <strong>Credits:</strong> ${rowData.credits ?? '0'}<br>
-//                     <strong>Faction:</strong> ${rowData.faction?.value ?? ''}<br>
-//                     <strong>Renown:</strong> ${rowData.renown ?? '0'}
-//                 </div>
-//             </td>
-//         </tr>
-//     `;
-//     // Insert the dropdown row after the clicked row
-//     $(this).after(additionalInfo);
-// });
-// $(document).on("click", "#player-character-table tbody tr", function(){
-//     const table = $("#player-character-table").DataTable() 
-//     const row = table.row(this);
-//     const rowData: Character = row.data();
-//     const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
-//     if ($(this).next().hasClass('dropdown-row')) {
-//         $(this).next().remove();
-//         return;
-//     }
-//     $('.dropdown-row').remove();
-//     const additionalInfo = `
-//         <tr class="dropdown-row">
-//             <td colspan="${table.columns().count()}">
-//                 <div class="p-3">
-//                     <strong>Primary Faction:</strong> ${rowData.faction?.value ?? ''}<br>
-//                     <strong>Credits:</strong> ${credits}<br>
-//                 </div>
-//             </td>
-//         </tr>
-//     `;
-//     $(this).after(additionalInfo);
-// });
-// $(document).on('click', '#player-table tbody tr', function(){
-//     const table = $("#player-table").DataTable()
-//     const playerData = table.row(this).data() as Player
-//     $("#member-id").val(playerData.id)
-//     $("#member-name").val(`${playerName(playerData.member)}`)
-//     $("#player-cc").val(playerData.cc)
-//     $("#player-div-cc").val(playerData.div_cc)
-//     $("#player-act-points").val(playerData.activity_points)
-//     initPlayerCharacterTable(playerData.characters)
-//     initStatsTable(Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
-//         command: key,
-//         value: value
-//     })))
-//     initSayTable(playerData)
-//     initGlobalNPCTable(playerData)
-//     $("#player-modal").modal("show")
-//     $("#member-overview-button").tab("show")
-//     $("#command-stats-button").tab("show")
-// })
-// $("#announcement-tab-button").on('click', function() {
-//     $('body').addClass("busy")
-//     buildAnnouncementTable()
-// })
-// $("#price-settings-button").on('click', function(){
-//     $('body').addClass("busy")
-//     buildPricingTab()
-// })
-// $("#census-button").on('click', function(){
-//     $('body').addClass("busy")
-//     $("#players-tab-button").tab("show")
-//     buildCensusTable()
-// })
-// $("#log-review-button").on('click', function(){
-//     $('body').addClass("busy")
-//     buildLogTable()
-// })
-// $(document).on('input', '.point-input', function(){
-//     const currentInput = $(this)
-//     const currentValue = parseFloat(currentInput.val())
-//     const currentRow = currentInput.closest("tr")
-//     const nextRow = currentRow.next()
-//     const nextInput = nextRow.find(".point-input")
-//     if (nextInput.length > 0){
-//         const nextValue = parseFloat(nextInput.val().toString())
-//         if (!isNaN(nextValue) && currentValue >= nextValue){
-//             currentInput.addClass('is-invalid')
-//             ToastError("Points must be less than the next value")
-//         } else{
-//             currentInput.removeClass("is-invalid")
-//         }
-//     }
-// })
-// $('#financial-settings-button').on('click', async function(){
-//     $('body').addClass("busy")
-//     const fin = await getFinancial()
-//     const store = await getStores()
-//     const entitlements = await getEntitlements()
-//     $("body").removeClass("busy")
-//     $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`)
-//     $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`)
-//     $('#reserve').val(`${fin.reserve.toFixed(2)}`)
-//     initSKUTable(store)
-//     initEntitlementTable(entitlements, store)
-// })
-// $('#financial-submit-button').on('click', function(){
-//     getFinancial()
-//     .then(fin => {
-//         fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0
-//         fin.monthly_total = Number($('#monthly-total').val()) ?? 0
-//         fin.reserve = Number($('#reserve').val()) ?? 0
-//         updateFinancial(fin)
-//     })
-// })
-// $('#sku-submit-button').on('click', function(){
-//     getStores()
-//     .then(stores => {
-//         stores.forEach(sku => {
-//             sku.user_cost = parseFloat($(`.sku-cost-input[data-id="${sku.sku}"]`).val().toString())
-//         })
-//         updateStores(stores)
-//     })
-// })
-// $("#conversion-submit-button").on('click', function(){
-//     getCodeconversions()
-//     .then(conversions => {
-//         conversions.forEach(conversion => {
-//             conversion.value = parseInt($(`.credit-input[data-id="${conversion.id}"]`).val().toString())
-//         })
-//         udpateCodeConversion(conversions)
-//     })
-// })
-// $("#level-cost-submit-button").on('click', function(){
-//     getLevelCosts()
-//     .then(costs => {
-//         costs.forEach(cost => {
-//             cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString())
-//         })
-//         updateLevelCosts(costs)
-//     })
-// })
-// async function buildCensusTable(){
-//     const players = await getPlayers() as Player[]
-//     const characters: Character[] = players.flatMap(player => player.characters.map(character => ({
-//         ...character,
-//         player_name: playerName(player.member)
-//     })))
-//     $("body").removeClass("busy")
-//     initPlayerTable(players)
-//     initCharacterTable(characters)
-//     initSaySummaryTable(players)
-// }
-// async function buildLogTable(){
-//     initLogTable()
-//     $("body").removeClass("busy")
-// }
-// async function buildPricingTab(){
-//     const conversions = await getCodeconversions()
-//     const costs = await getLevelCosts()
-//     $("body").removeClass("busy")
-//     initConversionTable(conversions)
-//     initLevelCostTable(costs)
-// }
-// $("#npc-start-date, #npc-end-date").on("change", function(){
-//     $("#global-npc-table").DataTable().draw()
-// })
-// $("#say-start-date, #say-end-date").on("change", function(){
-//     $("#say-table").DataTable().draw()
-// })
-// $("#say-summary-start-date, #say-summary-end-date").on("change", function(){
-//     $("#say-summary-table").DataTable().draw()
-// })
-// // Filter Functions
-// $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
-//     if (settings.nTable.id == 'global-npc-table') {
-//         var playerID = $("#member-id").val()
-//         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
-//         const npcTable = $("#global-npc-table").DataTable()
-//         const startDate = $("#npc-start-date").val() as string
-//         const endDate = $("#npc-end-date").val() as string
-//         var rowData = npcTable.row(dataIndex).data()
-//         if (!rowData) return true
-//         const key = rowData.command
-//         const npcStats = playerData.statistics.npc[key]
-//         if (!npcStats) return true
-//         rowData = filterStats(npcStats, rowData, startDate, endDate)
-//         npcTable.row(dataIndex).data(rowData)
-//         return rowData.count > 0
-//     } else if (settings.nTable.id == 'say-table'){
-//         var playerID = $("#member-id").val()
-//         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
-//         const sayTable = $("#say-table").DataTable()
-//         const startDate = $("#say-start-date").val() as string
-//         const endDate = $("#say-end-date").val() as string
-//         var rowData = sayTable.row(dataIndex).data()
-//         if (!rowData) return true
-//         const key = rowData.command
-//         const npcStats = playerData.statistics.say[key]
-//         if (!npcStats) return true
-//         rowData = filterStats(npcStats, rowData, startDate, endDate)
-//         sayTable.row(dataIndex).data(rowData)
-//         return rowData.count > 0
-//     } else if (settings.nTable.id == 'say-summary-table'){
-//         const playerData = $("#player-table").DataTable().rows().data().toArray() as Player[]
-//         const sayTable = $("#say-summary-table").DataTable()
-//         const stats = buildSaySummaryData(playerData)
-//         sayTable.row(0).data(stats)
-//         return stats.count > 0
-//     }
-//     return true
-// })
+$(document).on('input', '.point-input', function () {
+    const currentInput = $(this);
+    const currentValue = parseFloat(currentInput.val());
+    const currentRow = currentInput.closest("tr");
+    const nextRow = currentRow.next();
+    const nextInput = nextRow.find(".point-input");
+    if (nextInput.length > 0) {
+        const nextValue = parseFloat(nextInput.val().toString());
+        if (!isNaN(nextValue) && currentValue >= nextValue) {
+            currentInput.addClass('is-invalid');
+            ToastError("Points must be less than the next value");
+        }
+        else {
+            currentInput.removeClass("is-invalid");
+        }
+    }
+});
+// Pricing Tab
+$("#price-settings-button").on('click', function () {
+    $('body').addClass("busy");
+    buildPricingTab();
+});
+async function buildPricingTab() {
+    const conversions = await bot.get_code_conversions();
+    const costs = await bot.get_level_costs();
+    $("body").removeClass("busy");
+    initConversionTable(conversions);
+    initLevelCostTable(costs);
+}
+$("#npc-start-date, #npc-end-date").on("change", function () {
+    $("#global-npc-table").DataTable().draw();
+});
+$("#say-start-date, #say-end-date").on("change", function () {
+    $("#say-table").DataTable().draw();
+});
+$("#say-summary-start-date, #say-summary-end-date").on("change", function () {
+    $("#say-summary-table").DataTable().draw();
+});
+// Filter Functions
+$.fn.dataTable.ext.search.push(async function (settings, data, dataIndex) {
+    if (settings.nTable.id == 'global-npc-table') {
+        var playerID = $("#member-id").val();
+        const playerData = $("#player-table").DataTable().rows().data().toArray().find((player) => player.id == playerID);
+        const npcTable = $("#global-npc-table").DataTable();
+        const startDate = $("#npc-start-date").val();
+        const endDate = $("#npc-end-date").val();
+        var rowData = npcTable.row(dataIndex).data();
+        if (!rowData)
+            return true;
+        const key = rowData.command;
+        const npcStats = playerData.statistics.npc[key];
+        if (!npcStats)
+            return true;
+        rowData = filterStats(npcStats, rowData, startDate, endDate);
+        npcTable.row(dataIndex).data(rowData);
+        return rowData.count > 0;
+    }
+    else if (settings.nTable.id == 'say-table') {
+        var playerID = $("#member-id").val();
+        const playerData = $("#player-table").DataTable().rows().data().toArray().find((player) => player.id == playerID);
+        const sayTable = $("#say-table").DataTable();
+        const startDate = $("#say-start-date").val();
+        const endDate = $("#say-end-date").val();
+        var rowData = sayTable.row(dataIndex).data();
+        if (!rowData)
+            return true;
+        const key = rowData.command;
+        const npcStats = playerData.statistics.say[key];
+        if (!npcStats)
+            return true;
+        rowData = filterStats(npcStats, rowData, startDate, endDate);
+        sayTable.row(dataIndex).data(rowData);
+        return rowData.count > 0;
+    }
+    else if (settings.nTable.id == 'say-summary-table') {
+        const playerData = $("#player-table").DataTable().rows().data().toArray();
+        const sayTable = $("#say-summary-table").DataTable();
+        const stats = buildSaySummaryData(playerData);
+        sayTable.row(0).data(stats);
+        return stats.count > 0;
+    }
+    return true;
+});
+$("#conversion-submit-button").on('click', function () {
+    bot.get_code_conversions()
+        .then(conversions => {
+        conversions.forEach(conversion => {
+            conversion.value = parseInt($(`.credit-input[data-id="${conversion.id}"]`).val().toString());
+        });
+        bot.update_code_conversions(conversions);
+    });
+});
+$("#level-cost-submit-button").on('click', function () {
+    bot.get_level_costs()
+        .then(costs => {
+        costs.forEach(cost => {
+            cost.cc = parseInt($(`.level-cost-input[data-id="${cost.id}"]`).val().toString());
+        });
+        bot.update_level_costs(costs);
+    });
+});
+// Census Tab
+$("#census-button").on('click', function () {
+    $('body').addClass("busy");
+    $("#players-tab-button").tab("show");
+    buildCensusTable();
+});
+async function buildCensusTable() {
+    const players = await bot.get_player(userSession.guild.id);
+    const characters = players.flatMap(player => player.characters.map(character => ({
+        ...character,
+        player_name: playerName(player.member)
+    })));
+    $("body").removeClass("busy");
+    initPlayerTable(players);
+    initCharacterTable(characters);
+    initSaySummaryTable(players);
+}
+$(document).on('click', '#player-table tbody tr', function () {
+    const table = $("#player-table").DataTable();
+    const playerData = table.row(this).data();
+    $("#member-id").val(playerData.id);
+    $("#member-name").val(`${playerName(playerData.member)}`);
+    $("#player-cc").val(playerData.cc);
+    $("#player-div-cc").val(playerData.div_cc);
+    $("#player-act-points").val(playerData.activity_points);
+    initPlayerCharacterTable(playerData.characters);
+    initStatsTable(Object.entries(playerData.statistics.commands ?? {}).map(([key, value]) => ({
+        command: key,
+        value: value
+    })));
+    initSayTable(playerData);
+    initGlobalNPCTable(playerData);
+    $("#player-modal").modal("show");
+    $("#member-overview-button").tab("show");
+    $("#command-stats-button").tab("show");
+});
+$(document).on("click", "#player-character-table tbody tr", function () {
+    const table = $("#player-character-table").DataTable();
+    const row = table.row(this);
+    const rowData = row.data();
+    const credits = new Intl.NumberFormat().format(rowData.credits ?? 0);
+    if ($(this).next().hasClass('dropdown-row')) {
+        $(this).next().remove();
+        return;
+    }
+    $('.dropdown-row').remove();
+    const additionalInfo = `
+        <tr class="dropdown-row">
+            <td colspan="${table.columns().count()}">
+                <div class="p-3">
+                    <strong>Primary Faction:</strong> ${rowData.faction?.value ?? ''}<br>
+                    <strong>Credits:</strong> ${credits}<br>
+                </div>
+            </td>
+        </tr>
+    `;
+    $(this).after(additionalInfo);
+});
+// Logs
+$("#log-review-button").on('click', function () {
+    $('body').addClass("busy");
+    buildLogTable();
+});
+async function buildLogTable() {
+    initLogTable(userSession.guild.id);
+    $("body").removeClass("busy");
+}
+$(document).on("click", "#log-table tbody tr", function () {
+    const table = $("#log-table").DataTable();
+    const row = table.row(this);
+    const rowData = row.data();
+    // Check if a dropdown row already exists and remove it
+    if ($(this).next().hasClass('dropdown-row')) {
+        $(this).next().remove();
+        return;
+    }
+    // Remove any existing dropdown rows
+    $('.dropdown-row').remove();
+    // Create a new dropdown row
+    const additionalInfo = `
+        <tr class="dropdown-row">
+            <td colspan="${table.columns().count()}">
+                <div class="p-3">
+                    <strong>Chain Codes:</strong> ${rowData.cc ?? '0'}<br>
+                    <strong>Credits:</strong> ${rowData.credits ?? '0'}<br>
+                    <strong>Faction:</strong> ${rowData.faction?.value ?? ''}<br>
+                    <strong>Renown:</strong> ${rowData.renown ?? '0'}
+                </div>
+            </td>
+        </tr>
+    `;
+    // Insert the dropdown row after the clicked row
+    $(this).after(additionalInfo);
+});
+// Financial Tab
+$('#financial-settings-button').on('click', async function () {
+    $('body').addClass("busy");
+    const fin = await bot.get_financials();
+    const store = await bot.get_store_items();
+    const entitlements = await bot.get_entitlements();
+    $("body").removeClass("busy");
+    $('#monthly-goal').val(`${fin.monthly_goal.toFixed(2)}`);
+    $('#monthly-total').val(`${fin.monthly_total.toFixed(2)}`);
+    $('#reserve').val(`${fin.reserve.toFixed(2)}`);
+    initSKUTable(store);
+    initEntitlementTable(entitlements, store);
+});
+$('#financial-submit-button').on('click', function () {
+    bot.get_financials()
+        .then(fin => {
+        fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0;
+        fin.monthly_total = Number($('#monthly-total').val()) ?? 0;
+        fin.reserve = Number($('#reserve').val()) ?? 0;
+        bot.update_financials(fin);
+    });
+});
+$('#sku-submit-button').on('click', function () {
+    bot.get_store_items()
+        .then(stores => {
+        stores.forEach(sku => {
+            sku.user_cost = parseFloat($(`.sku-cost-input[data-id="${sku.sku}"]`).val().toString());
+        });
+        bot.update_store_items(stores);
+    });
+});

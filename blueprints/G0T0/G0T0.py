@@ -370,7 +370,7 @@ def get_players(guild_id: int, player_id: int = None):
     return jsonify(players)
 
 
-@G0T0_blueprint.route("/api/logs/<guild_id>", methods=["GET"])
+@G0T0_blueprint.route("/api/logs/<int:guild_id>", methods=["GET"])
 @is_api_admin
 def get_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
@@ -699,7 +699,6 @@ def update_financial():
         raise BadRequest(e.args[0])
 
 
-# TODO: Store
 @G0T0_blueprint.route("/api/store", methods=["GET"])
 @is_api_admin
 def get_store():

@@ -608,7 +608,7 @@ export function initActivityPointsTable(activityPoints): void {
     })
 }
 
-export function initLogTable(): void {
+export function initLogTable(guild_id: string): void {
     const tableName = "#log-table"
 
     destroyTable(tableName) 
@@ -621,7 +621,7 @@ export function initLogTable(): void {
                 emptyTable: "No logs to display."
             },
             ajax: {
-                url: 'api/logs',
+                url: `api/logs/${guild_id}`,
                 type: 'POST',
                 contentType: 'application/json',
                 data: (d: object) => {

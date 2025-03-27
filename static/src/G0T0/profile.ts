@@ -1,12 +1,12 @@
 import { ToastError } from "../General/main.js";
-import { Character, playerName } from "./types.js";
+import { Character, Player, playerName } from "./types.js";
 import { filterStats, initPlayerCharacterTable, initSayTable } from "./utils.js";
 
 $('body').addClass("busy")
 await setupProfile()
 
 async function setupProfile(){
-    const playerData = await bot.get_player(userSession.guild.id, userSession.user_id)
+    const playerData = await bot.get_player(userSession.guild.id, userSession.user_id) as Player
 
     $('body').removeClass("busy")
 
@@ -64,7 +64,7 @@ $(document).on("guildUpdated", async function() {
 
 // Filter Functions
 $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
-    const playerData = await bot.get_player(userSession.guild.id.toString(), userSession.user_id)
+    const playerData = await bot.get_player(userSession.guild.id.toString(), userSession.user_id) as Player
 
     if (settings.nTable.id == 'say-table'){
             const sayTable = $("#say-table").DataTable()

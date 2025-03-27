@@ -46,7 +46,7 @@ export class UserSession extends WebClass{
 
     async build(force: boolean = false): Promise<void>{
         if (!this.initialised || force){
-            const data = await this.fetch(`${window.location.origin}/auth/session`) as UserSession
+            const data = await this.fetch(`/auth/session`) as UserSession
             this.user_id = data.user_id?.toString() || ''
             this.guilds = Array.isArray(data.guilds) ? data.guilds : []
             this.guild = data.guild && typeof data.guild == 'object' ? data.guild : (this.guilds[0]) || {}
@@ -58,7 +58,7 @@ export class UserSession extends WebClass{
     } 
     
     async update(guild_id: number): Promise<void>{
-        const res = await this.sendData(`${window.location.origin}/auth/guilds/${guild_id}`, "PATCH", {}, true)
+        const res = await this.sendData(`/auth/guilds/${guild_id}`, "PATCH", {}, true)
         if (res == 200){
             await this.build(true)
             const event = new CustomEvent("guildUpdated")

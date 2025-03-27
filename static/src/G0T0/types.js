@@ -16,15 +16,12 @@ export class G0T0Bot extends WebClass {
         return this.sendData(`api/guild/${guild.id}`, "PATCH", guild);
     }
     async get_player(guild_id, player_id) {
-        const player = await this.fetch(`api/players/${guild_id}/${player_id}`);
-        return player;
+        let url = `api/players/${guild_id}${player_id ? `/${player_id}` : ''}`;
+        return this.fetch(url);
     }
     async get_messages(guild_id, message_id) {
         let url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`;
-        if (message_id) {
-            return await this.fetch(url);
-        }
-        return await this.fetch(url);
+        return this.fetch(url);
     }
     async new_message(guild_id, message) {
         return this.sendData(`api/message/${guild_id}`, "POST", message);
@@ -46,6 +43,33 @@ export class G0T0Bot extends WebClass {
     }
     async update_activity_points(activity_points) {
         return this.sendData(`api/activity_points`, "PATCH", activity_points);
+    }
+    async get_code_conversions() {
+        return this.fetch(`api/code_conversion`);
+    }
+    async update_code_conversions(converions) {
+        return this.sendData(`api/code_conversion`, "PATCH", converions);
+    }
+    async get_level_costs() {
+        return this.fetch(`api/level_costs`);
+    }
+    async update_level_costs(level_costs) {
+        return this.sendData('api/level_costs', "PATCH", level_costs);
+    }
+    async get_financials() {
+        return this.fetch(`api/financial`);
+    }
+    async update_financials(financial) {
+        return this.sendData(`api/financial`, "PATCH", financial);
+    }
+    async get_store_items() {
+        return this.fetch(`api/store`);
+    }
+    async update_store_items(store_items) {
+        return this.sendData(`api/store`, "PATCH", store_items);
+    }
+    async get_entitlements() {
+        return this.fetch(`api/entitlements`);
     }
     async get_channels(guild_id) {
         return this.fetch(`api/channels/${guild_id}`);

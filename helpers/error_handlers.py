@@ -1,5 +1,5 @@
 import traceback
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, url_for
 
 from helpers.auth_helper import AdminAccessError
 from models.exceptions import BadRequest, LoginError, NotFound
@@ -8,6 +8,8 @@ from models.exceptions import BadRequest, LoginError, NotFound
 def not_found(e):
     if "/api/" in request.path:
         return jsonify({"error": f"{getattr(e, 'message', 'URL not found')}"}), 404
+
+    test = url_for("G0T0.terms")
     return render_template("404.html")
 
 

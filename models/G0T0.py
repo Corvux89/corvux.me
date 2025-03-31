@@ -190,7 +190,7 @@ class Activity(db.Model, BaseModel):
         self.cc = kwargs.get("cc", 0)
         self.diversion = kwargs.get("diversion", False)
         self.points = kwargs.get("points", 0)
-        self.credit_ratio = kwargs.get('credit_ratio')
+        self.credit_ratio = kwargs.get("credit_ratio")
 
 
 class ActivityPoints(db.Model, BaseModel):

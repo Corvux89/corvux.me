@@ -83,7 +83,7 @@ talisman = Talisman(
 
 app.register_blueprint(combat_planner_blueprint, url_prefix="/Avrae_Combat_Planner")
 app.register_blueprint(auth_blueprint, url_prefix="/auth")
-app.register_blueprint(G0T0_blueprint, url_prefix="/G0T0")
+app.register_blueprint(G0T0_blueprint, url_prefix="/g0t0")
 register_handlers(app)
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@
             "type": "node",
             "name": "Typescript Debug",
             "request": "launch",
-            "program": "${workspaceFolder}/static/src/Resolute/profile.ts",
+            "program": "${workspaceFolder}/static/src/G0T0/profile.ts",
             "outFiles": [
                 "${workspaceFolder}/**/*.(m|c|)js",
                 "!**/node_modules/**"

@@ -194,10 +194,8 @@ export class Monster {
             let name = monster.label ? ` -name "${monster.label}"` : "";
             let args = monster.args ? ` ${monster.args}` : "";
             if (settings.notes) {
-                monster.coords.forEach(coord => {
+                if (monster.coords.length === 0) {
                     let notes = [];
-                    if (coord)
-                        notes.push(`Location: ${coord}`);
                     if (monster.size)
                         notes.push(`Size: ${monster.size} (${MonsterSizes[monster.size]})`);
                     if (monster.color)
@@ -206,7 +204,22 @@ export class Monster {
                         notes.push(`Token: ${monster.token}`);
                     if (notes.length > 0)
                         commands.push(`${baseCommand}${name} -note "${notes.join(' | ')}"${args}`);
-                });
+                }
+                else {
+                    monster.coords.forEach(coord => {
+                        let notes = [];
+                        if (coord)
+                            notes.push(`Location: ${coord}`);
+                        if (monster.size)
+                            notes.push(`Size: ${monster.size} (${MonsterSizes[monster.size]})`);
+                        if (monster.color)
+                            notes.push(`Color: ${monster.color} (${Colors[monster.color].toLowerCase()})`);
+                        if (monster.token)
+                            notes.push(`Token: ${monster.token}`);
+                        if (notes.length > 0)
+                            commands.push(`${baseCommand}${name} -note "${notes.join(' | ')}"${args}`);
+                    });
+                }
             }
             else {
                 let quantity = monster.quantity > 1 ? ` -n ${monster.quantity}` : "";

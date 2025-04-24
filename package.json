@@ -4,18 +4,18 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.5"
   },
   "devDependencies": {
     "@popperjs/core": "^2.11.8",
     "@types/bootstrap": "^5.2.10",
     "@types/datatables.net": "^1.12.3",
     "@types/jquery": "^3.5.32",
-    "@types/node": "^22.13.14",
+    "@types/node": "^22.14.1",
     "datatables.net-responsive": "^3.0.4",
     "mathjs": "^14.4.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   }
 }

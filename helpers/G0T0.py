@@ -1,5 +1,4 @@
-from flask import current_app
-from flask_discord import DiscordOAuth2Session
+from flask_login import current_user
 import requests
 from sqlalchemy import Date, String, cast, func
 from constants import BOT_API_AUTH_TOKEN, BOT_API_URL
@@ -47,15 +46,10 @@ def log_search_filter(search_value: str, guild_id: int) -> []:
 
 
 def trigger_compendium_reload():
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
-    try:
-        current_user = discord_session.fetch_user()
-    except:
-        return
     url = f"{BOT_API_URL}/reload"
     headers = {"auth-token": BOT_API_AUTH_TOKEN, "Content-Type": "application/json"}
     payload = {
-        "text": f"{current_user.name} [{current_user.id}] - Compendium reloaded from website"
+        "text": f"{current_user.username} [{current_user.id}] - Compendium reloaded from website"
     }
     try:
         requests.request("POST", url, headers=headers, data=json.dumps(payload))
@@ -64,15 +58,10 @@ def trigger_compendium_reload():
 
 
 def trigger_guild_reload(guild_id: int):
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
-    try:
-        current_user = discord_session.fetch_user()
-    except:
-        return
     url = f"{BOT_API_URL}/guild_update"
     headers = {"auth-token": BOT_API_AUTH_TOKEN, "Content-Type": "application/json"}
     payload = {
-        "text": f"{current_user.name} [{current_user.id}] - Guild Cache reloaded from website",
+        "text": f"{current_user.username} [{current_user.id}] - Guild Cache reloaded from website",
         "guild_id": guild_id,
     }
     try:

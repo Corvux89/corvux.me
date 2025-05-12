@@ -2,177 +2,17 @@ import json
 import datetime
 
 from flask_sqlalchemy import SQLAlchemy
-from flask.json.provider import JSONProvider
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import BigInteger, ForeignKey, DateTime, String, inspect
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy import BigInteger, ForeignKey, DateTime, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm.decl_api import registry
 
 from constants import DISCORD_GUILD_ID
-from helpers.general_helpers import get_channels_from_cache, get_members_from_cache
+from helpers.general_helpers import get_channels_from_cache
+from models.discord import MemberAttributeMixin
+from models.general import BaseModel, IntAttributeMixin
 
 db = SQLAlchemy()
-
-
-class BaseModel:
-    def __init__(self, **kwargs):
-        for key in kwargs:
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-
-    def to_dict(self):
-        result = {}
-        for attr in dir(self):
-            if attr.startswith("_") or callable(getattr(self, attr)):
-                continue
-            try:
-                value = getattr(self, attr)
-
-                if hasattr(value, "to_dict"):
-                    result[attr] = value.to_dict()
-
-                elif inspect(value, raiseerr=False) is not None or isinstance(
-                    value, registry
-                ):
-                    continue
-
-                elif isinstance(value, datetime.datetime):
-                    result[attr] = value.isoformat()
-
-                elif value == "None":
-                    result[attr] = ""
-                else:
-                    result[attr] = value
-            except AttributeError:
-                continue
-        return result
-
-
-class IntAttributeMixin:
-    def set_int_attribute(self, attr_name, value):
-        try:
-            setattr(self, attr_name, value)
-        except (ValueError, TypeError):
-            setattr(self, attr_name, None)
-
-
-class MemberAttributeMixin:
-    def get_member_attribute(self, member_id: str):
-        members = [DiscordMember(**m) for m in get_members_from_cache(DISCORD_GUILD_ID)]
-
-        try:
-            if m := next(
-                (m for m in members if m.user and m.user.id == member_id), None
-            ):
-                return m.__dict__
-            return None
-        except:
-            return None
-
-
-class DiscordUser(BaseModel, IntAttributeMixin):
-    global_name: str = None
-    _id: int = None
-    username: str = None
-    avatar: str = None
-
-    @property
-    def id(self):
-        return str(self._id)
-
-    @id.setter
-    def id(self, value):
-        self.set_int_attribute("_id", value)
-
-
-class DiscordMember:
-    nick: str = None
-    roles: [] = None
-    user: DiscordUser = None
-    bot: bool = None
-
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key in self.__annotations__:
-                if key == "user" and isinstance(value, dict):
-                    setattr(self, key, DiscordUser(**value))
-                else:
-                    setattr(self, key, value)
-
-    def to_dict(self):
-        result = {}
-        for attr in dir(self):
-            if attr.startswith("_") or callable(getattr(self, attr)):
-                continue
-            try:
-                value = getattr(self, attr)
-                if isinstance(value, DiscordUser):
-                    result[attr] = value.to_dict()
-                else:
-                    result[attr] = value
-            except AttributeError:
-                continue
-        return result
-
-    @property
-    def member_display_name(self):
-        return (
-            self.nick
-            or self.user.global_name
-            or self.user.username
-            or "Player not found"
-        )
-
-
-class DiscordChannel(BaseModel, IntAttributeMixin):
-    _id: int = None
-    name: str = None
-    _parent_id: int = None
-    type: int = None
-
-    @property
-    def id(self):
-        return str(self._id)
-
-    @id.setter
-    def id(self, value):
-        self.set_int_attribute("_id", value)
-
-    @property
-    def parent_id(self):
-        return str(self._parent_id)
-
-    @parent_id.setter
-    def parent_id(self, value):
-        self.set_int_attribute("_parent_id", value)
-
-
-class DiscordRole(BaseModel, IntAttributeMixin):
-    _id: int = None
-    name: str = None
-
-    @property
-    def id(self):
-        return str(self._id)
-
-    @id.setter
-    def id(self, value):
-        self.set_int_attribute("_id", value)
-
-
-class DiscordEntitlement(BaseModel, MemberAttributeMixin):
-    id: str = None
-    sku_id: str = None
-    type: int = None
-    deleted: bool = False
-    consumed: bool = False
-    user_id: str = None
-
-    @property
-    def member(self):
-        return self.get_member_attribute(self.user_id)
 
 
 class Activity(db.Model, BaseModel):
@@ -844,22 +684,3 @@ class BotMessage(BaseModel):
         self.title = title
         self.pin = kwargs.get("pin", False)
         self.error = kwargs.get("error", "")
-
-
-class CustomJSONProvider(JSONProvider):
-    def dumps(self, obj, **kwargs):
-        return json.dumps(obj, **kwargs, cls=AlchemyEncoder)
-
-    def loads(self, s: str | bytes, **kwargs):
-        return json.loads(s, **kwargs)
-
-
-class AlchemyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        elif hasattr(obj, "to_dict"):
-            return obj.to_dict()
-        elif hasattr(obj, "to_json"):
-            return obj.to_json()
-        return json.JSONEncoder.default(self, obj)

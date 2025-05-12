@@ -38,7 +38,6 @@ $(document).on('click', '#announcement-submit-button', function(){
     var title = $("#announcement-title").val()
     var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : ""
     var index = $("#announcement-modal-edit-form").data("id") 
-
     var announcement = title != "" ? `${title}|${body}` : body
 
     if (announcement != ""){

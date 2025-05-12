@@ -10,12 +10,11 @@ from flask import (
     jsonify,
     url_for,
 )
-from flask_discord import DiscordOAuth2Session
+from flask_login import login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, desc, func, asc, or_
-from helpers.auth_helper import is_admin, is_api_admin, login_required
+from helpers.auth_helper import is_admin, is_admin
 from helpers.general_helpers import (
-    bot_request_with_retry,
     get_channels_from_cache,
     get_entitlements_from_cache,
     get_roles_from_cache,
@@ -25,6 +24,12 @@ from helpers.G0T0 import (
     trigger_compendium_reload,
     trigger_guild_reload,
 )
+from models.discord import (
+    DiscordChannel,
+    DiscordEntitlement,
+    DiscordMember,
+    DiscordRole,
+)
 from models.exceptions import BadRequest, NotFound
 from models.G0T0 import (
     Activity,
@@ -32,10 +37,6 @@ from models.G0T0 import (
     BotMessage,
     Character,
     CodeConversion,
-    DiscordChannel,
-    DiscordEntitlement,
-    DiscordMember,
-    DiscordRole,
     Faction,
     Financial,
     LevelCost,
@@ -101,7 +102,7 @@ def get_guild(guild_id: int):
 
 
 @G0T0_blueprint.route("/api/guild/<int:guild_id>", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_guild(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     guild: G0T0Guild = (
@@ -173,7 +174,7 @@ def update_guild(guild_id: int):
 
 @G0T0_blueprint.route("/api/message/<int:guild_id>", methods=["GET"])
 @G0T0_blueprint.route("/api/message/<int:guild_id>/<int:message_id>", methods=["GET"])
-@is_api_admin
+@is_admin
 def ref_messages(guild_id: int, message_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
     if message_id:
@@ -186,7 +187,7 @@ def ref_messages(guild_id: int, message_id: int = None):
         if not message:
             raise NotFound("Message not found")
 
-        msg = bot_request_with_retry(
+        msg = current_app.discord.request(
             f"/channels/{message.channel_id}/messages/{message.message_id}"
         )
 
@@ -220,20 +221,19 @@ def ref_messages(guild_id: int, message_id: int = None):
 
 
 @G0T0_blueprint.route("/api/message/<int:guild_id>", methods=["POST"])
-@is_api_admin
+@is_admin
 def create_ref_message(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
     payload = request.get_json()
 
-    msg = discord_session.bot_request(
+    msg = current_app.discord.request(
         f"/channels/{payload['channel_id']}/messages",
         "POST",
         json={"content": payload["message"]},
     )
 
     if "pin" in payload and payload["pin"]:
-        discord_session.bot_request(
+        current_app.discord.request(
             f"/channels/{payload['channel_id']}/pins/{msg['id']}", "PUT"
         )
 
@@ -260,10 +260,9 @@ def create_ref_message(guild_id: int):
 
 
 @G0T0_blueprint.route("/api/message/<int:message_id>", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_message(message_id: int = None):
     db: SQLAlchemy = current_app.config.get("DB")
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
     payload = request.get_json()
 
     message: RefMessage = (
@@ -276,7 +275,7 @@ def update_message(message_id: int = None):
         raise NotFound("Message not found")
 
     try:
-        msg = discord_session.bot_request(
+        msg = current_app.discord.request(
             f"/channels/{message.channel_id}/messages/{message.message_id}",
             "PATCH",
             json={"content": payload["content"]},
@@ -289,7 +288,7 @@ def update_message(message_id: int = None):
     if "pin" in payload and payload["pin"] != bool(msg.get("pinned", False)):
         action = "PUT" if payload["pin"] else "DELETE"
 
-        discord_session.bot_request(
+        current_app.discord.request(
             f"/channels/{message.channel_id}/pins/{message.message_id}",
             action,
         )
@@ -299,10 +298,9 @@ def update_message(message_id: int = None):
 
 
 @G0T0_blueprint.route("/api/message/<int:message_id>", methods=["DELETE"])
-@is_api_admin
+@is_admin
 def delete_message(message_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
-    discord_session: DiscordOAuth2Session = current_app.config.get("DISCORD_SESSION")
 
     message: RefMessage = (
         db.session.query(RefMessage)
@@ -313,7 +311,7 @@ def delete_message(message_id: int):
     if not message:
         raise NotFound("Message not found")
 
-    discord_session.bot_request(
+    current_app.discord.request(
         f"/channels/{message.channel_id}/messages/{message.message_id}", "DELETE"
     )
     db.session.delete(message)
@@ -369,7 +367,7 @@ def get_players(guild_id: int, player_id: int = None):
 
 
 @G0T0_blueprint.route("/api/logs/<int:guild_id>", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     limit = request.args.get("limit", default=None, type=int)
@@ -395,7 +393,7 @@ def get_logs(guild_id: int):
 
 
 @G0T0_blueprint.route("/api/logs/<guild_id>", methods=["POST"])
-@is_api_admin
+@is_admin
 def sort_logs(guild_id: int):
     db: SQLAlchemy = current_app.config.get("DB")
     query = (
@@ -480,7 +478,7 @@ def sort_logs(guild_id: int):
 
 
 @G0T0_blueprint.route("/api/activities", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_activites():
     db: SQLAlchemy = current_app.config.get("DB")
     activities: list[Activity] = (
@@ -490,7 +488,7 @@ def get_activites():
 
 
 @G0T0_blueprint.route("/api/activities", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_activities():
     db: SQLAlchemy = current_app.config.get("DB")
     activities: list[Activity] = (
@@ -528,7 +526,7 @@ def update_activities():
 
 
 @G0T0_blueprint.route("/api/activity_points", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_activity_points():
     db: SQLAlchemy = current_app.config.get("DB")
     points: list[ActivityPoints] = (
@@ -542,7 +540,7 @@ def get_activity_points():
 
 
 @G0T0_blueprint.route("/api/activity_points", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_activity_points():
     db: SQLAlchemy = current_app.config.get("DB")
 
@@ -580,7 +578,7 @@ def update_activity_points():
 
 
 @G0T0_blueprint.route("/api/code_conversion", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_code_conversion():
     db: SQLAlchemy = current_app.config.get("DB")
     points: list[CodeConversion] = (
@@ -591,7 +589,7 @@ def get_code_conversion():
 
 
 @G0T0_blueprint.route("/api/code_conversion", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_code_conversion():
     db: SQLAlchemy = current_app.config.get("DB")
     points: list[CodeConversion] = (
@@ -624,7 +622,7 @@ def update_code_conversion():
 
 
 @G0T0_blueprint.route("/api/level_costs", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_level_costs():
     db: SQLAlchemy = current_app.config.get("DB")
     costs: list[LevelCost] = (
@@ -634,7 +632,7 @@ def get_level_costs():
 
 
 @G0T0_blueprint.route("/api/level_costs", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_level_costs():
     db: SQLAlchemy = current_app.config.get("DB")
     costs: list[LevelCost] = (
@@ -668,7 +666,7 @@ def update_level_costs():
 
 
 @G0T0_blueprint.route("/api/financial", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_financial():
     db: SQLAlchemy = current_app.config.get("DB")
     fin: Financial = db.session.query(Financial).first()
@@ -676,7 +674,7 @@ def get_financial():
 
 
 @G0T0_blueprint.route("/api/financial", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def update_financial():
     db: SQLAlchemy = current_app.config.get("DB")
     fin: Financial = db.session.query(Financial).first()
@@ -699,7 +697,7 @@ def update_financial():
 
 
 @G0T0_blueprint.route("/api/store", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_store():
     db: SQLAlchemy = current_app.config.get("DB")
     store: list[Store] = db.session.query(Store).order_by(asc(Store._sku)).all()
@@ -707,7 +705,7 @@ def get_store():
 
 
 @G0T0_blueprint.route("/api/store", methods=["PATCH"])
-@is_api_admin
+@is_admin
 def udpate_store():
     db: SQLAlchemy = current_app.config.get("DB")
     store: list[Store] = db.session.query(Store).order_by(asc(Store._sku)).all()
@@ -735,7 +733,7 @@ def udpate_store():
 
 
 @G0T0_blueprint.route("/api/entitlements", methods=["GET"])
-@is_api_admin
+@is_admin
 def get_entitlements():
     entitlements = get_entitlements_from_cache()
     return jsonify([DiscordEntitlement(**e) for e in entitlements])

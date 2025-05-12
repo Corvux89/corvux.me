@@ -1,6 +1,6 @@
 import { BattleMap, Monster, OverlayMap, planLimit, SavedPlan, Settings } from "./types.js";
 export function inputText(id, name, label, value, type = "text", min = null, max = null) {
-    var input = jQuery("<input>")
+    const input = jQuery("<input>")
         .addClass("form-control")
         .attr({
         "type": type,
@@ -9,18 +9,21 @@ export function inputText(id, name, label, value, type = "text", min = null, max
         "placeholder": label
     })
         .val(value);
-    type == "number" && min ? input.attr("min", min) : "";
-    type == "number" && max ? input.attr("max", max) : "";
-    var inputLabel = jQuery("<label>")
+    if (type == "number")
+        if (min)
+            input.attr("min", min);
+    if (max)
+        input.attr("max", max);
+    const inputLabel = jQuery("<label>")
         .attr("for", id)
         .text(label);
-    var div = jQuery("<div>")
+    const div = jQuery("<div>")
         .addClass("form-floating")
         .append(input, inputLabel);
     return div;
 }
 export function inputSelect(id, name, label, value, options) {
-    var select = jQuery("<select>")
+    const select = jQuery("<select>")
         .addClass("form-select")
         .attr({
         "aria-label": label,
@@ -28,37 +31,37 @@ export function inputSelect(id, name, label, value, options) {
         "name": name
     });
     Object.entries(options).forEach(([key, text]) => {
-        let option = jQuery("<option>")
+        const option = jQuery("<option>")
             .val(key)
             .text(text)
             .prop('selected', value == key);
         select.append(option);
     });
-    var selectLabel = jQuery("<label>")
+    const selectLabel = jQuery("<label>")
         .attr("for", id)
         .text(label);
-    var div = jQuery("<div>")
+    const div = jQuery("<div>")
         .addClass("form-floating")
         .append(select, selectLabel);
     return div;
 }
 export function buildMonsterInventory() {
-    var monsters = Monster.load();
+    const monsters = Monster.load();
     $("#monster-inventory").empty();
     monsters.forEach(monster => {
         $("#monster-inventory").append(monster.inventoryRow());
     });
 }
 export function buildMaddTable() {
-    var monsters = Monster.load();
+    const monsters = Monster.load();
     $("#madd-table").empty();
     monsters.forEach(monster => {
         $("#madd-table").append(monster.maddRow());
     });
 }
 export function buildOverlayModal() {
-    var overlay = BattleMap.load().overlay;
-    var columns = [];
+    const overlay = BattleMap.load().overlay;
+    const columns = [];
     if (overlay.type.toLowerCase() == "circle") {
         columns.push(inputText("map-overlay-radius", "radius", "Radius", overlay.radius, "number", 0, 200));
         columns.push(inputText("map-overlay-center", "center", "Center", overlay.center));
@@ -82,23 +85,23 @@ export function buildOverlayModal() {
     }
     $("#overlay-row").empty();
     columns.forEach(c => {
-        let div = jQuery("<div>")
+        const div = jQuery("<div>")
             .addClass("col-sm-3 mb-3")
             .append(c);
         $("#overlay-row").append(div);
     });
 }
 export function buildMapPreview() {
-    var monsters = Monster.load();
-    var battlemap = BattleMap.load();
-    var monsterOnMap = false;
+    const monsters = Monster.load();
+    const battlemap = BattleMap.load();
+    let monsterOnMap = false;
     monsters.forEach(monster => {
         if (monster.coords.length > 0 && monster.coords.some(coord => coord != null)) {
             monsterOnMap = true;
         }
     });
     if (battlemap.url != "" || battlemap.size != "" || monsterOnMap) {
-        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`;
+        let imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`;
         // Monster Placement
         monsters.forEach(monster => {
             for (let i = 0; i < monster.quantity; i++) {
@@ -116,7 +119,7 @@ export function buildMapPreview() {
         imgURL += "/";
         if (battlemap.url)
             imgURL += `/?a=2&bg=${battlemap.url}`;
-        var image = jQuery("<img>")
+        const image = jQuery("<img>")
             .addClass("img-fluid")
             .attr({
             "src": imgURL
@@ -142,38 +145,41 @@ export function buildSavedPlanList() {
         catch (error) {
             console.error("Error parsing data: ", error);
         }
-        let link = jQuery("<a>")
+        const link = jQuery("<a>")
             .addClass("dropdown-item")
             .attr("href", url)
             .text(name);
-        let item = jQuery("<li>")
+        const item = jQuery("<li>")
             .append(link);
         $("#load-plan-list").append(item);
     });
-    var hide = $("#load-plan-list").children().length == 0;
+    const hide = $("#load-plan-list").children().length == 0;
     $("#load-plan").prop("hidden", hide);
     $("#delete-plan").prop("hidden", hide);
 }
 export function isValidHttpURL(string) {
     try {
-        var url = new URL(string);
+        const url = new URL(string);
+        return url.protocol === "http:" || url.protocol === "https:";
     }
     catch {
         return false;
     }
-    return url.protocol === "http:" || url.protocol === "https:";
 }
 export function getTokenShortcode(url) {
     return new Promise((resolve, reject) => {
-        var base64 = btoa(url);
-        var queryURL = `https://token.otfbm.io/meta/${base64}`;
-        var request = new XMLHttpRequest();
+        const base64 = btoa(url);
+        const queryURL = `https://token.otfbm.io/meta/${base64}`;
+        const request = new XMLHttpRequest();
         request.open('POST', `${document.URL}shortcode`, true);
         request.setRequestHeader('Content-Type', 'application/json');
         request.onload = function () {
             if (request.status == 200) {
-                var response = JSON.parse(request.responseText);
-                response.token ? resolve(response.token) : resolve(null);
+                const response = JSON.parse(request.responseText);
+                if (response.token)
+                    resolve(response.token);
+                else
+                    resolve(null);
             }
             resolve(null);
         };
@@ -185,7 +191,7 @@ export function getTokenShortcode(url) {
 }
 export function buildMainCommandHeader() {
     const settings = Settings.load();
-    var commands = [];
+    let commands = [];
     if (settings.maptarget)
         commands.unshift(`${settings.prefix}i add 20 ${settings.attach} -p`);
     if (settings.multiline)
@@ -201,19 +207,19 @@ export function buildMainCommandHeader() {
 }
 export function buildMaddHeader() {
     const settings = Settings.load();
-    var str = Monster.mapCommand(settings);
+    const str = Monster.mapCommand(settings);
     $("#madd-header").prop("hidden", !str);
     $("#madd-command").html(str);
 }
 export function buildMapHeader() {
     const settings = Settings.load();
-    var str = BattleMap.load().command(settings, true);
+    const str = BattleMap.load().command(settings, true);
     $("#maps-header").prop("hidden", !str);
     $("#map-command").html(str.join(""));
 }
 export function buildOverlayHeader() {
     const settings = Settings.load();
-    var str = BattleMap.load().overlay.command(settings, true);
+    const str = BattleMap.load().overlay.command(settings, true);
     $("#overlay-header").prop("hidden", !str);
     $("#overlay-command").html(str);
 }
@@ -245,7 +251,7 @@ export function exportBuild() {
     copyString(`${window.location.href}${url}`, "Build copied to clipboard", "export-planner");
 }
 export function savePlan() {
-    var plans = SavedPlan.load();
+    const plans = SavedPlan.load();
     if (Object.keys(plans).length >= planLimit) {
         $("#save-plan").tooltip({
             title: `You can only save ${planLimit} builds at this time.`,
@@ -258,7 +264,7 @@ export function savePlan() {
         return;
     }
     if ($("#plan-name").val() != "") {
-        var plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()));
+        const plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()));
         plan.save();
         buildSavedPlanList();
         $("#saveModal").modal("hide");

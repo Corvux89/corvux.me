@@ -14,7 +14,7 @@ export class WebClass{
         }
     }
 
-    async sendData<T>(url: string, method: string, data: any, silent: boolean = false): Promise<T> {
+    async sendData<T>(url: string, method: string, data: unknown, silent: boolean = false): Promise<T> {
         const res = await fetch(url, {
             method: method,
             headers: {

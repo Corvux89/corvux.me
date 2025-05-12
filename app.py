@@ -1,5 +1,5 @@
 import json
-from flask_discord import DiscordOAuth2Session
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
@@ -9,8 +9,9 @@ from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
 from blueprints.G0T0.G0T0 import G0T0_blueprint
-from blueprints.combat_planner import combat_planner_blueprint
 from blueprints.auth import auth_blueprint
+from blueprints.combat_planner import combat_planner_blueprint
+
 from constants import (
     DB_URI,
     DISCORD_BOT_TOKEN,
@@ -22,7 +23,8 @@ from constants import (
 )
 from helpers import get_csp
 from helpers.error_handlers import register_handlers
-from models.G0T0 import CustomJSONProvider
+from models.discord import DiscordBot
+from models.general import CustomJSONProvider, User
 
 app = Flask(__name__)
 
@@ -37,9 +39,30 @@ app.config["DISCORD_REDIRECT_URI"] = DISCORD_REDIRECT_URI
 app.config["DISCORD_CLIENT_SECRET"] = DISCORD_SECRET_KEY
 app.config["DISCORD_BOT_TOKEN"] = DISCORD_BOT_TOKEN
 
-app.config["DISCORD_SESSION"] = DiscordOAuth2Session(app)
-app.config["DB"] = db = SQLAlchemy()
-db.init_app(app)
+# OAuth Providers
+app.config["OAUTH2_PROVIDERS"] = {
+    "discord": {
+        "client_id": DISCORD_CLIENT_ID,
+        "client_secret": DISCORD_SECRET_KEY,
+        "authorize_url": "https://discord.com/oauth2/authorize",
+        "token_url": "https://discord.com/api/oauth2/token",
+        "scopes": ["identify", "email", "guilds", "guilds.join"],
+        "userinfo": {
+            "url": "https://discord.com/api/users/@me",
+            "id": lambda json: json["id"],
+            "email": lambda json: json["email"],
+            "username": lambda json: json["username"],
+            "global_name": lambda json: (
+                json["global_name"] if json["global_name"] != "" else json["username"]
+            ),
+            "avatar": lambda json: json["avatar"] if json["avatar"] != "" else None,
+        },
+    }
+}
+
+app.config["DB"] = db = SQLAlchemy(app)
+app.config["login"] = login = LoginManager(app)
+app.discord = DiscordBot(app)
 
 
 @app.route("/")
@@ -70,6 +93,11 @@ def site_map():
     response = make_response(response)
     response.headers["Content-Type"] = "application/xml"
     return response
+
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, id)
 
 
 csp = get_csp()

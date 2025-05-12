@@ -2,12 +2,12 @@ import { ToastError } from '../General/main.js';
 import { playerName } from './types.js';
 import { buildSaySummaryData, filterStats, initActivityPointsTable, initActivityTable, initAnnouncementTable, initCharacterTable, initConversionTable, initEntitlementTable, initGlobalNPCTable, initLevelCostTable, initLogTable, initMessageTable, initPlayerCharacterTable, initPlayerTable, initSaySummaryTable, initSayTable, initSKUTable, initStatsTable, populateSelectOption } from './utils.js';
 $('body').addClass("busy");
-let guild = await bot.get_guild(userSession.guild.id);
+const guild = await bot.get_guild(userSession.guild.id);
 buildAnnouncementTable(guild);
 // Announcements
 $("#announcement-tab-button").on('click', async function () {
     $('body').addClass("busy");
-    let guild = await bot.get_guild(userSession.guild.id);
+    const guild = await bot.get_guild(userSession.guild.id);
     buildAnnouncementTable(guild);
 });
 async function buildAnnouncementTable(guild) {
@@ -29,14 +29,17 @@ $("#announcement-new-button").on('click', function () {
     $(".modal-body #announcement-body").val("");
 });
 $(document).on('click', '#announcement-submit-button', function () {
-    var title = $("#announcement-title").val();
-    var body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : "";
-    var index = $("#announcement-modal-edit-form").data("id");
-    var announcement = title != "" ? `${title}|${body}` : body;
+    const title = $("#announcement-title").val();
+    const body = $("#announcement-body").val() != undefined ? $("#announcement-body").val() : "";
+    const index = $("#announcement-modal-edit-form").data("id");
+    const announcement = title != "" ? `${title}|${body}` : body;
     if (announcement != "") {
         bot.get_guild(userSession.guild.id)
             .then(guild => {
-            index == "new" ? guild.weekly_announcement.push(announcement.toString()) : guild.weekly_announcement[index] = announcement.toString();
+            if (index == "new")
+                guild.weekly_announcement.push(announcement.toString());
+            else
+                guild.weekly_announcement[index] = announcement.toString();
             bot.update_guild(guild)
                 .then(function () {
                 buildAnnouncementTable(guild);
@@ -99,7 +102,7 @@ $("#message-new-button").on('click', async function () {
         .data('id', "new")
         .modal("show");
 });
-$('#message-save-button').on('click', function (e) {
+$('#message-save-button').on('click', function () {
     if ($('#message-title').val() == '' || $('#message-body').val() == '') {
         ToastError("Please fill out a title and a body");
         return;
@@ -107,7 +110,7 @@ $('#message-save-button').on('click', function (e) {
     const modal = $("#message-modal-edit-form");
     const message_id = $(modal).data('id');
     if (message_id == 'new') {
-        var NewMessage = {};
+        const NewMessage = {};
         NewMessage.channel_id = $('#message-channel').find(':selected').val().toString();
         NewMessage.channel_name = $('#message-channel').find(':selected').text();
         NewMessage.message = $("#message-body").val().toString();
@@ -120,7 +123,7 @@ $('#message-save-button').on('click', function (e) {
         });
     }
     else {
-        var UpdateMessage = {
+        const UpdateMessage = {
             "message_id": message_id,
             "channel_id": $('#message-channel').find(':selected').val().toString(),
             "channel_name": $('#message-channel').find(':selected').text(),
@@ -136,7 +139,7 @@ $('#message-save-button').on('click', function (e) {
     }
     modal.modal("hide");
 });
-$(document).on('click', '#message-table tbody tr', async function (e) {
+$(document).on('click', '#message-table tbody tr', async function () {
     const table = $("#message-table").DataTable();
     const row = table.row(this);
     const modal = $("#message-modal-edit-form");
@@ -266,9 +269,9 @@ $('#activity-submit-button').on('click', function () {
     bot.get_activities()
         .then(activities => {
         activities.forEach(activity => {
-            let ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val();
-            let pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
-            let crInputValue = $(`.cr-input[data-id="${activity.id}"]`).val();
+            const ccInputValue = $(`.cc-input[data-id="${activity.id}"]`).val();
+            const pointInputValue = $(`.points-input[data-id="${activity.id}"]`).val();
+            const crInputValue = $(`.cr-input[data-id="${activity.id}"]`).val();
             activity.cc = ccInputValue ? parseInt(ccInputValue.toString()) : null;
             activity.diversion = $(`.diversion-input[data-id="${activity.id}"]`).is(':checked');
             activity.points = pointInputValue ? parseInt(pointInputValue.toString()) : 0;
@@ -330,12 +333,12 @@ $("#say-summary-start-date, #say-summary-end-date").on("change", function () {
 // Filter Functions
 $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex) {
     if (settings.nTable.id == 'global-npc-table') {
-        var playerID = $("#member-id").val();
+        const playerID = $("#member-id").val();
         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player) => player.id == playerID);
         const npcTable = $("#global-npc-table").DataTable();
         const startDate = $("#npc-start-date").val();
         const endDate = $("#npc-end-date").val();
-        var rowData = npcTable.row(dataIndex).data();
+        let rowData = npcTable.row(dataIndex).data();
         if (!rowData)
             return true;
         const key = rowData.command;
@@ -347,12 +350,12 @@ $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex) {
         return rowData.count > 0;
     }
     else if (settings.nTable.id == 'say-table') {
-        var playerID = $("#member-id").val();
+        const playerID = $("#member-id").val();
         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player) => player.id == playerID);
         const sayTable = $("#say-table").DataTable();
         const startDate = $("#say-start-date").val();
         const endDate = $("#say-end-date").val();
-        var rowData = sayTable.row(dataIndex).data();
+        let rowData = sayTable.row(dataIndex).data();
         if (!rowData)
             return true;
         const key = rowData.command;
@@ -500,9 +503,9 @@ $('#financial-settings-button').on('click', async function () {
 $('#financial-submit-button').on('click', function () {
     bot.get_financials()
         .then(fin => {
-        fin.monthly_goal = Number($('#monthly-goal').val()) ?? 0;
-        fin.monthly_total = Number($('#monthly-total').val()) ?? 0;
-        fin.reserve = Number($('#reserve').val()) ?? 0;
+        fin.monthly_goal = Number($('#monthly-goal').val()) || 0;
+        fin.monthly_total = Number($('#monthly-total').val()) || 0;
+        fin.reserve = Number($('#reserve').val()) || 0;
         bot.update_financials(fin);
     });
 });

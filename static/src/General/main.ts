@@ -13,12 +13,13 @@ export function ToastSuccess(message: string): void{
 }
 
 declare global{
-    var userSession: UserSession
-    var bot: G0T0Bot
+    let userSession: UserSession
+    let bot: G0T0Bot
 }
 
 
 
 globalThis.userSession = new UserSession()
 globalThis.bot = new G0T0Bot()
+console.log(globalThis.userSession)
 await globalThis.userSession.build()

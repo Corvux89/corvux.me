@@ -1,7 +1,7 @@
 import { BattleMap, Monster, OverlayMap, planLimit, SavedPlan, Settings } from "./types.js"
 
 export function inputText(id: string, name: string, label: string, value: string|number, type: string = "text", min: number = null, max: number = null): JQuery<HTMLElement>{
-    var input = jQuery("<input>")
+    const input = jQuery("<input>")
         .addClass("form-control")
         .attr({
             "type": type,
@@ -11,14 +11,18 @@ export function inputText(id: string, name: string, label: string, value: string
         })
         .val(value)
 
-    type == "number" && min ? input.attr("min", min) : ""
-    type == "number" && max ? input.attr("max", max) : ""
+    if (type == "number")
+        if (min)
+            input.attr("min", min)
 
-    var inputLabel = jQuery("<label>")
+        if (max)
+            input.attr("max", max)
+
+    const inputLabel = jQuery("<label>")
         .attr("for", id)
         .text(label)
 
-    var div = jQuery("<div>")
+    const div = jQuery("<div>")
         .addClass("form-floating")
         .append(input, inputLabel)
 
@@ -26,7 +30,7 @@ export function inputText(id: string, name: string, label: string, value: string
 }
 
 export function inputSelect(id: string, name: string, label: string, value: string, options: {[key: string] : string}): JQuery<HTMLElement>{
-    var select = jQuery("<select>")
+    const select = jQuery("<select>")
         .addClass("form-select")
         .attr({
             "aria-label": label,
@@ -35,7 +39,7 @@ export function inputSelect(id: string, name: string, label: string, value: stri
         })
     
     Object.entries(options).forEach(([key, text]) => {
-        let option = jQuery("<option>")
+        const option = jQuery("<option>")
             .val(key)
             .text(text)
             .prop('selected', value==key)
@@ -43,11 +47,11 @@ export function inputSelect(id: string, name: string, label: string, value: stri
         select.append(option)
     })
 
-    var selectLabel = jQuery("<label>")
+    const selectLabel = jQuery("<label>")
         .attr("for", id)
         .text(label)
     
-    var div = jQuery("<div>")
+    const div = jQuery("<div>")
         .addClass("form-floating")
         .append(select, selectLabel)
 
@@ -55,7 +59,7 @@ export function inputSelect(id: string, name: string, label: string, value: stri
 }
 
 export function buildMonsterInventory(): void{
-    var monsters = Monster.load()
+    const monsters = Monster.load()
     $("#monster-inventory").empty()
 
     monsters.forEach(monster => {
@@ -64,7 +68,7 @@ export function buildMonsterInventory(): void{
 }
 
 export function buildMaddTable(): void {
-    var monsters = Monster.load()
+    const monsters = Monster.load()
     $("#madd-table").empty()
 
     monsters.forEach(monster => {
@@ -73,8 +77,8 @@ export function buildMaddTable(): void {
 }
 
 export function buildOverlayModal(): void {
-    var overlay = BattleMap.load().overlay
-    var columns = []
+    const overlay = BattleMap.load().overlay
+    const columns = []
 
     if (overlay.type.toLowerCase() == "circle"){
         columns.push(inputText("map-overlay-radius","radius", "Radius", overlay.radius, "number", 0, 200))
@@ -105,7 +109,7 @@ export function buildOverlayModal(): void {
 
     $("#overlay-row").empty()
     columns.forEach(c => {
-        let div = jQuery("<div>")
+        const div = jQuery("<div>")
             .addClass("col-sm-3 mb-3")
             .append(c)
         $("#overlay-row").append(div)
@@ -113,9 +117,9 @@ export function buildOverlayModal(): void {
 }
 
 export function buildMapPreview() :void {
-    var monsters = Monster.load()
-    var battlemap = BattleMap.load()
-    var monsterOnMap: boolean = false
+    const monsters = Monster.load()
+    const battlemap = BattleMap.load()
+    let monsterOnMap: boolean = false
 
     monsters.forEach(monster => {
         if (monster.coords.length > 0 && monster.coords.some(coord => coord != null)){
@@ -124,7 +128,7 @@ export function buildMapPreview() :void {
     })
 
     if (battlemap.url != "" || battlemap.size != "" || monsterOnMap){
-        var imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`
+        let imgURL = `https://otfbm.io/${battlemap.size || "10x10"}${battlemap.csettings ? `/@c${battlemap.csettings}` : ""}`
         
         // Monster Placement
         monsters.forEach(monster => {
@@ -145,7 +149,7 @@ export function buildMapPreview() :void {
 
         if (battlemap.url) imgURL += `/?a=2&bg=${battlemap.url}`
 
-        var image = jQuery("<img>")
+        const image = jQuery("<img>")
             .addClass("img-fluid")
             .attr({
                 "src": imgURL
@@ -174,18 +178,18 @@ export function buildSavedPlanList() :void {
             console.error("Error parsing data: ", error)
         }
 
-        let link = jQuery("<a>")
+        const link = jQuery("<a>")
             .addClass("dropdown-item")
             .attr("href", url)
             .text(name)
 
-        let item = jQuery("<li>")
+        const item = jQuery("<li>")
             .append(link)
 
         $("#load-plan-list").append(item)
     })
 
-    var hide = $("#load-plan-list").children().length == 0
+    const hide = $("#load-plan-list").children().length == 0
 
     $("#load-plan").prop("hidden", hide)
     $("#delete-plan").prop("hidden", hide)
@@ -193,27 +197,29 @@ export function buildSavedPlanList() :void {
 
 export function isValidHttpURL(string: string): boolean {
     try{
-        var url = new URL(string)
+        const url = new URL(string)
+        return url.protocol === "http:" || url.protocol === "https:"
     } catch {
         return false
     }
-
-    return url.protocol === "http:" || url.protocol === "https:"
 }
 
 export function getTokenShortcode(url): Promise<string>{
     return new Promise((resolve, reject) => {
-        var base64 = btoa(url)
-        var queryURL = `https://token.otfbm.io/meta/${base64}`
-        var request = new XMLHttpRequest()
+        const base64 = btoa(url)
+        const queryURL = `https://token.otfbm.io/meta/${base64}`
+        const request = new XMLHttpRequest()
 
         request.open('POST', `${document.URL}shortcode`, true)
         request.setRequestHeader('Content-Type', 'application/json')
 
         request.onload = function() {
             if (request.status == 200) {
-                var response = JSON.parse(request.responseText)
-                response.token ? resolve(response.token) : resolve(null)
+                const response = JSON.parse(request.responseText)
+                if (response.token)
+                    resolve(response.token)
+                else
+                    resolve(null)
             }
 
             resolve(null)
@@ -229,7 +235,7 @@ export function getTokenShortcode(url): Promise<string>{
 
 export function buildMainCommandHeader(): void {
     const settings = Settings.load()
-    var commands: string[] = []
+    let commands: string[] = []
     if (settings.maptarget) commands.unshift(`${settings.prefix}i add 20 ${settings.attach} -p`)
     
     if (settings.multiline) commands.unshift(`${settings.prefix}multiline`)
@@ -246,7 +252,7 @@ export function buildMainCommandHeader(): void {
 
 export function buildMaddHeader(): void{
     const settings = Settings.load()
-    var str = Monster.mapCommand(settings)
+    const str = Monster.mapCommand(settings)
 
     $("#madd-header").prop("hidden", !str)
     $("#madd-command").html(str)
@@ -254,14 +260,14 @@ export function buildMaddHeader(): void{
 
 export function buildMapHeader(): void {
     const settings = Settings.load()
-    var str = BattleMap.load().command(settings, true)
+    const str = BattleMap.load().command(settings, true)
     $("#maps-header").prop("hidden", !str)
     $("#map-command").html(str.join(""))
 }
 
 export function buildOverlayHeader(): void {
     const settings = Settings.load()
-    var str = BattleMap.load().overlay.command(settings, true)
+    const str = BattleMap.load().overlay.command(settings, true)
     $("#overlay-header").prop("hidden", !str)
     $("#overlay-command").html(str)
 }
@@ -299,7 +305,7 @@ export function exportBuild(){
 }
 
 export function savePlan(): void {
-    var plans = SavedPlan.load()
+    const plans = SavedPlan.load()
 
     if (Object.keys(plans).length >= planLimit){
         $("#save-plan").tooltip({
@@ -314,7 +320,7 @@ export function savePlan(): void {
     }
 
     if ($("#plan-name").val() != ""){
-        var plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()))
+        const plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()))
         plan.save()
         buildSavedPlanList()
         $("#saveModal").modal("hide")

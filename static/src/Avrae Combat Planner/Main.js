@@ -1,10 +1,10 @@
 import { BattleMap, Monster, Overlay, SavedPlan, Settings } from "./types.js";
 import { buildMaddTable, buildMapPreview, buildMonsterInventory, buildOverlayModal, buildMainCommandHeader, getTokenShortcode, isValidHttpURL, buildMaddHeader, buildMapHeader, buildOverlayHeader, copyString, exportBuild, savePlan, buildSavedPlanList } from "./utils.js";
 $("#monster-inventory").on("change", function (e) {
-    var target = $(e.target);
-    var monsters = Monster.load();
-    var index = target.parents(".monster").data("id");
-    var monster = monsters[index];
+    const target = $(e.target);
+    const monsters = Monster.load();
+    const index = target.parents(".monster").data("id");
+    const monster = monsters[index];
     monster[target.attr("name")] = target.is("input") ? target.val() : target.find(":selected").val();
     monster.save();
     buildMaddTable();
@@ -12,31 +12,33 @@ $("#monster-inventory").on("change", function (e) {
     buildMapPreview();
 });
 $(document).on("change", "input[name='name']", function () {
-    var monsters = Monster.load();
+    const monsters = Monster.load();
     if (monsters.length > $("#monster-inventory").children(".monster").length) {
         $("#monster-inventory").append(monsters[monsters.length - 1].inventoryRow());
     }
     else if ($("#monster-inventory").children(".monster").length > monsters.length) {
         monsters.forEach(monster => {
-            monster.name == "" && monster.index < monsters.length - 1 ? monster.remove() : "";
+            if (monster.name == "" && monster.index < monsters.length - 1) {
+                monster.remove();
+            }
         });
         buildMonsterInventory();
     }
 });
 $(document).on("change", "[name='quantity']", function () {
-    var target = $(this);
-    var index = target.parents(".monster").data("id");
-    var monsters = Monster.load();
-    var monster = monsters[index];
+    const target = $(this);
+    const index = target.parents(".monster").data("id");
+    const monsters = Monster.load();
+    const monster = monsters[index];
     monster.coords.length = monster.quantity;
     monster.save();
 });
 $(document).on("change", "[name='token']", function () {
-    var target = $(this);
-    var index = target.parents(".monster").data("id");
-    var monsters = Monster.load();
-    var monster = monsters[index];
-    var helpText = $(`#mini-token-help-${index}`);
+    const target = $(this);
+    const index = target.parents(".monster").data("id");
+    const monsters = Monster.load();
+    const monster = monsters[index];
+    let helpText = $(`#mini-token-help-${index}`);
     if (isValidHttpURL(monster.token)) {
         target.val("loading...");
         getTokenShortcode(monster.token)
@@ -45,11 +47,12 @@ $(document).on("change", "[name='token']", function () {
             if (token != null) {
                 target.val(token);
                 monster.token = token;
-                helpText.length > 0 ? helpText.remove() : "";
+                if (helpText.length > 0)
+                    helpText.remove();
             }
             else {
                 target.empty();
-                var error = "Seomthing went wrong with that image. Either OTFBM doesn't have access to the image, or it is malformed.<br>Try a different URL.";
+                const error = "Seomthing went wrong with that image. Either OTFBM doesn't have access to the image, or it is malformed.<br>Try a different URL.";
                 if (helpText.length > 0) {
                     helpText.val(error);
                 }
@@ -65,13 +68,14 @@ $(document).on("change", "[name='token']", function () {
         });
     }
     else {
-        helpText.length > 0 ? helpText.remove() : "";
+        if (helpText.length > 0)
+            helpText.remove();
     }
 });
 $(document).on("click", ".remove-monster", function (e) {
-    var target = $(e.target);
-    var index = target.parents(".monster").data("id");
-    var monsters = Monster.load();
+    const target = $(e.target);
+    const index = target.parents(".monster").data("id");
+    const monsters = Monster.load();
     if (index == monsters.length - 1) {
         target.tooltip({
             title: "Cannot remove the last row.",
@@ -88,21 +92,21 @@ $(document).on("click", ".remove-monster", function (e) {
     buildMainCommandHeader();
 });
 $("#madd-table").on("change", function (e) {
-    var target = $(e.target);
-    var monsters = Monster.load();
-    var index = target.parents(".monPos").data("id");
-    var monster = monsters[index];
-    var mon = target.parents(".monPos").data("mon");
+    const target = $(e.target);
+    const monsters = Monster.load();
+    const index = target.parents(".monPos").data("id");
+    const monster = monsters[index];
+    const mon = target.parents(".monPos").data("mon");
     monster.coords[mon] = target.val().toString();
     monster.save();
     buildMaddHeader();
     buildMapPreview();
 });
 $(document).on("click", ".madd-clear", function (e) {
-    var target = $(e.target);
-    var index = target.parents(".monGroup").data("id");
-    var monsters = Monster.load();
-    var monster = monsters[index];
+    const target = $(e.target);
+    const index = target.parents(".monGroup").data("id");
+    const monsters = Monster.load();
+    const monster = monsters[index];
     monster.coords = [];
     monster.coords.length = monster.quantity;
     monster.save();
@@ -111,8 +115,8 @@ $(document).on("click", ".madd-clear", function (e) {
     buildMapPreview();
 });
 $("#overlay-setup").on("change", function (e) {
-    var battlemap = BattleMap.load();
-    var target = $(e.target);
+    const battlemap = BattleMap.load();
+    const target = $(e.target);
     battlemap.overlay[target.attr('name')] = target.is("input") ? target.val() : target.find(":selected").val();
     battlemap.save();
     if (target.attr("name") == "type")
@@ -121,7 +125,7 @@ $("#overlay-setup").on("change", function (e) {
     buildOverlayHeader();
 });
 $("#reset-overlay").on("click", function () {
-    var battlemap = BattleMap.load();
+    const battlemap = BattleMap.load();
     battlemap.overlay = new Overlay();
     battlemap.save();
     $("#map-overlay-type").find(":selected").prop("selected", false);
@@ -131,9 +135,9 @@ $("#reset-overlay").on("click", function () {
     buildMapPreview();
 });
 $(".settings").on("change", function (e) {
-    var settings = Settings.load();
-    var target = $(e.target);
-    var errorButton = $('.error-button');
+    const settings = Settings.load();
+    const target = $(e.target);
+    let errorButton = $('.error-button');
     settings[target.attr("name")] = target.prop('type') == 'text' ? target.val() : target.prop("checked");
     settings.save();
     if (settings.conflict == true) {
@@ -164,7 +168,7 @@ $(".settings").on("change", function (e) {
     buildOverlayHeader();
 });
 $("#map-setup").on("change", function (e) {
-    var target = $(e.target);
+    const target = $(e.target);
     battlemap[target.attr("name")] = target.val();
     battlemap.save();
     buildMapHeader();
@@ -184,7 +188,7 @@ $("#reset-monsters").on("click", function () {
 });
 $("#reset-battlemap").on("click", function () {
     BattleMap.dump();
-    var battlemap = BattleMap.load();
+    const battlemap = BattleMap.load();
     buildOverlayModal();
     buildOverlayHeader();
     buildMapHeader();
@@ -192,7 +196,7 @@ $("#reset-battlemap").on("click", function () {
     buildMapPreview();
     $("#map-overlay-type").find(":selected").prop("selected", false);
     $("#map-setup :input").map(function () {
-        var target = $(this);
+        const target = $(this);
         target.val(battlemap[target.attr("name")]);
     });
 });
@@ -207,7 +211,7 @@ $("#save-plan").on("click", function () {
     savePlan();
 });
 $("#delete-plan").on("click", function () {
-    var planName = $("#plan-name").val().toString();
+    const planName = $("#plan-name").val().toString();
     if (planName != "") {
         SavedPlan.dump(planName);
         $("#reset-monsters").trigger("click");
@@ -223,8 +227,8 @@ Monster.import();
 BattleMap.import();
 SavedPlan.import();
 window.history.replaceState({}, document.title, window.location.pathname);
-var settings = Settings.load();
-var battlemap = BattleMap.load();
+const settings = Settings.load();
+const battlemap = BattleMap.load();
 buildMonsterInventory();
 buildMaddTable();
 buildMaddHeader();
@@ -235,17 +239,20 @@ buildSavedPlanList();
 buildMainCommandHeader();
 // Load Settings
 $(".settings :input").map(function () {
-    let x = $(this);
-    x.prop('type') == 'text' ? x.val(settings[x.attr("name")]) : x.prop("checked", settings[x.attr("name")]);
+    const x = $(this);
+    if (x.prop('type') == 'text')
+        x.val(settings[x.attr("name")]);
+    else
+        x.prop("checked", settings[x.attr("name")]);
 });
 // Load Overlay
 $("#overlay-setup [id^='map-overlay']").map(function () {
-    var target = $(this);
+    const target = $(this);
     target.val(battlemap.overlay[target.attr("name")]);
 });
 // Load Map
 $("#map-setup :input").map(function () {
-    var target = $(this);
+    const target = $(this);
     target.val(battlemap[target.attr("name")]);
 });
 $(document).on("DOMContentLoaded", function () {
@@ -309,7 +316,7 @@ $(document).on("DOMContentLoaded", function () {
         }
     });
     $(".modal").map(function () {
-        var target = $(this);
+        const target = $(this);
         target.draggable({ handle: ".modal-header" });
         if (target.find(".default-focus")) {
             target.on("shown.bs.modal", function () {

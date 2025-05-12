@@ -4,8 +4,14 @@ class AdminAccessError(Exception):
         super().__init__(self.message)
 
 
-class LoginError(Exception):
+class UnauthorizedAccessError(Exception):
     def __init__(self, message="Access denied. You must be logged in to view this"):
+        self.message = message
+        super().__init__(self.message)
+
+
+class LoginRequiredError(Exception):
+    def __init__(self, message="Unauthorized"):
         self.message = message
         super().__init__(self.message)
 

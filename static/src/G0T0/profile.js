@@ -53,7 +53,7 @@ $.fn.dataTable.ext.search.push(async function (settings, data, dataIndex) {
         const sayTable = $("#say-table").DataTable();
         const startDate = $("#say-start-date").val();
         const endDate = $("#say-end-date").val();
-        var rowData = sayTable.row(dataIndex).data();
+        let rowData = sayTable.row(dataIndex).data();
         if (!rowData)
             return true;
         const key = rowData.command;

@@ -5,7 +5,7 @@ export function guildAbbreviation(guild) {
     return guild.name.split(" ").map((word) => word[0]).join("");
 }
 async function buildGuildDropdown() {
-    let guild_list = $("#guild-list");
+    const guild_list = $("#guild-list");
     guild_list.html('');
     userSession.guilds.forEach(g => {
         guild_list.append(`

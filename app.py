@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import markdown
 from urllib.parse import urlparse
 
-from flask import Flask, render_template, request, make_response
+from flask import Flask, redirect, render_template, request, make_response, url_for
 from flask_bootstrap import Bootstrap
 from flask_talisman import Talisman
 
@@ -98,6 +98,11 @@ def site_map():
 @login.user_loader
 def load_user(id):
     return db.session.get(User, id)
+
+
+@login.unauthorized_handler
+def unauthorized():
+    return redirect(url_for("auth.login", provider="discord", next=request.path))
 
 
 csp = get_csp()

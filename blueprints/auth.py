@@ -30,7 +30,7 @@ def login(provider):
 
     oauth_session = OAuth2Session(
         client_id=provider_data["client_id"],
-        state=jwt.encode(data, current_app.config["SECRET_KEY"]),
+        state=jwt.encode(data, current_app.config["SECRET_KEY"], algorithm="HS256"),
         scope=provider_data["scopes"],
         redirect_uri=url_for("auth.callback", provider=provider, _external=True),
     )
@@ -98,23 +98,28 @@ def callback(provider):
             )
 
         user.avatar = provider_data["userinfo"]["avatar"](user_data)
-
         db.session.add(user)
         db.session.commit()
 
         login_user(user)
+        session["admin"] = is_admin()
+        data = jwt.decode(
+            session.get("OAUTH2_STATE"),
+            current_app.config["SECRET_KEY"],
+            algorithms=["HS256"],
+        )
 
     except Exception as e:
         print(f"Issue with callback: {e}")
         return redirect(url_for("homepage"))
 
-    # TODO: Fix this so it redirects properly
-    return redirect(url_for("homepage"))
+    return redirect(data.get("redirect", url_for("homepage")))
 
 
 @auth_blueprint.route("/logout")
 def logout():
     logout_user()
+    session.pop("admin")
     return redirect(url_for("homepage"))
 
 
@@ -131,8 +136,6 @@ def get_guild():
         for g in user_guilds
         if g["id"] in {g["id"] for g in bot_guilds}
     ]
-
-    session["admin"] = is_admin()
 
     data = {
         "guilds": session["guilds"],

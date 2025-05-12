@@ -16,11 +16,11 @@ export class G0T0Bot extends WebClass {
         return this.sendData(`api/guild/${guild.id}`, "PATCH", guild);
     }
     async get_player(guild_id, player_id) {
-        let url = `api/players/${guild_id}${player_id ? `/${player_id}` : ''}`;
+        const url = `api/players/${guild_id}${player_id ? `/${player_id}` : ''}`;
         return this.fetch(url);
     }
     async get_messages(guild_id, message_id) {
-        let url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`;
+        const url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`;
         return this.fetch(url);
     }
     async new_message(guild_id, message) {

@@ -8,7 +8,7 @@ export function guildAbbreviation(guild: DiscordGuild): string {
 }
 
 async function buildGuildDropdown(){
-    let guild_list = $("#guild-list")
+    const guild_list = $("#guild-list")
     guild_list.html('')
 
     userSession.guilds.forEach(g => {

@@ -18,7 +18,7 @@ export function filterStats(sourceData, rowData, startDate, endDate) {
     });
     const minDate = startDate ? new Date(startDate.replace('-', '/')) : new Date(Math.min(...rowDates.map(date => date.getTime())));
     const maxDate = endDate ? new Date(endDate.replace('-', '/')) : new Date(Math.max(...rowDates.map(date => date.getTime())));
-    let newData = {};
+    const newData = {};
     newData.count = 0;
     newData.num_characters = 0;
     newData.num_lines = 0;
@@ -56,7 +56,7 @@ export function initPlayerTable(players) {
             {
                 data: "member",
                 title: "Name",
-                render: function (data, type, row) {
+                render: function (data) {
                     return `${playerName(data)}`;
                 }
             },
@@ -64,7 +64,7 @@ export function initPlayerTable(players) {
                 data: "characters",
                 searchable: false,
                 title: "# Characters",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data.length;
                 }
             }
@@ -95,7 +95,7 @@ export function initCharacterTable(characters) {
             {
                 title: "Species",
                 data: "species",
-                render: function (data, type, row) {
+                render: function (data) {
                     return `${data != null ? data.value : "Not found"}`;
                 }
             },
@@ -103,14 +103,14 @@ export function initCharacterTable(characters) {
                 data: "classes",
                 title: `Class`,
                 width: "70%",
-                render: function (data, type, row) {
+                render: function (data) {
                     return classString(data);
                 }
             },
             {
                 title: "Faction",
                 data: "faction",
-                render: function (data, type, row) {
+                render: function (data) {
                     return `${data != null ? data.value : ""}`;
                 }
             }
@@ -119,7 +119,7 @@ export function initCharacterTable(characters) {
         columnDefs: [
             {
                 targets: [0, 3],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -149,7 +149,7 @@ export function initPlayerCharacterTable(characters) {
             {
                 data: "species",
                 title: "Species",
-                render: function (data, type, row) {
+                render: function (data) {
                     return `${data != null ? data?.value : "Not found"}`;
                 }
             },
@@ -157,7 +157,7 @@ export function initPlayerCharacterTable(characters) {
                 data: "classes",
                 title: `Class`,
                 width: "70%",
-                render: function (data, type, row) {
+                render: function (data) {
                     return classString(data);
                 }
             }
@@ -166,7 +166,7 @@ export function initPlayerCharacterTable(characters) {
         columnDefs: [
             {
                 targets: [0, 3],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -199,7 +199,7 @@ export function initStatsTable(commands) {
         columnDefs: [
             {
                 targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -241,7 +241,7 @@ export function initSayTable(player) {
             {
                 title: "Character",
                 data: "command",
-                render: function (data, type, row) {
+                render: function (data) {
                     return player.characters.find(c => c.id == parseInt(data))?.name ?? "Character not found/Inactive Character";
                 }
             },
@@ -264,7 +264,7 @@ export function initSayTable(player) {
             {
                 title: "Avg. Words / Post",
                 data: "words",
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `${row.count == 0 ? 0 : (data / row.count).toFixed(2)}`;
                 }
             }
@@ -273,7 +273,7 @@ export function initSayTable(player) {
         columnDefs: [
             {
                 targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -343,7 +343,7 @@ export function initGlobalNPCTable(player) {
         columnDefs: [
             {
                 targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -358,7 +358,7 @@ export function initSKUTable(store) {
     destroyTable(tableName);
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 25,
         lengthChange: false,
@@ -374,7 +374,7 @@ export function initSKUTable(store) {
             {
                 title: "Cost",
                 data: "user_cost",
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control sku-cost-input" step="0.01" data-id="${row.sku}" value="${data != null ? data : ''}"/>`;
                 }
             }
@@ -405,7 +405,7 @@ export function initEntitlementTable(entitlements, store) {
     });
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 25,
         lengthChange: false,
@@ -437,7 +437,7 @@ export function initAnnouncementTable(announcements) {
     destroyTable(tableName);
     $(tableName).DataTable({
         orderCellsTop: true,
-        //@ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         searching: false,
         info: false,
@@ -475,7 +475,7 @@ export function initActivityTable(activities) {
         orderCellsTop: true,
         pageLength: 50,
         lengthChange: false,
-        //@ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         info: false,
         paging: false,
@@ -491,7 +491,7 @@ export function initActivityTable(activities) {
                 orderable: false,
                 searchable: false,
                 width: "20%",
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control cc-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
                 }
             },
@@ -501,7 +501,7 @@ export function initActivityTable(activities) {
                 orderable: false,
                 searchable: false,
                 width: "20%",
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control cr-input" data-id="${row.id}" step="0.25" value="${data != null ? data : ''}"/>`;
                 }
             },
@@ -510,7 +510,7 @@ export function initActivityTable(activities) {
                 title: "Diversion",
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<div class="form-check"><input type="checkbox" class="form-check-input diversion-input" data-id="${row.id}" ${data ? 'checked' : ''}/></div>`;
                 }
             },
@@ -519,7 +519,7 @@ export function initActivityTable(activities) {
                 title: "Points",
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control points-input" data-id="${row.id}" value="${data}"/>`;
                 }
             }
@@ -531,7 +531,7 @@ export function initActivityPointsTable(activityPoints) {
     destroyTable(tableName);
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -550,7 +550,7 @@ export function initActivityPointsTable(activityPoints) {
                 title: "Points",
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control point-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
                 }
             }
@@ -584,8 +584,8 @@ export function initLogTable(guild_id) {
             {
                 title: "Created",
                 data: 'created_ts',
-                render: function (data, type, row) {
-                    let date = new Date(data);
+                render: function (data) {
+                    const date = new Date(data);
                     return date.toLocaleString();
                 }
             },
@@ -661,7 +661,7 @@ export function initConversionTable(conversions) {
     destroyTable(tableName);
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -680,7 +680,7 @@ export function initConversionTable(conversions) {
                 title: "# Credits / Chain Code",
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control credit-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
                 }
             }
@@ -692,7 +692,7 @@ export function initLevelCostTable(costs) {
     destroyTable(tableName);
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -711,7 +711,7 @@ export function initLevelCostTable(costs) {
                 title: "Chain Codes",
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`;
                 }
             }
@@ -721,7 +721,7 @@ export function initLevelCostTable(costs) {
 export function buildSaySummaryData(playerData) {
     const startDate = $("#say-summary-start-date").val() ? new Date($("#say-summary-start-date").val().toString()) : 0;
     const endDate = $("#say-summary-end-date").val() ? new Date($("#say-summary-end-date").val().toString()) : new Date();
-    let stats = { count: 0, num_lines: 0, num_words: 0, num_characters: 0 };
+    const stats = { count: 0, num_lines: 0, num_words: 0, num_characters: 0 };
     playerData.forEach(player => {
         const characters = player.statistics?.say || {};
         for (const char in characters) {
@@ -755,7 +755,7 @@ export function initSaySummaryTable(players) {
                 data: "count",
                 title: "# Posts",
                 className: "text-end",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data.toLocaleString();
                 }
             },
@@ -763,7 +763,7 @@ export function initSaySummaryTable(players) {
                 title: "Characters",
                 data: "num_characters",
                 className: "text-end",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data.toLocaleString();
                 }
             },
@@ -771,7 +771,7 @@ export function initSaySummaryTable(players) {
                 title: "Lines",
                 data: "num_lines",
                 className: "text-end",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data.toLocaleString();
                 }
             },
@@ -779,7 +779,7 @@ export function initSaySummaryTable(players) {
                 title: "Words",
                 data: "num_words",
                 className: "text-end",
-                render: function (data, type, row) {
+                render: function (data) {
                     return data.toLocaleString();
                 }
             },
@@ -787,7 +787,7 @@ export function initSaySummaryTable(players) {
                 title: "Avg. Words / Post",
                 data: "num_words",
                 className: "text-end",
-                render: function (data, type, row) {
+                render: function (data, _, row) {
                     return `${row.count == 0 ? 0 : (data / row.count).toFixed(2)}`;
                 }
             }
@@ -796,7 +796,7 @@ export function initSaySummaryTable(players) {
         columnDefs: [
             {
                 targets: [0, 1],
-                createdCell: function (td, cellData, rowData, row, col) {
+                createdCell: function (td) {
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"

@@ -277,7 +277,6 @@ class ButtonTab extends HTMLElement{
   private updateFromAttributes(){
     const labelText = this.getAttribute('label-text')
     const controls = this.getAttribute('controls')
-    const active = this.getAttribute('active')
     const id = this.getAttribute('custom-id')
 
     if (id){

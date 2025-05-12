@@ -25,7 +25,7 @@ export function filterStats(sourceData: NPCStats, rowData: GenericDict, startDat
     const minDate = startDate ? new Date(startDate.replace('-', '/')) : new Date(Math.min(...rowDates.map(date => date.getTime())))
     const maxDate = endDate ? new Date(endDate.replace('-', '/')) : new Date(Math.max(...rowDates.map(date => date.getTime())))
 
-    let newData = {} as DailyStats
+    const newData = {} as DailyStats
     newData.count = 0 
     newData.num_characters = 0
     newData.num_lines = 0
@@ -72,7 +72,7 @@ export function initPlayerTable(players: Player[]): void{
             {
                 data: "member",
                 title: "Name",
-                render: function(data, type, row){
+                render: function(data){
                     return `${playerName(data)}`
                 }
             },
@@ -80,7 +80,7 @@ export function initPlayerTable(players: Player[]): void{
                 data: "characters",
                 searchable: false,
                 title: "# Characters",
-                render: function(data, type, row){
+                render: function(data){
                     return data.length
                 }
             }
@@ -114,7 +114,7 @@ export function initCharacterTable(characters: Character[]): void{
             {
                 title: "Species",
                 data: "species",
-                render: function(data, type, row){
+                render: function(data){
                     return `${data != null ? data.value : "Not found"}`
                 }
             },
@@ -122,14 +122,14 @@ export function initCharacterTable(characters: Character[]): void{
                 data: "classes",
                 title: `Class`,
                 width: "70%",
-                render: function(data, type, row){
+                render: function(data){
                     return classString(data)
                 }
             },
             {
                 title: "Faction",
                 data: "faction",
-                render: function(data, type, row){
+                render: function(data){
                     return `${data != null ? data.value : ""}`
                 }
             }
@@ -138,7 +138,7 @@ export function initCharacterTable(characters: Character[]): void{
         columnDefs: [
             {
                 targets: [0, 3],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -171,7 +171,7 @@ export function initPlayerCharacterTable(characters: Character[]): void{
             {
                 data: "species",
                 title: "Species",
-                render: function(data, type, row){
+                render: function(data){
                     return `${data != null ? data?.value : "Not found"}`
                 }
             },
@@ -179,7 +179,7 @@ export function initPlayerCharacterTable(characters: Character[]): void{
                 data: "classes",
                 title: `Class`,
                 width: "70%",
-                render: function(data, type, row){
+                render: function(data){
                     return classString(data)
                 }
             }
@@ -188,7 +188,7 @@ export function initPlayerCharacterTable(characters: Character[]): void{
         columnDefs: [
             {
                 targets: [0, 3],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -224,7 +224,7 @@ export function initStatsTable(commands: GenericDict[]): void{
         columnDefs: [
             {
                 targets: [0,1],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -274,7 +274,7 @@ export function initSayTable(player: Player): void{
             {
                 title: "Character",
                 data: "command",
-                render: function(data, type, row){
+                render: function(data){
                     return player.characters.find(c => c.id == parseInt(data))?.name ?? "Character not found/Inactive Character"
                 }
             },
@@ -297,7 +297,7 @@ export function initSayTable(player: Player): void{
             {
                 title: "Avg. Words / Post",
                 data: "words",
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `${row.count == 0 ? 0 : (data/row.count).toFixed(2)}`
                 }
             }
@@ -306,7 +306,7 @@ export function initSayTable(player: Player): void{
         columnDefs: [
             {
                 targets: [0,1],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -384,7 +384,7 @@ export function initGlobalNPCTable(player: Player): void{
         columnDefs: [
             {
                 targets: [0,1],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"
@@ -402,7 +402,7 @@ export function initSKUTable(store: Store[]): void {
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 25,
         lengthChange: false,
@@ -418,7 +418,7 @@ export function initSKUTable(store: Store[]): void {
             {
                 title: "Cost",
                 data: "user_cost",
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control sku-cost-input" step="0.01" data-id="${row.sku}" value="${data != null ? data : ''}"/>`
                 }
             }
@@ -456,7 +456,7 @@ export function initEntitlementTable(entitlements: DiscordEntitlement[], store: 
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 25,
         lengthChange: false,
@@ -491,7 +491,7 @@ export function initAnnouncementTable(announcements: string[]): void {
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        //@ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         searching: false,
         info: false,
@@ -532,7 +532,7 @@ export function initActivityTable(activities: Activity[]): void {
         orderCellsTop: true,
         pageLength: 50,
         lengthChange: false,
-        //@ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         info: false,
         paging: false,
@@ -548,7 +548,7 @@ export function initActivityTable(activities: Activity[]): void {
                 orderable: false,
                 searchable: false,
                 width: "20%",
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control cc-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
                 }
             },
@@ -558,7 +558,7 @@ export function initActivityTable(activities: Activity[]): void {
                 orderable: false,
                 searchable: false,
                 width: "20%",
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control cr-input" data-id="${row.id}" step="0.25" value="${data != null ? data : ''}"/>`
                 }
             },
@@ -567,7 +567,7 @@ export function initActivityTable(activities: Activity[]): void {
                 title: "Diversion",
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<div class="form-check"><input type="checkbox" class="form-check-input diversion-input" data-id="${row.id}" ${data ? 'checked': ''}/></div>`
                 }
             },
@@ -576,7 +576,7 @@ export function initActivityTable(activities: Activity[]): void {
                 title: "Points",
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control points-input" data-id="${row.id}" value="${data}"/>`
                 }
             }
@@ -591,7 +591,7 @@ export function initActivityPointsTable(activityPoints): void {
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -610,7 +610,7 @@ export function initActivityPointsTable(activityPoints): void {
                 title: "Points",
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control point-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
                 }
             }
@@ -647,8 +647,8 @@ export function initLogTable(guild_id: string): void {
                 { 
                     title: "Created", 
                     data: 'created_ts',
-                    render: function(data, type, row){
-                        let date = new Date(data)
+                    render: function(data){
+                        const date = new Date(data)
                         return date.toLocaleString()
                     } 
                 },
@@ -729,7 +729,7 @@ export function initConversionTable(conversions: CodeConversion[]): void {
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -748,7 +748,7 @@ export function initConversionTable(conversions: CodeConversion[]): void {
                 title: "# Credits / Chain Code",
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control credit-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
                 }
             }
@@ -763,7 +763,7 @@ export function initLevelCostTable(costs: LevelCost[]): void {
 
     $(tableName).DataTable({
         orderCellsTop: true,
-        // @ts-ignore
+        // @ts-expect-error: Error that responsive isn't in the library, but it is still a respected property.
         responsive: true,
         pageLength: 10,
         lengthChange: false,
@@ -782,7 +782,7 @@ export function initLevelCostTable(costs: LevelCost[]): void {
                 title: "Chain Codes",
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `<input type="number" class="form-control level-cost-input" data-id="${row.id}" value="${data != null ? data : ''}"/>`
                 }
             }
@@ -791,10 +791,10 @@ export function initLevelCostTable(costs: LevelCost[]): void {
 }
 
 export function buildSaySummaryData(playerData: Player[]){
-    const startDate = $("#say-summary-start-date").val() as String ? new Date($("#say-summary-start-date").val().toString()) : 0
-    const endDate = $("#say-summary-end-date").val() as String? new Date($("#say-summary-end-date").val().toString()) : new Date()
+    const startDate = $("#say-summary-start-date").val() as string ? new Date($("#say-summary-start-date").val().toString()) : 0
+    const endDate = $("#say-summary-end-date").val() as string? new Date($("#say-summary-end-date").val().toString()) : new Date()
 
-    let stats = {count: 0, num_lines: 0, num_words: 0, num_characters: 0} as DailyStats
+    const stats = {count: 0, num_lines: 0, num_words: 0, num_characters: 0} as DailyStats
 
     playerData.forEach(player => {
         const characters: GenericDict = player.statistics?.say as GenericDict || {}
@@ -839,7 +839,7 @@ export function initSaySummaryTable(players: Player[]): void {
                 data: "count",
                 title: "# Posts",
                 className: "text-end",
-                render: function(data, type, row){
+                render: function(data){
                     return data.toLocaleString()
                 }
             },
@@ -847,7 +847,7 @@ export function initSaySummaryTable(players: Player[]): void {
                 title: "Characters",
                 data: "num_characters",
                 className: "text-end",
-                render: function(data, type, row){
+                render: function(data){
                     return data.toLocaleString()
                 }
             },
@@ -855,7 +855,7 @@ export function initSaySummaryTable(players: Player[]): void {
                 title: "Lines",
                 data: "num_lines",
                 className: "text-end",
-                render: function(data, type, row){
+                render: function(data){
                     return data.toLocaleString()
                 }
             },
@@ -863,7 +863,7 @@ export function initSaySummaryTable(players: Player[]): void {
                 title: "Words",
                 data: "num_words",
                 className: "text-end",
-                render: function(data, type, row){
+                render: function(data){
                     return data.toLocaleString()
                 }
             },
@@ -871,7 +871,7 @@ export function initSaySummaryTable(players: Player[]): void {
                 title: "Avg. Words / Post",
                 data: "num_words",
                 className: "text-end",
-                render: function(data, type, row){
+                render: function(data, _, row){
                     return `${row.count == 0 ? 0 : (data/row.count).toFixed(2)}`
                 }
             }
@@ -880,7 +880,7 @@ export function initSaySummaryTable(players: Player[]): void {
         columnDefs: [
             {
                 targets: [0,1],
-                createdCell: function(td, cellData, rowData, row, col){ 
+                createdCell: function(td){ 
                     $(td).css({
                         "white-space": "pre",
                         "word-wrap": "normal"

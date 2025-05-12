@@ -43,35 +43,35 @@ export class Monster {
         if (this.label) {
             return this.label;
         }
-        var split = this.name.split(/\W+/);
+        const split = this.name.split(/\W+/);
         return split.length == 1 ? this.name.slice(0, 2).toUpperCase() : split.filter(word => word).map(word => word[0]).join("").toUpperCase();
     }
     combatID(number) {
         return this.prefix().includes("#") ? this.prefix().replace("#", `${number}`) : this.quantity > 1 ? `${this.prefix()}${number}` : this.prefix();
     }
     inventoryRow() {
-        var nameColumn = jQuery("<div>")
+        const nameColumn = jQuery("<div>")
             .addClass("col-sm mb-3")
             .append(inputText(`name-${this.index}`, "name", "Name", this.name));
-        var labelColumn = jQuery("<div>")
+        const labelColumn = jQuery("<div>")
             .addClass("col-sm-2 mb-3")
             .append(inputText(`label-${this.index}`, "label", "Label", this.label));
-        var quantityColumn = jQuery("<div>")
+        const quantityColumn = jQuery("<div>")
             .addClass("col-sm-2 mb-3")
             .append(inputText(`quantity-${this.index}`, "quantity", "Quantity", this.quantity, "number", 0, 20));
-        var sizeColumn = jQuery("<div>")
+        const sizeColumn = jQuery("<div>")
             .addClass("col-sm-3 mb-3")
             .append(inputSelect(`size-${this.index}`, "size", "Size", this.size, MonsterSizes));
-        var colorColumn = jQuery("<div>")
+        const colorColumn = jQuery("<div>")
             .addClass("col-sm-2 mb-3")
             .append(inputSelect(`color-${this.index}`, "color", "Token Color", this.color, Colors));
-        var tokenColumn = jQuery("<div>")
+        const tokenColumn = jQuery("<div>")
             .addClass("col-sm-4 mb-3")
             .append(inputText(`token-${this.index}`, "token", "Token Shorcode/URL", this.token));
-        var argsColumn = jQuery("<div>")
+        const argsColumn = jQuery("<div>")
             .addClass("col-sm mb-3")
             .append(inputText(`args-${this.index}`, "args", "Additional Arguments", this.args));
-        var headerRow = jQuery("<div>")
+        const headerRow = jQuery("<div>")
             .addClass("row mt-2")
             .html(`
                 <div class="col-md-12 d-flex monster-header">
@@ -79,13 +79,13 @@ export class Monster {
                     ${this.index == 0 ? "" : `<button type="button" class="btn btn-close ms-auto remove-monster" tabindex="-1"></button>`}
                 </div>
                 `);
-        var row1 = jQuery("<div>")
+        const row1 = jQuery("<div>")
             .addClass("row m-2")
             .append(nameColumn, labelColumn, quantityColumn, sizeColumn, colorColumn);
-        var row2 = jQuery("<div>")
+        const row2 = jQuery("<div>")
             .addClass("row m-2")
             .append(tokenColumn, argsColumn);
-        var monsterRow = jQuery("<div>")
+        const monsterRow = jQuery("<div>")
             .addClass("row monster border rounded bg-secondary m-2")
             .attr({
             "id": `monster-${this.index}`,
@@ -98,14 +98,14 @@ export class Monster {
         if (this.name == "") {
             return;
         }
-        var headerRow = jQuery("<div>")
+        const headerRow = jQuery("<div>")
             .addClass("row m-2")
             .html(`
                 <div class="col-md-12 d-flex monHeader">
                     <h3>${this.name}</h3>
                 </div>
                 `);
-        var monsterRow = jQuery("<div>")
+        const monsterRow = jQuery("<div>")
             .addClass("row m-2 border rounded monGroup bg-secondary")
             .attr({
             "id": `madd-${this.index}`,
@@ -113,7 +113,7 @@ export class Monster {
         })
             .append(headerRow);
         for (let i = 0; i < this.quantity; i++) {
-            let monsterColumn = jQuery("<div>")
+            const monsterColumn = jQuery("<div>")
                 .addClass("col-sm-3 mb-3 monPos")
                 .attr({
                 "data-id": this.index,
@@ -124,7 +124,7 @@ export class Monster {
                 monsterColumn.find("input[name='monster-position']").addClass("default-focus");
             monsterRow.append(monsterColumn);
         }
-        var footerRow = jQuery("<div>")
+        const footerRow = jQuery("<div>")
             .addClass("row m-2")
             .html(`
                 <div class="col mb-3">
@@ -135,18 +135,21 @@ export class Monster {
         return monsterRow;
     }
     save() {
-        var monsters = Monster.load();
-        this.name == "" ? monsters.splice(this.index, 1) : monsters[this.index] = this;
+        const monsters = Monster.load();
+        if (this.name == "")
+            monsters.splice(this.index, 1);
+        else
+            monsters[this.index] = this;
         localStorage.setItem(monsterNode, JSON.stringify(monsters));
     }
     remove() {
-        var monsters = Monster.load();
+        const monsters = Monster.load();
         monsters.splice(this.index, 1);
         localStorage.setItem(monsterNode, JSON.stringify(monsters));
     }
     static load() {
-        var monsterData = JSON.parse(localStorage.getItem(monsterNode) || "[]");
-        var monsters = monsterData.map((data, index) => new Monster(index, data.name, data.label, data.quantity, data.size, data.color, data.token, data.args, data.coords));
+        const monsterData = JSON.parse(localStorage.getItem(monsterNode) || "[]");
+        const monsters = monsterData.map((data, index) => new Monster(index, data.name, data.label, data.quantity, data.size, data.color, data.token, data.args, data.coords));
         if (monsters.length == 0 || monsters[monsters.length - 1].name != "")
             monsters.push(new Monster(monsters.length));
         return monsters;
@@ -167,8 +170,8 @@ export class Monster {
         }
     }
     static mapCommand(settings) {
-        var monsters = Monster.load();
-        var coords = [];
+        const monsters = Monster.load();
+        const coords = [];
         monsters.forEach(monster => {
             if (monster.name == "" || monster.quantity == 0) {
                 return;
@@ -177,25 +180,25 @@ export class Monster {
                 if (monster.coords[i] == null || monster.coords[i] == "") {
                     continue;
                 }
-                let str = ` -t "${monster.combatID(i + 1)}|${monster.coords[i]}|${monster.size}|${monster.color}|$${monster.token}"`;
+                const str = ` -t "${monster.combatID(i + 1)}|${monster.coords[i]}|${monster.size}|${monster.color}|$${monster.token}"`;
                 coords.push(str);
             }
         });
         return coords.length > 0 ? `${settings.prefix}map${coords.join(" ")}` : "";
     }
     static maddCommand(settings) {
-        var monsters = Monster.load();
-        var commands = [];
+        const monsters = Monster.load();
+        const commands = [];
         monsters.forEach(monster => {
             if (monster.name == "" || monster.quantity == 0) {
                 return;
             }
-            let baseCommand = `${settings.prefix}i madd "${monster.name}"`;
-            let name = monster.label ? ` -name "${monster.label}"` : "";
-            let args = monster.args ? ` ${monster.args}` : "";
+            const baseCommand = `${settings.prefix}i madd "${monster.name}"`;
+            const name = monster.label ? ` -name "${monster.label}"` : "";
+            const args = monster.args ? ` ${monster.args}` : "";
             if (settings.notes) {
                 if (monster.coords.length === 0) {
-                    let notes = [];
+                    const notes = [];
                     if (monster.size)
                         notes.push(`Size: ${monster.size} (${MonsterSizes[monster.size]})`);
                     if (monster.color)
@@ -207,7 +210,7 @@ export class Monster {
                 }
                 else {
                     monster.coords.forEach(coord => {
-                        let notes = [];
+                        const notes = [];
                         if (coord)
                             notes.push(`Location: ${coord}`);
                         if (monster.size)
@@ -222,7 +225,7 @@ export class Monster {
                 }
             }
             else {
-                let quantity = monster.quantity > 1 ? ` -n ${monster.quantity}` : "";
+                const quantity = monster.quantity > 1 ? ` -n ${monster.quantity}` : "";
                 commands.push(`${baseCommand}${quantity}${name}${args}`);
             }
         });
@@ -247,7 +250,7 @@ export class Settings {
         localStorage.setItem(settingNode, JSON.stringify(this));
     }
     static load() {
-        var settings = JSON.parse(localStorage.getItem(settingNode) || "{}");
+        const settings = JSON.parse(localStorage.getItem(settingNode) || "{}");
         return new Settings(settings.multiline, settings.maptarget, settings.notes, settings.monsters, settings.battlemap, settings.overlay, settings.prefix, settings.attach);
     }
 }
@@ -327,7 +330,7 @@ export class BattleMap {
         }
     }
     command(settings, mapOnly = false) {
-        var commands = [];
+        const commands = [];
         let str = "";
         if (!this.url && !this.size)
             return commands;
@@ -351,7 +354,7 @@ export class BattleMap {
             if (settings.attach)
                 str += ` -t ${settings.attach}`;
             if (settings.monsters && !mapOnly) {
-                let monStr = Monster.mapCommand(settings);
+                const monStr = Monster.mapCommand(settings);
                 if (monStr)
                     commands.push(monStr);
             }
@@ -366,15 +369,15 @@ export class SavedPlan {
         this.data = data;
     }
     save() {
-        var builds = SavedPlan.load();
+        const builds = SavedPlan.load();
         builds[this.name] = this;
         localStorage.setItem(saveNode, JSON.stringify(builds));
     }
     static load() {
         const data = JSON.parse(localStorage.getItem(saveNode) || "{}");
-        var builds = {};
-        for (let name in data) {
-            let build = data[name];
+        const builds = {};
+        for (const name in data) {
+            const build = data[name];
             builds[name] = new SavedPlan(name, build.data);
         }
         return builds;
@@ -392,7 +395,7 @@ export class SavedPlan {
         }
     }
     static dump(name) {
-        var plans = SavedPlan.load();
+        const plans = SavedPlan.load();
         if (plans[name]) {
             delete plans[name];
             localStorage.setItem(saveNode, JSON.stringify(plans));

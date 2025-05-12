@@ -207,12 +207,12 @@ export class G0T0Bot extends WebClass{
     }
 
     async get_player(guild_id: string, player_id?: string): Promise<Player | Player[]>{
-        let url = `api/players/${guild_id}${player_id ? `/${player_id}` : ''}`
+        const url = `api/players/${guild_id}${player_id ? `/${player_id}` : ''}`
         return this.fetch(url)
     }
 
     async get_messages(guild_id: string, message_id?: string): Promise<RefMessage[] | RefMessage>{
-        let url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`
+        const url = `api/message/${guild_id}${message_id ? `/${message_id}` : ''}`
         return this.fetch(url) 
     } 
 

@@ -13,8 +13,8 @@ export function ToastSuccess(message: string): void{
 }
 
 declare global{
-    var userSession: UserSession
-    var bot: G0T0Bot
+    let userSession: UserSession
+    let bot: G0T0Bot
 }
 
 

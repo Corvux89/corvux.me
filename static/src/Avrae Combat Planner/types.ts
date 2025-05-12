@@ -387,10 +387,12 @@ export class BattleMap {
         public url: string = "",
         public size: string = "10x10",
         public csettings: string = "",
-        public overlay: Overlay = new Overlay()
+        public overlay: Overlay = new Overlay(),
+        public darkMode: boolean = false
     ) {}
 
     save(): void{
+        console.log(this)
         localStorage.setItem(battlemapNode, JSON.stringify(this))
     }
 
@@ -402,6 +404,7 @@ export class BattleMap {
             battlemap.size = mapData.size !== undefined ? mapData.size :  this.prototype.size 
             battlemap.csettings = mapData.csettings !== undefined ?  mapData.csettings : this.prototype.csettings
             battlemap.overlay = mapData.overlay !== undefined ? Overlay.load(mapData.overlay) : this.prototype.overlay
+            battlemap.darkMode = mapData.darkMode !== undefined ? mapData.darkMode : this.prototype.darkMode
         }
         return battlemap
     }
@@ -434,13 +437,13 @@ export class BattleMap {
         if (settings.notes && !mapOnly){
             str += `i effect ${settings.attach} map -attack "||Size: ${this.size || '10x10'}`
             if (this.url) str += ` ~ Background: ${this.url}`
-            if (this.csettings) str += ` ~Options: c${this.csettings}`
+            if (this.csettings) str += ` ~Options: ${this.darkMode ? 'd' : ''}c${this.csettings}`
             str += '"'
         } else {
             str += "map"
             if (this.url) str += ` -bg "${this.url}"`
             if (this.size) str += ` -mapsize ${this.size}`
-            if (this.csettings) str += ` -options c${this.csettings}`
+            if (this.csettings) str += ` -options ${this.darkMode ? 'd' : ''}c${this.csettings}`
             if (settings.attach) str += ` -t ${settings.attach}`
 
             if (settings.monsters && !mapOnly){

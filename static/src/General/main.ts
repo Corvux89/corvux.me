@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 
 import { G0T0Bot } from "../G0T0/types.js"
 import { UserSession } from "./types.js"
@@ -13,10 +14,9 @@ export function ToastSuccess(message: string): void{
 }
 
 declare global{
-    let userSession: UserSession
-    let bot: G0T0Bot
+    var userSession: UserSession
+    var bot: G0T0Bot
 }
-
 
 
 globalThis.userSession = new UserSession()

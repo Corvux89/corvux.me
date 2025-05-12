@@ -169,7 +169,7 @@ $(".settings").on("change", function (e) {
 });
 $("#map-setup").on("change", function (e) {
     const target = $(e.target);
-    battlemap[target.attr("name")] = target.val();
+    battlemap[target.attr("name")] = target.prop('type') == 'text' || target.prop('type') == 'number' ? target.val() : target.prop("checked");
     battlemap.save();
     buildMapHeader();
     buildMapPreview();
@@ -253,7 +253,10 @@ $("#overlay-setup [id^='map-overlay']").map(function () {
 // Load Map
 $("#map-setup :input").map(function () {
     const target = $(this);
-    target.val(battlemap[target.attr("name")]);
+    if (target.prop('type') == 'text' || target.prop('type') == 'number')
+        target.val(battlemap[target.attr("name")]);
+    else
+        target.prop('checked', battlemap[target.attr("name")]);
 });
 $(document).on("DOMContentLoaded", function () {
     buildMapPreview();

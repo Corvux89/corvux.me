@@ -294,13 +294,15 @@ export class Overlay {
     }
 }
 export class BattleMap {
-    constructor(url = "", size = "10x10", csettings = "", overlay = new Overlay()) {
+    constructor(url = "", size = "10x10", csettings = "", overlay = new Overlay(), darkMode = false) {
         this.url = url;
         this.size = size;
         this.csettings = csettings;
         this.overlay = overlay;
+        this.darkMode = darkMode;
     }
     save() {
+        console.log(this);
         localStorage.setItem(battlemapNode, JSON.stringify(this));
     }
     static load() {
@@ -311,6 +313,7 @@ export class BattleMap {
             battlemap.size = mapData.size !== undefined ? mapData.size : this.prototype.size;
             battlemap.csettings = mapData.csettings !== undefined ? mapData.csettings : this.prototype.csettings;
             battlemap.overlay = mapData.overlay !== undefined ? Overlay.load(mapData.overlay) : this.prototype.overlay;
+            battlemap.darkMode = mapData.darkMode !== undefined ? mapData.darkMode : this.prototype.darkMode;
         }
         return battlemap;
     }
@@ -340,7 +343,7 @@ export class BattleMap {
             if (this.url)
                 str += ` ~ Background: ${this.url}`;
             if (this.csettings)
-                str += ` ~Options: c${this.csettings}`;
+                str += ` ~Options: ${this.darkMode ? 'd' : ''}c${this.csettings}`;
             str += '"';
         }
         else {
@@ -350,7 +353,7 @@ export class BattleMap {
             if (this.size)
                 str += ` -mapsize ${this.size}`;
             if (this.csettings)
-                str += ` -options c${this.csettings}`;
+                str += ` -options ${this.darkMode ? 'd' : ''}c${this.csettings}`;
             if (settings.attach)
                 str += ` -t ${settings.attach}`;
             if (settings.monsters && !mapOnly) {

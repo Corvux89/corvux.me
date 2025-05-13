@@ -4,13 +4,13 @@ import json
 
 from abc import ABC
 
-from flask import Flask
+from flask import Flask, current_app, session
 from requests import request
 
 from constants import DISCORD_GUILD_ID
 from helpers.general_helpers import get_members_from_cache
 from models.exceptions import UnauthorizedAccessError
-from models.general import BaseModel, IntAttributeMixin
+from models.general import BaseModel, IntAttributeMixin, User
 
 
 class MemberAttributeMixin:
@@ -25,6 +25,36 @@ class MemberAttributeMixin:
             return None
         except:
             return None
+        
+class DiscordGuild(BaseModel, IntAttributeMixin):
+    _id: str = None
+    name: str = None
+    icon: str = None
+
+    @property
+    def id(self):
+        return str(self._id)
+
+    @id.setter
+    def id(self, value):
+        self.set_int_attribute("_id", value)
+
+        
+class DiscordUser(BaseModel, IntAttributeMixin):
+    global_name: str = None
+    _id: int = None
+    username: str = None
+    avatar: str = None
+
+    guilds = None
+
+    @property
+    def id(self):
+        return str(self._id)
+
+    @id.setter
+    def id(self, value):
+        self.set_int_attribute("_id", value)
 
 
 class DiscordBot(ABC):
@@ -35,6 +65,8 @@ class DiscordBot(ABC):
         self.bot_token = app.config["DISCORD_BOT_TOKEN"]
 
         self.retries = app.config.get("DISCORD_RETRIES", 5)
+
+        self.user_cache = {}
 
     def request(self, route: str, method="GET", **kwargs) -> typing.Union[dict, str]:
         headers = {"Authorization": f"Bot {self.bot_token}"}
@@ -79,21 +111,19 @@ class DiscordBot(ABC):
                     return response.text()
 
         raise Exception("Max retries exceeded")
+    
+    @staticmethod
+    def fetch_user() -> User:
+        if not (user := current_app.discord.user_cache.get(session.get("USER_ID"))):
+            user = User.fetch_user("discord")
+            user_guilds = current_app.discord.user_request(
+                session["OAUTH2_TOKEN"], "/users/@me/guilds"
+                )
+            
+            user.guilds = [DiscordGuild(**g) for g in user_guilds]
 
-
-class DiscordUser(BaseModel, IntAttributeMixin):
-    global_name: str = None
-    _id: int = None
-    username: str = None
-    avatar: str = None
-
-    @property
-    def id(self):
-        return str(self._id)
-
-    @id.setter
-    def id(self, value):
-        self.set_int_attribute("_id", value)
+            current_app.discord.user_cache.update({user.id: user})
+        return user
 
 
 class DiscordMember:
@@ -184,15 +214,3 @@ class DiscordEntitlement(BaseModel, MemberAttributeMixin):
         return self.get_member_attribute(self.user_id)
 
 
-class DiscordGuild(BaseModel, IntAttributeMixin):
-    _id: str = None
-    name: str = None
-    icon: str = None
-
-    @property
-    def id(self):
-        return str(self._id)
-
-    @id.setter
-    def id(self, value):
-        self.set_int_attribute("_id", value)

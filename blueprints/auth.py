@@ -1,15 +1,11 @@
 from flask import Blueprint, current_app, jsonify, redirect, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from flask_sqlalchemy import SQLAlchemy
 import jwt
-import requests
 from requests_oauthlib import OAuth2Session
 
 from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_bot_guilds_from_cache
-from models.discord import DiscordGuild
 from models.exceptions import NotFound, UnauthorizedAccessError
-from models.general import User
 
 auth_blueprint = Blueprint("auth", __name__)
 
@@ -71,35 +67,10 @@ def callback(provider):
 
         if not (access_token := token.get("access_token")):
             raise UnauthorizedAccessError()
+        
+
         session["OAUTH2_TOKEN"] = access_token
-        response = requests.get(
-            provider_data["userinfo"]["url"],
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Accept": "application/json",
-            },
-        )
-
-        if response.status_code != 200:
-            raise UnauthorizedAccessError()
-
-        user_data = response.json()
-        db: SQLAlchemy = current_app.config.get("DB")
-
-        email = provider_data["userinfo"]["email"](user_data)
-        user = db.session.scalar(db.select(User).where(User.email == email))
-
-        if user is None:
-            user = User(
-                id=provider_data["userinfo"]["id"](user_data),
-                email=email,
-                username=provider_data["userinfo"]["username"](user_data),
-                global_name=provider_data["userinfo"]["global_name"](user_data),
-            )
-
-        user.avatar = provider_data["userinfo"]["avatar"](user_data)
-        db.session.add(user)
-        db.session.commit()
+        user = current_app.discord.fetch_user()
 
         login_user(user)
         session["admin"] = is_admin()
@@ -127,14 +98,11 @@ def logout():
 @login_required
 def get_guild():
     bot_guilds = get_bot_guilds_from_cache()
-    user_guilds = current_app.discord.user_request(
-        session["OAUTH2_TOKEN"], "/users/@me/guilds"
-    )
 
     session["guilds"] = [
-        DiscordGuild(**g)
-        for g in user_guilds
-        if g["id"] in {g["id"] for g in bot_guilds}
+        g
+        for g in current_user.guilds
+        if g.id in {g["id"] for g in bot_guilds}
     ]
 
     data = {

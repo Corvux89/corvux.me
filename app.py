@@ -96,8 +96,8 @@ def site_map():
 
 
 @login.user_loader
-def load_user(id):
-    return db.session.get(User, id)
+def load_user(_):
+    return app.discord.fetch_user()
 
 
 @login.unauthorized_handler

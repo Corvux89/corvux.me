@@ -1,31 +1,30 @@
 import datetime
 import json
+from flask import current_app, session
 from flask.json.provider import JSONProvider
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
+import requests
 from sqlalchemy import inspect
-from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.orm.decl_api import registry
 
+from models.exceptions import UnauthorizedAccessError
 
-db = SQLAlchemy()
 
+class User(UserMixin):  
+    id: str
+    username: str
+    global_name: str
+    email: str
+    avatar: str = None
 
-class User(UserMixin, db.Model):
-    __tablename__ = "users"
+    guilds = None
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-    username: Mapped[str]
-    global_name: Mapped[str]
-    email: Mapped[str]
-
-    avatar: Mapped[str] = None
-
-    def __init__(self, id, email, username, global_name):
+    def __init__(self, id, email, username, global_name, **kwargs):
         self.id = id
         self.email = email
         self.username = username
         self.global_name = global_name
+        self.avatar = kwargs.get('avatar')
 
     @property
     def avatar_url(self):
@@ -34,7 +33,34 @@ class User(UserMixin, db.Model):
             if self.avatar
             else None
         )
+        
+    @classmethod
+    def fetch_user(cls, provider: str):
+        provider_data = current_app.config["OAUTH2_PROVIDERS"].get(provider)
+        
+        response = requests.get(
+            provider_data["userinfo"]["url"],
+            headers={
+                "Authorization": f"Bearer {session['OAUTH2_TOKEN']}",
+                "Accept": "application/json"
+            }
+        )
+        
+        if response.status_code != 200:
+            raise UnauthorizedAccessError()
+        
+        user_data = response.json()
+        session["USER_ID"] = provider_data["userinfo"]["id"](user_data)
 
+        user = cls(
+                id=session["USER_ID"],
+                email=provider_data["userinfo"]["email"](user_data),
+                username=provider_data["userinfo"]["username"](user_data),
+                global_name=provider_data["userinfo"]["global_name"](user_data),
+                avatar=provider_data["userinfo"]["avatar"](user_data)
+            )
+        
+        return user
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):

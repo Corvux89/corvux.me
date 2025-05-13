@@ -393,7 +393,7 @@ $("#say-summary-start-date, #say-summary-end-date").on("change", function(){
 })
 
 // Filter Functions
-$.fn.dataTable.ext.search.push(async function (settings, data, dataIndex){
+$.fn.dataTable.ext.search.push(async function (settings, _, dataIndex){
     if (settings.nTable.id == 'global-npc-table') {
         const playerID = $("#member-id").val()
         const playerData = $("#player-table").DataTable().rows().data().toArray().find((player: Player) => player.id == playerID) as Player
@@ -493,6 +493,7 @@ async function buildCensusTable(){
 $(document).on('click', '#player-table tbody tr', function(){
     const table = $("#player-table").DataTable()
     const playerData = table.row(this).data() as Player
+    console.log(playerData)
 
     $("#member-id").val(playerData.id)
     $("#member-name").val(`${playerName(playerData.member)}`)
@@ -500,6 +501,7 @@ $(document).on('click', '#player-table tbody tr', function(){
     $("#player-cc").val(playerData.cc)
     $("#player-div-cc").val(playerData.div_cc)
     $("#player-act-points").val(playerData.activity_points)
+    $("#player-staff-points").val(playerData.points)
 
     initPlayerCharacterTable(playerData.characters)
 

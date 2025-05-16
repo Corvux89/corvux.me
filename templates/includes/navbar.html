@@ -65,7 +65,7 @@
                 </li>
 
                 <!-- G0T0 Stuff Goes here-->
-                {% if session.admin %}
+                {% if current_user.is_authenticated and current_user.is_admin %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for ('G0T0.main') }}">G0T0 Management</a>
                 </li>

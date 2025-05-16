@@ -3,7 +3,6 @@ from flask_login import current_user, login_required, login_user, logout_user
 import jwt
 from requests_oauthlib import OAuth2Session
 
-from helpers.auth_helper import is_admin
 from helpers.general_helpers import get_bot_guilds_from_cache
 from models.exceptions import NotFound, UnauthorizedAccessError
 
@@ -67,13 +66,11 @@ def callback(provider):
 
         if not (access_token := token.get("access_token")):
             raise UnauthorizedAccessError()
-        
 
         session["OAUTH2_TOKEN"] = access_token
         user = current_app.discord.fetch_user()
 
         login_user(user)
-        session["admin"] = is_admin()
         data = jwt.decode(
             session.get("OAUTH2_STATE"),
             current_app.config["SECRET_KEY"],
@@ -90,7 +87,6 @@ def callback(provider):
 @auth_blueprint.route("/logout")
 def logout():
     logout_user()
-    session.pop("admin")
     return redirect(url_for("homepage"))
 
 
@@ -100,9 +96,7 @@ def get_guild():
     bot_guilds = get_bot_guilds_from_cache()
 
     session["guilds"] = [
-        g
-        for g in current_user.guilds
-        if g.id in {g["id"] for g in bot_guilds}
+        g for g in current_user.guilds if g.id in {g["id"] for g in bot_guilds}
     ]
 
     data = {

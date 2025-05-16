@@ -25,7 +25,8 @@ class MemberAttributeMixin:
             return None
         except:
             return None
-        
+
+
 class DiscordGuild(BaseModel, IntAttributeMixin):
     _id: str = None
     name: str = None
@@ -39,7 +40,7 @@ class DiscordGuild(BaseModel, IntAttributeMixin):
     def id(self, value):
         self.set_int_attribute("_id", value)
 
-        
+
 class DiscordUser(BaseModel, IntAttributeMixin):
     global_name: str = None
     _id: int = None
@@ -111,15 +112,15 @@ class DiscordBot(ABC):
                     return response.text()
 
         raise Exception("Max retries exceeded")
-    
+
     @staticmethod
     def fetch_user() -> User:
         if not (user := current_app.discord.user_cache.get(session.get("USER_ID"))):
             user = User.fetch_user("discord")
             user_guilds = current_app.discord.user_request(
                 session["OAUTH2_TOKEN"], "/users/@me/guilds"
-                )
-            
+            )
+
             user.guilds = [DiscordGuild(**g) for g in user_guilds]
 
             current_app.discord.user_cache.update({user.id: user})
@@ -212,5 +213,3 @@ class DiscordEntitlement(BaseModel, MemberAttributeMixin):
     @property
     def member(self):
         return self.get_member_attribute(self.user_id)
-
-

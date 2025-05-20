@@ -286,7 +286,7 @@ export class Overlay {
         if (!this.validOverlay)
             return "";
         if (settings.notes && !mapOnly) {
-            return `${settings.prefix}i notes ${this.target ? this.target : settings.attach} Overlay: ${OverlayMap[this.type]}${this.requiredNodes[this.type].join("")}`;
+            return `${settings.prefix}i note ${this.target ? this.target : settings.attach} Overlay: ${OverlayMap[this.type]}${this.requiredNodes[this.type].join("")}`;
         }
         else {
             return `${settings.prefix}map -over ${this.type.toLowerCase()},${this.requiredNodes[this.type].join(",")}${this.target ? ` -t ${this.target}` : ""}`;
@@ -343,7 +343,7 @@ export class BattleMap {
             if (this.url)
                 str += ` ~ Background: ${this.url}`;
             if (this.csettings)
-                str += ` ~Options: ${this.darkMode ? 'd' : ''}c${this.csettings}`;
+                str += ` ~ Options: ${this.darkMode ? 'd' : ''}c${this.csettings}`;
             str += '"';
         }
         else {

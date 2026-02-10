@@ -39,11 +39,85 @@
 
 <body>
     <div id="navbar">
-        {% include "includes/navbar.html" %}
+        <nav class="navbar navbar-dark bg-dark p-2">
+    <button class="navbar-toggler m-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar"
+            aria-controls="offcanvasDarkNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <a class="navbar-brand" href="/">
+        <img src="/static/images/header2.png"
+             width="70"
+             height="auto"
+             alt="Corvux.me">
+    </a>
+ 
+
+    <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar"
+         aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header">
+            <a class="navbar-brand" href="/">
+                <img src="/static/images/header2.png"
+                     width="70"
+                     height="auto"
+                     alt="Corvux.me">
+            </a>
+
+            <a class="align-bottom text-center m-2" href='https://ko-fi.com/J3J8GWP6G' target='_blank'><img id="kofi-link" src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+
+                <!-- Home -->
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+
+                <!-- Avrae Combat Planner -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/Avrae_Combat_Planner/">Avrae Combat Planner</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script src="/static/src/General/navbar.js" type="module"></script>
     </div>
 
     <div id="content">
-        {% block body %} {% endblock %}
+        
+
+<h1>Oops! Looks like we're a little lost.</h1>
+
+<a href="/"><p>Click Here</a> to go to the Home Page</p>
+
+<div class="d-inline-flex">
+    <p>Redirecting in</p>
+    <p id="timer"></p> 
+    <p>seconds</p> 
+</div>
+
+<script>
+    var seconds = 6
+    let url = "/"
+    function redirect(){
+        if (seconds <= 0){
+        window.location = url
+        } else {
+            seconds--
+            document.getElementById('timer').innerHTML=`${seconds}`
+            setTimeout(() => redirect(), 1000)
+        }
+    }
+
+    redirect()
+</script>
+
     </div>
 
     <!-- Spinner -->

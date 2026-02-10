@@ -4,31 +4,8 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    {% if current_user.is_authenticated %}
-    <div class="d-flex ms-auto align-items-center" id="user-info-container">
-        <!-- Guilds Dropdown -->
-        <div class="dropdown me-3">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="guild-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="guild-dropdown" id="guild-list">
-            </ul>
-        </div>
-
-        <!-- User Badge -->
-        <a class="navbar-brand ms-auto" href="{{ url_for('auth.logout') }}" id="user-badge">
-            <p class="text-muted d-inline">{{current_user.username}}</p>
-            {% if current_user.avatar_url %}
-            <img src="{{ current_user.avatar_url}}"
-                class="rounded-circle"
-                    width="35"
-                    height="auto">
-            {% endif %}
-        </a>
-    </div>
-    {% endif %}
-
     <a class="navbar-brand" href="/">
-        <img src="{{ url_for('static', filename='/images/header2.png') }}"
+        <img src="/static/images/header2.png"
              width="70"
              height="auto"
              alt="Corvux.me">
@@ -39,7 +16,7 @@
          aria-labelledby="offcanvasDarkNavbarLabel">
         <div class="offcanvas-header">
             <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='/images/header2.png') }}"
+                <img src="/static/images/header2.png"
                      width="70"
                      height="auto"
                      alt="Corvux.me">
@@ -61,35 +38,11 @@
 
                 <!-- Avrae Combat Planner -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('complanner.planner') }}">Avrae Combat Planner</a>
+                    <a class="nav-link" href="/Avrae_Combat_Planner/">Avrae Combat Planner</a>
                 </li>
-
-                <!-- G0T0 Stuff Goes here-->
-                {% if current_user.is_authenticated and current_user.is_admin %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('G0T0.main') }}">G0T0 Management</a>
-                </li>
-                {% endif %}
-
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('G0T0.profile') }}">G0T0 Profile</a>
-                </li>
-                {% endif %}
-                
-                <!-- Login Options -->
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('auth.logout') }}">Logout</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('auth.login', provider='discord', next=request.path) }}">Login</a>
-                </li>
-                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
-<script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='src/General/navbar.js') }}" type="module"></script>
+<script src="/static/src/General/navbar.js" type="module"></script>

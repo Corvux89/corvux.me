@@ -2,7 +2,7 @@
 
 <h1>Oops! Looks like we're a little lost.</h1>
 
-<a href="{{ url_for('homepage') }}"><p>Click Here</a> to go to the Home Page</p>
+<a href="/"><p>Click Here</a> to go to the Home Page</p>
 
 <div class="d-inline-flex">
     <p>Redirecting in</p>
@@ -10,9 +10,9 @@
     <p>seconds</p> 
 </div>
 
-<script nonce="{{ csp_nonce() }}">
+<script>
     var seconds = 6
-    let url = "{{ url_for('homepage') }}"
+    let url = "/"
     function redirect(){
         if (seconds <= 0){
         window.location = url

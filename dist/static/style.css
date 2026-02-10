@@ -1,0 +1,171 @@
+h1{
+    font-family: verdana;
+    margin-left: 15px;
+    color: white;
+    text-align: center;
+}
+
+h2, h3, h4, p {
+    font-family: verdana;
+    margin-left: 15px;
+    color: white;
+}
+
+.nav-item{
+    font-size: 120%;
+}
+
+body{
+    display: inline;
+    font-family: verdana;
+    background-color: #2C2F33;
+}
+
+
+:root{
+    color: #d5e0e7;
+}
+
+.nav-link.sw5ecalc, .nav-link.resolute, .nav-link.combat-planner, .nav-link.silver{
+    background-color: silver;
+}
+
+#kofi-link{
+    height: 36px;
+    border: 0px;
+}
+
+.bg-image{
+    background-size: cover;
+    position: absolute;
+    -webkit-mask-image:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+}
+
+.icon-link, .popover-link, .undecorated-link{
+    text-decoration: none;
+}
+
+.project-card{
+    opacity: 95%;
+    color: black;
+    max-width: 18rem;
+    min-width: 18rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px
+    rgba(0,0,0,0.16), 0 3px 6px
+    rgba(0,0,0,0.23);
+}
+
+.project-logo{
+    object-fit: contain;
+    height: 100px
+}
+
+.card-img-top{
+    width: 100%;
+    height: 8vw;
+    object-fit: contain;
+}
+
+.dropdown-menu{
+    z-index: 1050;
+}
+
+.fa-triangle-exclamation{
+    color: #ff0000;
+}
+
+.announcement-table, .log-table, .activity-table, .selectable{
+    cursor: pointer;
+}
+
+.big-edit-body{
+    height: 30vh !important;
+    overflow-y: scroll !important;
+    resize: none !important;
+}
+
+.toasts{
+    z-index: 3;
+}
+
+.dataTables_wrapper{
+    color: white !important;
+}
+
+.dt-bootstrap5{
+    color: white !important;
+}
+
+.dt-input option{
+    color: black!important;
+}
+
+.loading-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1050; 
+    display: none; 
+}
+
+body.busy .loading-overlay {
+    display: flex;
+    pointer-events: auto;
+}
+
+body:not(.busy) .loading-overlay {
+    display: none !important;
+}
+
+#player-modal .modal-content {
+    background-color: #2C2F33;
+}
+
+.wide-table {
+    width: 100% !important;
+}
+
+.toast-container {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1060; 
+    pointer-events: none; 
+}
+
+.toast {
+    pointer-events: auto; 
+}
+
+#user-info-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Default: Show both icon and name */
+.guild-name {
+    display: inline;
+}
+
+/* For larger screens: Hide the abbreviation */
+.guild-abbreviation {
+    display: none;
+}
+
+/* For smaller screens: Hide the full name */
+@media (max-width: 768px) {
+    .guild-name {
+        display: none;
+    }
+
+    .guild-abbreviation {
+        display: inline;
+    }
+}
+

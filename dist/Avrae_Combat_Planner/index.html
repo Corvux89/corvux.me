@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="Author" content="Bryce Hadsell">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/static/src/General/elements.js" type="module"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/r-3.0.3/datatables.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.2/css/all.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/r-3.0.3/datatables.min.css" rel="stylesheet">
+ 
+    
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QCJBWQSGVR"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QCJBWQSGVR');
+    </script>
+
+    <link rel="shortcut icon" href="/static/images/mainlogo.png">
+    <title>Corvux.me</title>
+</head>
+
+<body>
+    <div id="navbar">
+        <nav class="navbar navbar-dark bg-dark p-2">
+    <button class="navbar-toggler m-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar"
+            aria-controls="offcanvasDarkNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <a class="navbar-brand" href="/">
+        <img src="/static/images/header2.png"
+             width="70"
+             height="auto"
+             alt="Corvux.me">
+    </a>
+ 
+
+    <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar"
+         aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header">
+            <a class="navbar-brand" href="/">
+                <img src="/static/images/header2.png"
+                     width="70"
+                     height="auto"
+                     alt="Corvux.me">
+            </a>
+
+            <a class="align-bottom text-center m-2" href='https://ko-fi.com/J3J8GWP6G' target='_blank'><img id="kofi-link" src='https://storage.ko-fi.com/cdn/kofi4.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+
+                <!-- Home -->
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+
+                <!-- Avrae Combat Planner -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/Avrae_Combat_Planner/">Avrae Combat Planner</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script src="/static/src/General/navbar.js" type="module"></script>
+    </div>
+
+    <div id="content">
+        
+
+<div class="container m-2">
+    <h1>Avrae/OTFBM Combat Planner</h1>
+    <!-- Reset Button -->
+    <button type="button" class="btn btn-danger m-2" id="reset-button" data-bs-toggle="modal"
+            data-bs-target="#resetModal" data-reset="all" title="Reset All">
+        Reset
+    </button>
+
+    <!-- Load Plan Button -->
+    <div class="dropdown d-inline">
+        <a type="button" class="btn btn-info m-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="load-plan" title="Load Saved Plan" hidden>Load Saved Plan</a>
+        <ul class="dropdown-menu" aria-labelledby="load-plan" id="load-plan-list"></ul>
+    </div>
+
+    <!-- Delete Plan Button -->
+    <button class="btn btn-danger m-2" role="button" id="delete-plan" title="Delete Plan" hidden><i class="fa-solid fa-trash"></i></button>
+
+    <!-- Save Plan Button Icon -->
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#saveModal" title="Save plan" id="save-plan-button">
+        <i class="fa-solid fa-floppy-disk"></i>
+    </button>
+
+    <!-- Export Button Icon-->
+    <button type="button" class="btn btn-primary m-2" id="export-planner" title="Export Build"><i class="fa-solid fa-file-export"></i></button>
+
+    <!-- General Settings Button Icon -->
+    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#appSettingsModal" title="General Settings">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- Information Button Icon -->
+    <button type="button" class="btn btn-info m-2" data-bs-toggle="modal" data-bs-target="#howtomodal" title="About this tool">
+        <i class="fa-solid fa-circle-info"></i>
+    </button>
+</div>
+
+<!-- Nav Tabs -->
+<nav>
+    <div class="nav nav-tabs combat-planner-tabs m-2" id="combat-plannerTab" role="tablist">
+        <button class="nav-link active combat-planner" id="inventory-tab" data-bs-toggle="tab"
+                data-bs-target="#main-tab"
+                type="button" role="tab" aria-selected="true" aria-controls="main-tab">Monster Inventory
+        </button>
+
+        <button class="nav-link combat-planner" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-planner"
+                type="button"
+                role="tab" aria-selected="true" aria-controls="map-planner">Map Planner
+        </button>
+    </div>
+</nav>
+
+<!-- Tab Content -->
+<div class="tab-content" id="combat-plannerTabContent">
+
+    <!--    Main  Tab   -->
+    <div class="tab-pane fade show active" id="main-tab" role="tabpanel" aria-labelledby="inventory-tab"
+         tabindex="0">
+    <div class="container m-2">
+    <div class="row border rounded border-success bg-light" id="inventory-header">
+        <div class="col">
+            <div class="row border rounded border-success bg-light">
+                <div class="col-sm">
+                    <p class="text-black">Avrae Command String</p>
+                    <div id="command-string" hidden>
+                        <button class="btn float-end pe-2 me-2 copy-button" id="command-copy"><i
+                                class="fa-solid fa-copy pe-2"></i></button>
+                        <div id="avrae-command" class="text-dark bg-secondary border rounded m-2 p-2 command"></div>
+                    </div>
+                </div>
+                <div class="col-auto mt-5 mb-4 settings">
+                    <div class="form-check form-switch" id="multiColumn">
+                        <input class="form-check-input" type="checkbox" id="setting-multiline"
+                               name="multiline">
+                        <label class="form-check-label" for="setting-multiline">Include Multiline</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="setting-maptarget"
+                               name="maptarget">
+                        <label class="form-check-label" for="setting-maptarget">Include Map Target</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="setting-notes" name="notes">
+                        <label class="form-check-label" for="setting-notes">Include Notes</label>
+                    </div>
+                </div>
+                <div class="col-auto mt-5 mb-4 settings">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="setting-monsters"
+                               name="monsters">
+                        <label class="form-check-label" for="setting-monsters">Monsters</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="setting-battlemap"
+                               name="battlemap">
+                        <label class="form-check-label" for="setting-battlemap">Map</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="setting-overlay"
+                               name="overlay">
+                        <label class="form-check-label" for="setting-overlay">Overlay</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form method="dialog" id="monster-inventory">
+    </form>
+</div>
+    </div>
+
+    <!--    Map Commands    -->
+    <div class="tab-pane fade" id="map-planner" role="tabpanel" aria-labelledby="map-tab" tabindex="0">
+        <div class="container m-2">
+            <div class="row m-3">
+                <div class="col-auto mb-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#monsterMapModal">Place Monsters
+                    </button>
+                </div>
+
+                <div class="col-auto mb-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#mapSettingsModal">Map Settings
+                    </button>
+                </div>
+
+                <div class="col-auto mb-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#mapOverlayModal">Overlay Settings
+                    </button>
+                </div>
+            </div>
+            <div id="map-preview" class="text-center" hidden></div>
+        </div>
+    </div>
+
+</div>
+
+<! -- Modal -->
+<!--    Monster Map Placement    -->
+<div class="modal fade" id="monsterMapModal" tabindex="-1" role="dialog" aria-labelledby="monsterMapModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="monsterMapModalLabel">Monster
+                    Coordinates</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="madd-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <button class="btn copy-button pe-2 me-2 float-end" id="madd-copy"><i class="fa-solid fa-copy"></i></button>
+                            <div id="madd-command" class="text-dark bg-secondary border rounded m-2 p-2 command"></div>
+                        </div>
+                    </div>
+                    <div class="row m-2">
+                        <div class="col-md">
+                            <form method="dialog" id="madd-table">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--    Map Settings    -->
+<div class="modal fade " id="mapSettingsModal" tabindex="-1" role="dialog" aria-labelledby="mapSettingsModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center ">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapSettingsModalLabel">Map Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="maps-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <button class="btn copy-button float-end pe-2 me-2" id="map-command-copy"><i class="fa-solid fa-copy"></i></button>
+                            <div id="map-command" class="text-dark bg-secondary border rounded m-2 p-2 command"></div>
+                        </div>
+                    </div>
+                    <form method="dialog" id="map-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control default-focus" id="map-url" name="url"
+                                               placeholder="Map URL">
+                                        <label for="map-url">Map URL</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-size" name="size"
+                                               placeholder="Map Size">
+                                        <label for="map-url">Map Size</label>
+                                        <small id="map-url-help" class="form-text text-white-50">Ex: 25x25</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="map-csettings"
+                                               name="csettings"
+                                               placeholder="Map CSettings">
+                                        <label for="map-url">Map CSettings</label>
+                                    </div>
+                                </div>
+                                  <!-- Dark Mode Toggle -->
+                                <div class="row m-2">
+                                    <div class="col-sm-12">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="map-darkMode" name="darkMode">
+                                            <label class="form-check-label text-white" for="dark-mode-toggle">Enable Dark Mode</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--    Map Overlay    -->
+<div class="modal fade" id="mapOverlayModal" tabindex="-1" role="dialog" aria-labelledby="mapOverlayModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="mapOverlayModalLabel">Overlay
+                    Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <div class="row border rounded border-success bg-light" id="overlay-header" hidden>
+                        <div class="col-sm">
+                            <p class="text-black">Avrae Command String</p>
+                            <button class="btn copy-button pe-2 me-2 float-end" id="overlay-copy"><i class="fa-solid fa-copy"></i></button>
+                            <div id="overlay-command" class="text-dark bg-secondary border rounded m-2 p-2 command"></div>
+                        </div>
+                    </div>
+                    <form method="dialog" id="overlay-setup">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm-5 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select default-focus" arial-label="Overlay Type" id="map-overlay-type"
+                                                name="type">
+                                            <option value="" selected></option>
+                                            <option value="Circle">Circle</option>
+                                            <option value="Cone">Cone</option>
+                                            <option value="Line">Line</option>
+                                            <option value="Square">Square</option>
+                                        </select>
+                                        <label for="map-overlay-type">Overlay</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="map-overlay-target"
+                                               name="target" placeholder="Target">
+                                        <label for="map-overlay-target">Target</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-2" id="overlay-row">
+                            </div>
+                            <div class="row m-2">
+                                <div class="col mb-3">
+                                    <button type="button" class="btn btn-light float-end" id="reset-overlay">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- General Settings -->
+<div class="modal fade" id="appSettingsModal" tabindex="-1" role="dialog" aria-labelledby="appSettingsModalTitle"
+     aria-hidden="true" draggable="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black" id="appSettingsLabel">General Settings</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-2">
+                    <form method="dialog" id="appSettings-setup" class="settings">
+                        <div class="row border rounded bg-secondary m-2">
+                            <div class="row m-2">
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control default-focus" id="setting-prefix" value="!"
+                                               name="prefix"
+                                               placeholder="!">
+                                        <label for="setting-prefix">Avrae Prefix</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="setting-attach" name="attach"
+                                               placeholder="DM" value="DM">
+                                        <label for="setting-attach">Map Attached to</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How-to Modal -->
+<div class="modal fade" id="howtomodal" tabindex="-1" role="dialog" aria-labelledby="howtomodalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black">How to use this tool</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container m-0 p-0 g-0 bg-dark">
+                    <div class="row m-2">
+                        <div class="col-md overflow-auto">
+                            <p>This tool is designed to help with planning encounters in Avrae giving an easy way to setup monsters, tokens, and maps.  </p>
+<h2>General Setup</h2>
+<p>If you have a different Avrae prefix or want to use a different target for the <code>map</code> then you can change that in the <code>General Settings</code>. This will update the commands the tool gives.</p>
+<h3>Getting Monsters Setup</h3>
+<p>Fill out the information on the monster you want to use </p>
+<img src="/static/images/Avrae Combat Planner/monster.png" alt="Monster Information" width="95%"/>  
+  
+
+<p>Go to the <code>Map Planner</code> tab, and you can set the coordinates for the monsters in using <code>Place Monsters</code> button. This will also give you the standalone <code>!map</code> command.  </p>
+<img src="/static/images/Avrae Combat Planner/coordinates.png" alt="Monster Coordinates" width="95%"/>  
+  
+<p>This will also show in the map preview embedded on this tab as well. </p>
+<h3>Setting up the map</h3>
+<p>If you need to change the background, or map size being used you can use the <code>Map Settings</code> to set a background URL, mapsize, and change csettings if needed.  </p>
+<img src="/static/images/Avrae Combat Planner/mapsettings.png" alt="Map Settings" width="95%"/>
+
+<h3>Overlay</h3>
+<p>If you want to use an overlay the <code>Overlay Settings</code> can help you setup the command and preview the overlay as well. </p>
+<h2>Command String Options</h2>
+<p>On the <code>Monster Inventory</code> tab there are multiple toggle switches that change how the command is presented. </p>
+<p><code>Multiline</code> - Includes multiline in the command for running multiple commands in Avrae  </p>
+<p><code>Include Map Target</code> - Includes the designated map target in the command to add to initiative (Default: &quot;DM&quot;)  </p>
+<p><code>Include Notes</code> - Will convert <code>map</code> commands to all work with the native Avrae commands. This allows <code>multiline</code> to work with monster placement and map setup (<strong>Note</strong>: This is helpful for aliases like <code>bplan</code> or if you just want to copy and paste the entire command without splitting them up)  </p>
+<p><code>Monsters</code> - Includes all information pertaining to the monsters  </p>
+<p><code>Map</code> - Includes all information pertaining to the map  </p>
+<p><code>Overlay</code> - Includes all information pertaining to the overlay  </p>
+<h2>Exporting/Importing/Saving</h2>
+<p>Because this planner relies on local storage it is recommended to export/import when you can. If reviewing someone elses plan however, we would recommend either exporting your current plan or opening in incognito mode.</p>
+<p>Exporting will add a url to your clipboard encoding all the information for the <code>Monster Inventory</code> and <code>Map planner</code> (<code>General Settings</code> do not get exported). Then going to that link again will load up all the information stored in the url</p>
+<p>You can additionally locally save up to 10 plans (monsters and map settings) to reload for later use</p>
+<h2>Keyboard Shortcuts</h2>
+<p><code>ctrl + 2</code>  - Saves the current plan<br><code>ctrl + x</code>  - Exports the current plan  </p>
+<p><code>alt + 1</code>   - Navigates to the Monster Inventory tab<br><code>alt + 2</code>   - Navigates to the Map Planner tab<br><code>alt + h</code>   - Opens the help text</p>
+<h3>While on the Map Planner Tab</h3>
+<p><code>alt + m</code>   - Opens the Place Monsters form
+<code>alt + s</code>   - Opens the Map Settings form
+<code>alt + o</code>   - Opens the Overlay Settings form</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Plan Modal -->
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black">Save Plan</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <div class="container m-2">
+                   <form method="dialog" id="save-plan-form">
+                       <div class="row border rounded bg-secondary m-2">
+                           <div class="row m-2">
+                               <div class="col-sm mb-3">
+                                   <div class="form-floating">
+                                       <input type="text" class="form-control default-focus" id="plan-name" name="plan-name" placeholder="Plan Name" required>
+                                       <label for="plan-name">Plan Name</label>
+                                   </div>
+                               </div>
+                           </div>
+                           <div class="row">
+                               <div class="col mb-3">
+                                   <button type="submit" class="btn btn-primary m-2" id="save-plan">Save Build</button>
+                                   <button type="button" class="btn btn-light float-end m-2" data-bs-dismiss="modal"
+                                           data-dismiss="modal">
+                                       Cancel
+                                   </button>
+                               </div>
+                           </div>
+                       </div>
+                   </form>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<! -- Reset Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold text-black">Reset</h4>
+                <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md">
+                            <p class="text-dark">What do you want to reset?</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <button type="button" class="btn btn-danger m-2 reset-button" id="reset-all"
+                                    data-bs-dismiss="modal" data-dismiss="modal">
+                                Reset All
+                            </button>
+
+                            <button type="button" class="btn btn-primary m-2 reset-button" id="reset-monsters"
+                                    data-bs-dismiss="modal" data-dismiss="modal">
+                                Reset Monsters
+                            </button>
+
+                            <button type="button" class="btn btn-primary m-2 reset-button" id="reset-battlemap"
+                                    data-bs-dismiss="modal" data-dismiss="modal">
+                                Reset Battlemap
+                            </button>
+
+                            <button type="button" class="btn btn-secondary float-end m-2" data-bs-dismiss="modal"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/src/Avrae%20Combat%20Planner/Main.js" type="module"></script>
+
+
+
+    </div>
+
+    <!-- Spinner -->
+    <div class="loading-overlay d-flex justify-content-center align-items-center text-center">
+        <div class="spinner-border text-light" role="status" aria-hidden="true">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div class="toast-container d-flex justify-content-center align-items-center">
+        <div class="toast text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true" id="confirm-toast" data-bs-delay="3200">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <div class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="error-toast" data-bs-delay="3000">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

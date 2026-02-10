@@ -57,7 +57,7 @@
     <!--    Main  Tab   -->
     <div class="tab-pane fade show active" id="main-tab" role="tabpanel" aria-labelledby="inventory-tab"
          tabindex="0">
-       {% include '/combat_planner/components/monster_inventory.html' %}
+    {% include 'combat_planner/components/monster_inventory.html' %}
     </div>
 
     <!--    Map Commands    -->
@@ -90,29 +90,28 @@
 
 <! -- Modal -->
 <!--    Monster Map Placement    -->
-{% include '/combat_planner/modals/monster_map.html' %}
+{% include 'combat_planner/modals/monster_map.html' %}
 
 <!--    Map Settings    -->
-{% include '/combat_planner/modals/map_settings.html' %}
+{% include 'combat_planner/modals/map_settings.html' %}
 
 <!--    Map Overlay    -->
-{% include '/combat_planner/modals/map_overlay.html' %}
+{% include 'combat_planner/modals/map_overlay.html' %}
 
 <!-- General Settings -->
-{% include '/combat_planner/modals/general_settings.html' %}
+{% include 'combat_planner/modals/general_settings.html' %}
 
 <!-- How-to Modal -->
-{% include '/combat_planner/modals/how_to.html' %}
+{% include 'combat_planner/modals/how_to.html' %}
 
 <!-- Save Plan Modal -->
-{% include '/combat_planner/modals/save_plan.html' %}
+{% include 'combat_planner/modals/save_plan.html' %}
 
 <! -- Reset Modal -->
-{% include '/combat_planner/modals/reset.html' %}
+{% include 'combat_planner/modals/reset.html' %}
 
 
-<script nonce="{{ csp_nonce() }}"
-        src="{{ url_for('static', filename='src/Avrae Combat Planner/Main.js')}}" type="module"></script>
+<script src="/static/src/Avrae%20Combat%20Planner/Main.js" type="module"></script>
 
 
 {% endblock %}

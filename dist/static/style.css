@@ -470,3 +470,13 @@ body:not(.busy) .loading-overlay {
         top: 96px;
     }
 }
+
+.solace-map-viewport.is-showing-labels .solace-map-marker::after {
+    opacity: 1;
+}
+
+.solace-map-labels-toggle.is-active {
+    background: rgba(255, 250, 230, 0.12);
+    border-color: rgba(255, 250, 230, 0.35);
+    color: #fffae6;
+}

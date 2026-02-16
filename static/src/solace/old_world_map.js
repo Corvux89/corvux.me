@@ -12,6 +12,7 @@ const searchInput = document.getElementById("solace-map-search");
 const searchResults = document.getElementById("solace-map-search-results");
 const searchToggle = document.getElementById("solace-map-search-toggle");
 const searchPanel = document.getElementById("solace-map-search-panel");
+const labelsToggle = document.getElementById("solace-map-labels-toggle");
 if (!mapImage ||
     !markersContainer ||
     !mapStage ||
@@ -22,7 +23,8 @@ if (!mapImage ||
     !modalMeta ||
     !modalClose ||
     !searchPanel ||
-    !searchToggle) {
+    !searchToggle ||
+    !labelsToggle) {
     throw new Error("Solace map page is missing required elements.");
 }
 const formatPercent = (value) => `${value}%`;
@@ -420,6 +422,11 @@ const initMap = async () => {
                 panzoom.reset();
             }
         });
+    });
+    labelsToggle.addEventListener("click", () => {
+        const isActive = mapViewport.classList.toggle("is-showing-labels");
+        labelsToggle.classList.toggle("is-active", isActive);
+        labelsToggle.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
     const renderSearchResults = (results) => {
         if (!searchResults) {

@@ -222,6 +222,8 @@ body:not(.busy) .loading-overlay {
     width: 100%;
     --map-zoom: 1;
     --map-zoom-inv: 1;
+    touch-action: none;
+    overscroll-behavior: contain;
 }
 
 .solace-map-stage {
@@ -229,6 +231,8 @@ body:not(.busy) .loading-overlay {
     display: block;
     width: 100%;
     transform-origin: 0 0;
+    touch-action: none;
+    user-select: none;
 }
 
 .solace-map-image {
@@ -254,6 +258,7 @@ body:not(.busy) .loading-overlay {
     place-items: center;
     cursor: pointer;
     box-shadow: none;
+    touch-action: manipulation;
 }
 
 .solace-map-marker-ring {
@@ -384,6 +389,21 @@ body:not(.busy) .loading-overlay {
     border-radius: 18px;
     padding: 22px 20px 20px;
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.45);
+    max-height: min(80vh, calc(100vh - 120px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+    .solace-map-modal {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .solace-map-modal-content {
+        width: min(92vw, 560px);
+        max-height: calc(100vh - 80px);
+    }
 }
 
 .solace-map-modal-close {

@@ -73,7 +73,7 @@ const createFallbackPanzoom = (stage, viewport) => {
         viewport.style.setProperty("--map-zoom", scale.toString());
         viewport.style.setProperty("--map-zoom-inv", (1 / scale).toString());
     };
-    const clampScale = (nextScale) => Math.min(5, Math.max(1, nextScale));
+    const clampScale = (nextScale) => Math.min(12, Math.max(1, nextScale));
     const zoomBy = (delta) => {
         scale = clampScale(scale + delta);
         applyTransform();
@@ -200,6 +200,19 @@ const initMap = async () => {
                 openModalForPoint(point, marker);
             }
         });
+        marker.addEventListener("pointerup", (event) => {
+            if (event.pointerType === "mouse") {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            if (activeState.id === point.id) {
+                openModalForPoint(null, null);
+            }
+            else {
+                openModalForPoint(point, marker);
+            }
+        });
         markersContainer.appendChild(marker);
         markerById.set(point.id, marker);
     });
@@ -219,12 +232,12 @@ const initMap = async () => {
     const panzoomInstance = panzoomFactory
         ? window.panzoom
             ? panzoomFactory(mapStage, {
-                maxZoom: 5,
+                maxZoom: 12,
                 minZoom: 1,
                 zoomSpeed: 0.065,
             })
             : panzoomFactory(mapStage, {
-                maxScale: 5,
+                maxScale: 12,
                 minScale: 1,
                 contain: "outside",
             })
@@ -244,7 +257,7 @@ const initMap = async () => {
         const zoomBy = (delta) => {
             const transform = getTransform();
             const rect = mapViewport.getBoundingClientRect();
-            const nextScale = Math.min(5, Math.max(1, transform.scale + delta));
+            const nextScale = Math.min(12, Math.max(1, transform.scale + delta));
             if (zoomAbs) {
                 zoomAbs(rect.width / 2, rect.height / 2, nextScale);
                 syncZoomScale();

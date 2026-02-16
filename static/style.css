@@ -173,6 +173,12 @@ body:not(.busy) .loading-overlay {
     padding: 24px 16px 32px;
 }
 
+@media (min-width: 1200px) {
+    .solace-map-page {
+        padding: 32px 24px 48px;
+    }
+}
+
 .solace-map-header {
     max-width: 980px;
     margin: 0 auto 20px;
@@ -188,7 +194,7 @@ body:not(.busy) .loading-overlay {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
     align-items: start;
-    max-width: 1240px;
+    max-width: min(96vw, 1800px);
     margin: 0 auto;
 }
 
@@ -211,12 +217,17 @@ body:not(.busy) .loading-overlay {
     background: #0b0c0f;
     border-radius: 12px;
     overflow: hidden;
-    max-height: 70vh;
+    height: min(72vh, calc(100vh - 260px));
+    max-height: min(72vh, calc(100vh - 260px));
+    width: 100%;
+    --map-zoom: 1;
+    --map-zoom-inv: 1;
 }
 
 .solace-map-stage {
     position: relative;
-    display: inline-block;
+    display: block;
+    width: 100%;
     transform-origin: 0 0;
 }
 
@@ -233,8 +244,8 @@ body:not(.busy) .loading-overlay {
 
 .solace-map-marker {
     position: absolute;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     border: 2px solid transparent;
     background: transparent;
@@ -246,11 +257,39 @@ body:not(.busy) .loading-overlay {
 }
 
 .solace-map-marker-ring {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: transparent;
     opacity: 0;
+}
+
+.solace-map-marker::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) scale(var(--map-zoom-inv, 1));
+    transform-origin: bottom center;
+    white-space: nowrap;
+    background: rgba(16, 18, 22, 0.95);
+    color: #f2f5f7;
+    padding: clamp(4px, 0.6vw, 8px) clamp(8px, 1vw, 14px);
+    border-radius: 6px;
+    font-size: clamp(0.75rem, 1.1vw, 1rem);
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+    z-index: 10;
+    margin-bottom: 6px;
+    max-width: min(70vw, 360px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.solace-map-marker:hover::after {
+    opacity: 1;
 }
 
 .solace-map-marker.is-active {
@@ -339,7 +378,7 @@ body:not(.busy) .loading-overlay {
 
 .solace-map-modal-content {
     position: relative;
-    width: min(420px, 90vw);
+    width: 45vw;
     background: rgba(16, 18, 22, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 18px;

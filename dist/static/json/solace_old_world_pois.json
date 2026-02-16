@@ -4,12 +4,317 @@
         {
             "id": "rooks-landing",
             "name": "Rook's Landing",
-            "subtitle": "Capital of the Old World",
             "description": "**Primary Species**: Minotaur\n\nNotable for its capacious city squares (on average, the largest in the continent), Rook’s Landing often sees the famous dances of the minotaurs, drawing gawkers and onlookers of every race. It can be certain that on any day performative debate takes place in these squares, ranging from solving small disputes to massive ensembles deciding the fate of the city itself. Vendors compete for placement serving foods local and exotic, and a thriving secondary market has sprung up around the edges of most of these squares. These proceedings are all visible from a ziggurat rising from the river’s edge - the largest temple to the Choral Host on Acanthera, itself square in the middle of the largest square.\n\nTrading with the arborkin to the west for lumber and the harengon to the east for minerals, a fleet of ships spreads daily across Whitelock Bay - fishing, merchantmen, even naval convoys. The area is also often home to a frequent, drizzling rain - most locals eschewing protective raingear. The parasols the city is known for are in fact meant as colorful props for the city and its performances - someone using one for the rain is a sure sign of a tourist.",
             "region": "Whitelock River",
             "subRegion": "Whitelock Bay",
-            "x": 27.02,
-            "y": 22.70
+            "x": 26.98,
+            "y": 22.47
+        },
+        {
+            "id": "pinch-pot",
+            "name": "Pinch Pot",
+            "description": "**Primary Species**: Minotaur and Harengon\n\nAt the narrowing of the Whitelock river and two encroaching cliffs, Pinch Pot has an ancient history. Hundreds of years ago saw a dispute between harengon warren and local minotaurs, with fears of the ritual of destruction seeing the cliffs collapsing into the river and blockading a vital trade route for the minotaur - resolution came via the help of the Still Hand, with the harengon instead destroying the minotaur’s homes and seeing the minotaur moving into their old warrens.\n\nThis cycle has been repeated over generations, the cliffside dwellings becoming built out into permanent structures serviced by hand powered lifts, both cliff faces a verdant green as every wall is lined with produce growing and structure-stabilizing vines. These vertical vineyards stretch far north and south of Pinch Pot, a wall of greenery visible for miles.\n\nThe growth of both communities’ populations may threaten this cycle in due time - with every new generation and more and more space occupied, it becomes more and more difficult to find the appropriate buildings necessary for the ritual of destruction, and the Still Hand no longer remains to send an incarnation of mediation.",
+            "region": "Whitelock River",
+            "subRegion": "The Pinch",
+            "x": 26.90,
+            "y": 27.36
+        },
+        {
+            "id": "hatshield",
+            "name": "Hatshield (after the Hatshield Mage Tower)",
+            "description": "**Primary Species**: Halfling\n\nThe first image many travelers recall from their visit to Hatshield is the striking image of the Hatshield magetower, a spire with no apparent entry jutting from the steep incline of a limestone mountain face. To enter the twenty-seven story tall tower, mages and scholars are blindfolded and ushered through a twisting maze of tunnels and mineshafts - from where they enter a sophisticated metallurgy research and manufacturing center.\n\nIntermediate parts and components flow into the tower from the town below, where they are refined into weapons of war or industry. Apocryphally, a Hatshield archmage a century ago invented firearms so his apprentices wouldn’t waste their effort learning combat cantrips - but it is certainly true that the jealously guarded manufacturing secret of hand-held firearms has been a lucrative source of income for the Tower, especially in recent years.\n\nA sprawling town at the base of the cliff supplies the mages with all they might ever require in their day-to-day life and studies, with a wide open air market spreading through the main square. Here, crops of the surrounding country are often traded for ores and other imports of interest, with certain trusted merchants given access to stores of weaponry and explosives.",
+            "region": "Western Coast",
+            "subRegion": "Bowcliff Basin",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "mountfall",
+            "name": "Mountfall",
+            "description": "**Primary Species**: Minotaur and Halflings\n\nMountfall is the birthplace of bardic dance - the legend goes that when the halflings on the west side and the minotaurs on the east side of the river first built a bridge to join their communities, the exuberance of their celebration and the merging of their cultures was itself blessed by the gods. To the minotaurs was given dance, and to the halflings was given inspiration. That they used that inspiration to then develop explosives and the first magicked fireworks is entirely on the halflings.\n\nRegardless - the anniversary of this exchange is celebrated every year at the Bridge Festival, which sees the ancient construction tested by thousands of feet dancing and stomping in time.\n\nThe rest of the year, the town is a lush farming center, fed by snowmelt and the river’s source in the mountains, and well known for a massive tavern known as the Swinging Bend. Surrounded by rolling fields of grain and nestled in a fertile valley, paintings of picturesque Mountfall are a collector’s item for those who wish to remember the trip they had and the sleepless night they spent dancing at the Swinging Bend - paintings found all around the continent.",
+            "region": "Whitelock River",
+            "subRegion": "Snaggletooth Drop",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "flamewatch",
+            "name": "Flamewatch",
+            "description": "**Primary Species**: Kenku\n\nSmaller in size than the other two great aeries of the Kenku, the marble city walls of Flamewatch are nevertheless visible from the valleys below during most months - outside of winter, the city experiences very mild weather for a kenku aerie. As a result, it is often the aerie whose torturous, twisted mountain paths are attempted by pilgrims and travellers.\n\nThese visitors report a near crimeless city, filled with kenku training in law and blade, or engaged in magnificent arts. Flamewatch calligraphy and illuminated manuscripts are renowned the continent over, with some collector’s items being valued nearly as much as a Thalyndraen noble’s entire estate. Others engage in magnificent paintings, though critics of the nearly flawless recreations of the natural world often decry them as ‘soulless copies.’\n\nRegardless, Flamewatch is most known for its export of justiciars, an export that has only increased in recent years with the disappearance of the Iron Mask. Though they produce more justiciars than any other aerie, Flamewatch justiciars are more than any other considered to be reckless, somewhat sloppy in legal judgment, and far too overzealous. For better or worse, their justiciars are the ones most often met by other civilizations, having spread far and wide across the continent.",
+            "region": "The Spine",
+            "subRegion": "Ashglow Mountains",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "flatport",
+            "name": "Flatport",
+            "description": "**Primary Species**: Harengon\n\nA bustling port that handles most of the trade passing through the northeastern region, the city itself earned its name from the entirely flat beach and plain it lies on, cheap, public-facing buildings stretching across the grass and sand. Beneath this city lies a network of shallow warrens that brush close to the surface to avoid flooding in frequent storms, a maze of above-ground footpaths connecting them.\n\nDespite the risk of storms and their warehouses and merchantries being collapsed from time to time, merchants sail and travel around the edge of the continent near-constantly for the valuable prize traded in Flatport: cheap sulfur, and blood of the earth. Storerooms full of these minerals give the port an unpleasant odor closer to the docks, warehouses crowding the beach so as to avoid ritual destruction - it is very rare for a harengon to build their warren in sand. That said, the smell of sulfur rolls across the ocean for miles as the winds roll down from the mountains, leaving many sailors wondering if they are smelling Flatport, the Wailing Sea, or worse.",
+            "region": "Northreach",
+            "subRegion": "Crystal Shore",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "ironcrown",
+            "name": "Ironcrown",
+            "description": "**Primary Species**: Kenku\n\nThe largest of the kenku aeries, the star-shaped walls of Ironcrown encircle the peak of the tallest of the Blackwall Mountains. The path to its gates are treacherous and steep, city and roads covered year round in snow and ice - a journey made by few outsiders.\n\nAt the center of Ironcrown, atop the peak itself, a massive temple serves as both the religious center of kenku life and home to their greatest court, the libraries enclosed within containing judicial records dating back centuries, as well as a complete collection of the laws and legal systems of every polity on the continent (many long since out of date).\n\nEvery building in the city covers its interior, cold stone walls with intricate and colorful tapestries, warm textiles depicting the great justices visited on Acanthera by the justiciars and the Iron Mask. Statues are reserved for the greatest paragons, whose deeds and injustices avenged are engraved at the base of their stonework. The justiciars of Ironcrown train for decades before being dispatched to the world, and the city ensures it sends only its level best - lest they stain the dignity of their missing god. Countless fail the strict requirements necessary to represent Ironcrown, but it is not unheard of for those who fail to meet those standards to set out on their own, unsanctioned.",
+            "region": "The Spine",
+            "subRegion": "Blackwall Mountains",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "hammerhill",
+            "name": "Hammerhill",
+            "description": "**Primary Species**: Harengon\n\nFishers returning after a cold windy day with their catch dock at the small port at the base of Hammerhill, a hill dotted with holes into warrens beneath with the rest covered in potato, beet, and carrot crops. Down in the dimly lit tunnels below, the paths between the cozy caves are lined with hardy mushrooms leaving no space on Hammerhill wasted. The locals are dour, practical, and prefer sensibility over anything else. Visitors are welcomed in with hearty stews and free lodging for a night, then shooed out at first light.",
+            "region": "Northreach",
+            "subRegion": "The Paw",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "deepburrow",
+            "name": "Deepburrow",
+            "description": "**Primary Species**: Harengon\n\nFollowing the rough road to Deepburrow, the merchants can tell they are getting close by smell alone. The burrows reach deep beneath the earth, where the Harengon mine the valuable riches of sulphur and blood of the earth. The entire cave system is warm, heated by the sulphur hidden within the walls. Rather than deal with the cold surface, the harengon of Deepburrow dig deeper. They have little value for the riches they uncover, content to trade it away for just enough to buy food from Hammerhill for the year. This means that despite the remote location, crates of ores marked with the names of Deepburrow families find themselves shipped across the continent sold with impressive markup.\n\nFewer that travel this far continue past on the trails beyond. Marked only by sparse numbers of cairns, the path beyond to Lastpeak is rarely taken, making this the functional last stop of northern trading routes.",
+            "region": "Northreach",
+            "subRegion": "The Paw",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "lastpeak",
+            "name": "Lastpeak",
+            "description": "**Primary Species**: Kenku\n\nThe chill winds weather the walls of the fortress of Lastpeak. No roads rise to this isolated city, yet the cliffsides are patrolled by the diligent Kenku, ever careful that no demon incursions pass by unnoticed. Many justiciars from Lastpeak are far more concerned with tracking down demon incursions than what they consider to be lesser worries. Many tieflings tell tales of justiciars from Lastpeak investigating them to ensure they are what they claim to be. The Justiciars, less patient with their search, often make their way to the Stormwall itself to lend aid.\n\nThe locals are as cold as the weather, unwelcoming and distrustful of those who would make the journey up the mountains. Those who have their trust are able to train under weaponmasters who teach harshly, but effectively. Few who make the climb receive such tutelage, but many of the most impressive kenku heroes either were trained under these experts or had that added posthumously to their histories as their tales got exaggerated over time.",
+            "region": "The Spine",
+            "subRegion": "Dagger Basin",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "gathergully",
+            "name": "Gathergully (after the Gathergully Mage Tower)",
+            "description": "**Primary Species**: Halflings\n\nDepending on the season, herds of livestock either graze in the valley, or higher in the hills surrounding the Gathergully Mage Tower. This tower and its surrounding community is smaller than the other prominent Mage Towers, but their alchemist and enchanting masters keep them relevant. The locals are friendly, and often gently nudge visitors to try one of the many chocolatiers for some sweets before they leave. Many halflings living here are also known to leave their plows in their fields to start up friendly conversations with strangers passing through.",
+            "region": "Western Coast",
+            "subRegion": "Snowmelt Basin",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "noc-elyrria",
+            "name": "Noc Elyrria",
+            "description": "**Primary Species**: Fey (Mostly Satyrs and Hobgoblins)\n\nThe fey of Noc Elyrria consider themselves the hardest working of all of their peers - a reputation that they have well-earned. Their diligent efforts in lumber and iron mining are second only to their hunting process - between shifts in the mines and working the mills, laborers often form hunting parties that spread across wide regions - particularly hunting for boar.\n\nThese hunting parties only ever travel north, east, and south - an ill-fated expedition (some might say a Noccian invasion) into the mountains decades ago saw swift retribution from the militias of local kenku aeries, and Noc Elyrria isn’t keen to repeat that history. From time to time, however, at least one foolhardy hunting party makes their way up in spite of that threat, never to return. Whether that is a result of kenku retaliation, some great beast, or weather is quite unclear.",
+            "region": "(N) Thalyndrae Kingdoms",
+            "subRegion": "Western Foothills",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "eos-syloris",
+            "name": "Eos Syloris",
+            "description": "**Primary Species**: Fey\n\nThe industrial center of the Thalyndrae Kingdoms, goods from across the continent make their way here to be refined into an astonishingly wide array of finished products. Eos Syloris can’t boast that they make the finest of all goods, but they certainly can produce the most.\n\nAfter the Eosian kingdom lost its status as an agricultural giant, it took decades for them to slowly shift into an industrial one instead - decades of poverty, famine, and industrial espionage. They have now become a juggernaut, and one that shows little sign of stopping. This has drawn eyes of envy from nearby nations, but also eyes of suspicion and fear. There is little doubt in Thalyndrae that the Eosians are preparing to return to the forefront of Acantheran politics - and many fear they intend to return with a vengeance.",
+            "region": "(E) Thalyndrae Kingdoms",
+            "subRegion": "Sylori River",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "the-stormwall",
+            "name": "The Stormwall",
+            "description": "**Primary Species**: Shadar-Kai\n\nExtending across the entire isthmus, and a mile beyond into the sea on each side, the great wall is the largest building constructed by mortal hands, though some believe the lone gate itself to be an incarnation of divinity. The wall is near a hundred feet tall and thirty feet wide, with patrols roving night and day across the rain drenched, wind-blasted ramparts. Scattered watchtowers serve to provide early warning on incoming assaults, and at more fortified sections, barracks within the wall garrison troops ready to deploy to counter incursions. The most defended place on the wall is the gate, where the surrounding wall is much thicker and a much larger garrison is stationed. The Shader-Kai must fend off the largest assaults at this gate, with the no longer fertile lands behind them a reminder of what happens when they fail. Tieflings and Reborn are regularly granted passage from the wastes beyond, but must face scrutiny as all manner of deceptions are used by fiends trying to make their way into Acanthera.\n\nWhile the walls are primarily the responsibility of the Shadar-Kai, others are eagerly welcomed in the defence. Kenku justiciars looking for easy black and white justice, mercenaries of every people looking to put something impressive on their resume, pilgrims faithful to the Pale Gate, and even the occasional halfling scholar looking to study fiends firsthand all bolster the Shadar-Kai’s ranks.",
+            "region": "Eastern Wastes",
+            "subRegion": "Blasted Isthmus",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "noc-hiber",
+            "name": "Noc Hiber",
+            "description": "**Primary Species**: Fey\n\nThe Noccian capital city rises from the forest environs surrounding it like a glittering jewel, millennia of ancient, ostentatious wealth grown and sung from the world around it. Entire towering buildings are made of fused mage-glass; great trees are carved into mansions and archives, their exteriors studded with gemstones and filigreed with precious metals; delicate spires of such flimsy construction that only the magic of the blood of the earth can sustain them - yet all meticulously laid out and planned, with nothing obviously out of place. A manicured, perfect oasis in the center of the forest.\n\nThe ubiquity of these screamingly expensive buildings can make it hard to identify the royal palace, as every noble for generations has sought to outdo the very seat of government, even if such an endeavor obviously resulted in a significant hike in their taxes.\n\nDespite the external opulence and seeming perfect orderliness, Noc Hiber is perhaps the most dangerous city in the Kingdoms for the politically ambitious, even if it is the most valuable for them - every darkened corner can hide a blade, and it is not uncommon for political rivals to disappear - many often gossip about the night that the Noc royal family undoubtedly disappeared the entire clan of a powerful duke, leaving only an empty patch of grass where their mage-glass tower had once stood - and none in the city the wiser.",
+            "region": "(N) Thalyndrae Kingdoms",
+            "subRegion": "Hibero Forest",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "noc-ebellum",
+            "name": "Noc Ebellum",
+            "description": "**Primary Species**: Fey (Mostly Eladrin and Firbolg)\n\nThis small trading post is fairly isolated from the greater political strife of the Thalyndrae kingdoms. Performing any substantial intrigue proves impossible as the town has a reputation for gossip so strong that plans laid in secret are being rumored about at the local taverns before the secret meetings are even concluded. It is not uncommon for a plotter to ruin their own plans, valuing sharing the latest gossip over success in their endeavors.",
+            "region": "Thalyndrae Kingdoms",
+            "subRegion": "Sylori River, Thaloen Branch",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "eos-uuram",
+            "name": "Eos Uuram",
+            "description": "**Primary Species**: Fey (Mostly Hobgoblins and Eladrin)\n\nThe scraggly trees that surround the small oasis of Eos Uuram are barely enough to provide moderate shade, and not enough to build new homes. Once the capital of their nation, this town once sat at the center of expansive plains and orchards. Now, it has become the desolate reminder of what they once had, and is populated by terribly stubborn Eosians.\n\nSome time after the incursion that left their land desolate, the howling winds blew away enough sand that an entire construction of stone below Eos Uuram was revealed. Archeologists determined it must have been a necropolis housing the dead, but no Eladrin of ancient age has any recollection of this. Nor can anyone answer why all the sepulchers lie empty, nor the indentations in the wall that must have once held bodies. Due to the limitations of construction materials, many have moved into this underground necropolis to escape the cold of the frozen desert, with newly constructed stairwells connecting the upper and lower cities.",
+            "region": "(E) Thalyndrae Kingdoms",
+            "subRegion": "Gestuza Desert (Formerly Plains)",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "thistlemeadow",
+            "name": "Thistlemeadow (after the Thistlemeadow Mage Tower)",
+            "description": "**Primary Species**: Halflings\n\nThe finest mathematicians and astronomers study at the Thistlemeadow Mage Tower, seeking to understand the rules of the movements of the world. An unsolved mystery is whether their signet rings are shaped in the same rune as required to cast the light cantrip by inspiration, or if some ancient Thistlemeadow discovered a way to get the light cantrip to function written that way to get their name in wizard spellbooks across the continent. The rolling hills surrounding the mage tower make for fine grazing grounds and spread out small halfling farms. A specialty forge and glasssmithing operation to make the finest spyglasses and telescopes is under constant investigation for selling to the Keenbrands, even though their wares are seen traded everywhere.\n\nTheir study of the stars to understand physics of the world has placed them in a rivalry with the Keenbrand Mage Tower.",
+            "region": "Western Coast",
+            "subRegion": "Greenhills",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "keenbrand",
+            "name": "Keenbrand (after the Keenbrand Mage Tower)",
+            "description": "**Primary Species**: Halflings\n\nThe Keenbrand Mage tower is far enough down the beach that the doors can only be accessed by foot at lower tides. The Keenbrands are nautical experts, using transmutation to dive under the oceans to study the life and currents beneath the waves. While they have no significant shipbuilding capacity, their innovations in ship design are sold to shipbuilders at great cost. The town along the coastline of the cove is designed to meet every need of the Mage Tower, with vineyards and winepresses, lobster trappers, fishers, and farmers all providing astonishingly high quality meals to the mages. Their study of the stars in interest of nautical navigation has placed them in a somewhat heated rivalry with the Thistlemeadow Mage Tower.",
+            "region": "Western Coast",
+            "subRegion": "Flatsands",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "wol-loraeho",
+            "name": "Wol Loraeho",
+            "description": "**Primary Species**: Fey (Mostly Firbolg)\n\nThe mining of more standard ores for the Thalyndrae Kingdoms mostly happens at Wol Loraeho, the Firbolg not content to be only known for having with great effort cultivated vineyards growing specialized grapes that make for unique wines. Many attempts to steal their techniques over the years have ended with the would-be thieves returning home with seeds that only grew normal grapes.",
+            "region": "(W) Thalyndrae Kingdoms",
+            "subRegion": "Lomiel River Valley",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "noc-arothil",
+            "name": "Noc Arothil",
+            "description": "**Primary Species**: Fey (Mostly Satyrs)\n\nNoc Arothil is not a place anyone would call safe. Resting near but not adjacent to the great crater at the center of the kingdom, the people of this place have much to fear from that they call the Outer.\n\nMore monsters roam these woods than anywhere but the demon wastes - their strange forms a source of constant fear for the villagers.\n\nStill, it remains somewhere worth living. Expeditions travel from time to time to the crater to mine for exotic ores and materials, or go on expeditions to hunt particularly dangerous nests of monsters - themselves a source of valuable loot. The longer lived Eladrin rarely stay long, usually not as willing to risk the significantly reduced lifespan living in such a dangerous land invites, making this a land of mostly Satyrs, a rare opportunity to seize power and wealth harder to get elsewhere in the Kingdoms.",
+            "region": "(N) Thalyndrae Kingdoms",
+            "subRegion": "Crater’s Edge",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "sov-naothil",
+            "name": "Sov Naothil",
+            "description": "**Primary Species**: Fey (Mostly Hobgoblins)\n\nEvery morning formations of hobgoblin pikemen drill in anti centaur tactics. While not a strategic position requiring fortification, this trade route stop is just wealthy enough to make it a target of centaur raids every summer. Trade caravans are willing to forgive the brusque manner in which the town greets travellers if it means being secure behind the renowned militia which patrols with great frequency year round.",
+            "region": "(S) Thalyndrae Kingdoms",
+            "subRegion": "Lower Thaloen",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "whitefoot",
+            "name": "Whitefoot (after the Whitefoot Mage Tower)",
+            "description": "**Primary Species**: Halflings and Kalashtar\n\nThe Whitefoot Mage tower is known for mastery of telepaths, telekinetics, mind enchantments and the earliest developments in psychology. Their specialty comes as no surprise as half of the town is not halfling at all, but kalashtar. It is common for halflings to train at least some basic level of telepathy to be able to communicate with their neighbors with ease, while those who choose not to or are unable to master the techniques live to the north side of town separated from the rest by a fair distance. That outsiders can only find lodgings in this northern outcast part of town has given the locals a reputation for being standoffish and unwelcoming. The Whitefoot Mage Tower has a training exchange with the Kalashtar of Spire Bellave negotiated several decades back, and it is suspected that their collaborations are responsible for the intimidating psionic siege weaponry deployed at Spire Bellave.",
+            "region": "Western Coast",
+            "subRegion": "South Spine",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "wol-passonia",
+            "name": "Wol Passonia",
+            "description": "**Primary Species**: Fey\n\nIt is a point of pride for the Wolseri that everything under the sun travels through Wol Passonia, at some point or another. The base of the Wolseri (and to an extent, Thalyndraean) navy and merchant marine corps., the city is a bustling hub of commerce.\n\nIt makes the best use it can of the island it finds itself on, careful zoning rules preserving the forested environment that once and still makes it picturesque. This has the side effect of making buildable land a hotly contested commodity - and the very much intended effect of limiting the number of ducal houses that can fit within the kingdom’s seat of power.\n\nStrategically, the city’s position deep within the river delta has prevented countless reprisals from the Kalashtar navy, who’s heavier ships of the line rarely want to risk skirmishing in the shallow rivers against fey who are far more accustomed to the waters.",
+            "region": "(W) Thalyndrae Kingdoms",
+            "subRegion": "River Delta",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "wol-homara",
+            "name": "Wol Homara",
+            "description": "**Primary Species**: Fey\n\nFurther down the delta from the capital city, Wol Homara was founded primarily to keep the larger city fed with the bounty of the Acantheran sea. Over time, those who found they could not afford to live in Wol Passonia slowly migrated to the fishing town, and to this day humbler dwellings are built daily.\n\nWould-be nobles have begun to move in in recent years, sensing a power vacuum - this has led to backroom jockeying and power struggles as each attempt to secure what they would make into a new ducal house.\n\nThe ruckus hasn’t done much to endear these upstart lords to the local populace, but most can begrudgingly agree that it’s nice to have some military forces around to defend them from Kalashtar raids and reprisals.",
+            "region": "(W) Thalyndrae Kingdoms",
+            "subRegion": "River Delta",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "sov-messelina",
+            "name": "Sov Messelina",
+            "description": "**Primary Species**: Fey (Mostly Eladrin)\n\nA recent colony of Sovul, Sov Messelina was founded by a landless count in an attempt to make a name for himself. It has been growing in leaps and bounds, mercifully distant from the worst of Thalyndraean politics - the residents finding some relative peace and quiet in the simplicity of fending off centaur raids and probing Kalashtar naval groups.\n\nRecent efforts to grow a barrier forest between Sovul and the steppes have started here, earning the local lord significant accolades - and also the significant anger of his neighbors, foreign and domestic. Sections of the forest burn down from time to time, and the hoof marks found are just as often found to not actually be made by centaurs.",
+            "region": "Thalyndrae Kingdoms",
+            "subRegion": "Saora Plains",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "sov-saora",
+            "name": "Sov Saora",
+            "description": "**Primary Species**: Fey\n\nSov Saora is an ancient, famous city - though it is much more famous lately for all the wrong reasons. There is not a person in Acanthera who has not heard that Sov Saora is the place where the Still Hand was murdered, and countless pilgrims and scholars pour in to visit the site of the tragedy. Here, in the Still Hand’s temple, crystals of divine blood still float frozen in the air, the ground itself split and rent as jagged streaks of gold and transparent red ripple through it.\n\nBefore this, the city was famous as a floating island that skimmed across the lake it was named for, though now it remains still in honor of its dead god. It was known then for elaborate masquerade balls in countless lounges and palatial halls - events that were a fun diversion for visitors, and opportunities for locals to get a leg up through the benefits of masked espionage and assassination.\n\nVisiting kenku justiciars that attempt to resolve such masked crimes find themselves caught in tangled webs of intrigue that are rarely solved.",
+            "region": "Thalyndrae Kingdoms",
+            "subRegion": "Lake Saora",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "hornmeet",
+            "name": "Hornmeet",
+            "description": "**Primary Species**: Centaur\n\nTwice a year in the spring and fall the centaurs gather from their long migrations to Hornmeet, more of a massive jamboree than a city proper. About a month before the changing of the season, the first centaurs start to gather in, a trickle that becomes a flood as preparations of the seasonal festivities get under way. It is traditional for the centaurs to find prospective partners one season, and if still inclined at the next, to marry in the weeks leading up to the season’s passage at Hornmeet. After the 3 day long celebration, the clans slowly begin to filter out until a few weeks later, it is only the few that remain year round to watch over those who through age or injury cannot keep up with the herds.",
+            "region": "Southern Steppes",
+            "subRegion": "Siltmane Delta",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "seravella",
+            "name": "Seravella",
+            "description": "**Primary Species**: Kalashtar\n\nThe breadbasket of kalashtar lands, Seravella grows endless fields of wheat. It rests on the edge of a beautiful lake that is the perfect amount of calm for hobby sailing and other tourism.",
+            "region": "Asterian Peninsula",
+            "subRegion": "Vale Seressa",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "canale-doro",
+            "name": "Canale Doro",
+            "description": "**Primary Species**: Kalashtar\n\nThe smallest of the major kalashtar towns, Canale Doro is renowned for their fine textiles, and the city owes its security to the narrow mouth of the river feeding into the sea. With only smaller ships being able to navigate up the river, they have been allowed to defend with minimal fortifications from any foreign incursion. It is deceptively small looking, as many of the non-farming town dwellers live in large bunkhouses and work together in just a few large textile mills.",
+            "region": "Asterian Peninsula",
+            "subRegion": "Corten Hills",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "calavento",
+            "name": "Calavento",
+            "description": "**Primary Species**: Kalashtar\n\nHome of the most philosophical of the kalashtar, Calavento is famous for open air meditation parlors on the lake’s edge, where their great thinkers hone their minds and debate silently the nature of virtually everything - a process that can be quite vexing to visiting kalashtar who are less inclined.\n\nThese parlors are a rather famous draw for tourism, though non-kalashtar are often warned to keep their distance: the psychic resonance of these meditative debates can be quite distressing to the unprotected mind. They are often welcomed to join the novices, however - a valuable experience that broadens both their minds.\n\nDue to the city’s relatively secure position, it often lends out units of infantry and cavalry to neighboring city states, as caravan protection, and as reinforcements to kalashtar lands under siege. Some thinkers of the city claim that this “free” loan positions them as the most moral of all the kalashtar city-states - some of their less-privileged neighbors more immediate to the Thalyndrae wondering if it would be better to pay them coin to shut them up.",
+            "region": "Asterian Peninsula",
+            "subRegion": "Lake Marethi",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "spire-bellave",
+            "name": "Spire Bellave",
+            "description": "**Primary Species**: Kalashtar\n\nAtop the limestone cliffside of the Widow’s Throat, Spire Bellave looks imperiously over the sea below. Armed with the finest cannons, arcane artillery, and psionic amplification warshrines the kalashtar can muster, this single city-state controls access to the waters beyond the Acantheran sea - a service they are paid handsomely for by the other kalashtar city-states, and one they pay themselves handsomely for with loot from the occasional Thalyndrae attempt to break through their blockade rather than pay any toll.\n\nA massive, telekinetically charged elevator of solid stone rises and lowers from the cliffside city to a massive drydock and port complex below, from which their navy is constructed and sent. Other docks are held for other city-states, and Spire Bellave often sells its constructed ships to other kalashtar, as well as the occasional merchant.\n\nAll goods that pass through the strait are subject to a toll, though the city usually votes to keep this at a low enough rate so as to not impact trade in the continent too much - they are well aware that their naval power is not total, and that excess greed would likely result in a coalition of peoples to break their strangehold on the strait.",
+            "region": "Asterian Peninsula",
+            "subRegion": "Widow’s Throat",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "scatterpine",
+            "name": "Scatterpine",
+            "description": "**Primary Species**: Minotaur and Harengon\n\nThe few warrens of Scatterpine are unique in being connected by an underground river. Travel between them is mostly by skiff and swimming, meaning many outsiders initially mistake Scatterpine for being an exclusively minotaur town.\n\nThe Minotaurs grow a variety of cold adapted berries and cabbages in addition to collecting syrups from the nearby maple trees. The currents of the nearby waters make sailing tough, but the lakes provide great sources of freshwater fish, in addition to the fish the harengon catch below.\n\nLegend has it that a legendary destructive beast lives at the source of the underground river of Scatterpine, and many a daring youth has attempted to prove themself by returning with its head, or at least evidence of it. While Harengon’s lax attitude towards recording history might make it unclear if evidence was ever found, the minotaur have captured the legends of their neighbors in song, and no verse claims certainty.",
+            "region": "Northreach",
+            "subRegion": "Pine Islands",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "castellore",
+            "name": "Castellore",
+            "description": "**Primary Species**: Kalashtar\n\nThe largest kalashtar city, this walled metropolis extends from the mountain to the sea, and is tightly packed and infamous for winding, narrow streets and multistory, multifamily dwellings. The cynical mind might even say such construction is intentional - all the easier for an invading army to get split up and lost, and high windows make for good arrow-slits.\n\nEverything about the city is coordinated: traffic flows with one mind, a seamless blend of movement with exception of foreigners unable to feel the flow; firefighting efforts are of such efficiency that in a matter of seconds bucket passing lines can be formed to bring water from the docks to the site of any fire; it is not uncommon to find a kalashtar dropping their tools and moving to assist another, even if that other kalashtar is hundreds of feet away.\n\nTheir army is renowned for being undefeated in written record - once, kalashtar lands used to spread further north, but the cities beyond fell to Thalyndraean advances. It was Castellore that halted the advance of the fey, and it is Catellore that continues to be a check on their expansion. While their navy isn’t nearly as prestigious as their southern neighbors, they feel a pressing need to prove their capability, being much more ambitious and seeking chances to prove their might than the navy of Spire Bellave.",
+            "region": "Asterian Peninsula",
+            "subRegion": "Vena Narrows",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "id": "copperbottle",
+            "name": "Copperbottle",
+            "description": "**Primary Species**: Halflings and Arborkin\n\nThe vine covered Copperbottle Mage Tower rises higher than the trees of the Ironwood Jungle. The naturalists that study at the Mage Tower and the arborkin druids theoretically have a working relationship of coordination, but in reality the arborkin druids try to keep the Copperbottle naturalists from delving too deep in the jungle, while the Copperbottle naturalists are often finding ways to frustrate the druids back through unwarned about experiments or pranks. How many tales of the strange things said to happen in the jungle are real dangers rather than shenanigans from both sides is unknowable. When tensions are lower, the port is a site of shipbuilding and exports of pelts, lumber and cured meats.\n\nOf late, Copperbottle has been home to the start of two doomed expeditions to the west, and looks to be the home of an upcoming third. The halflings of the town are well-known for being intrepid and daring, but many onlookers wonder as to how they have hooked so many foreigners for their mad plans this time.",
+            "region": "Ironwood Jungle",
+            "subRegion": "Jungle’s Edge",
+            "x": 0,
+            "y": 0
         }
     ]
 }

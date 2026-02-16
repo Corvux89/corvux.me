@@ -70,6 +70,8 @@ const createFallbackPanzoom = (stage, viewport) => {
     let lastY = 0;
     const applyTransform = () => {
         stage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        viewport.style.setProperty("--map-zoom", scale.toString());
+        viewport.style.setProperty("--map-zoom-inv", (1 / scale).toString());
     };
     const clampScale = (nextScale) => Math.min(5, Math.max(1, nextScale));
     const zoomBy = (delta) => {
@@ -178,6 +180,7 @@ const initMap = async () => {
         marker.style.left = formatPercent(point.x);
         marker.style.top = formatPercent(point.y);
         marker.setAttribute("aria-label", point.name);
+        marker.setAttribute("data-name", point.name);
         marker.dataset.pointId = point.id;
         const ring = document.createElement("span");
         ring.className = "solace-map-marker-ring";
@@ -233,21 +236,46 @@ const initMap = async () => {
         const getTransform = () => instance.getTransform?.() ?? { x: 0, y: 0, scale: 1 };
         const zoomAbs = instance.zoomAbs?.bind(instance);
         const moveTo = instance.moveTo?.bind(instance);
+        const syncZoomScale = () => {
+            const transform = getTransform();
+            mapViewport.style.setProperty("--map-zoom", transform.scale.toString());
+            mapViewport.style.setProperty("--map-zoom-inv", (1 / transform.scale).toString());
+        };
         const zoomBy = (delta) => {
             const transform = getTransform();
             const rect = mapViewport.getBoundingClientRect();
             const nextScale = Math.min(5, Math.max(1, transform.scale + delta));
             if (zoomAbs) {
                 zoomAbs(rect.width / 2, rect.height / 2, nextScale);
+                syncZoomScale();
             }
         };
+        syncZoomScale();
         return {
-            zoomIn: instance.zoomIn?.bind(instance) ?? (() => zoomBy(0.2)),
-            zoomOut: instance.zoomOut?.bind(instance) ?? (() => zoomBy(-0.2)),
-            reset: instance.reset?.bind(instance) ?? (() => {
+            zoomIn: () => {
+                if (instance.zoomIn) {
+                    instance.zoomIn();
+                }
+                else {
+                    zoomBy(0.2);
+                }
+                syncZoomScale();
+            },
+            zoomOut: () => {
+                if (instance.zoomOut) {
+                    instance.zoomOut();
+                }
+                else {
+                    zoomBy(-0.2);
+                }
+                syncZoomScale();
+            },
+            reset: () => {
+                instance.reset?.();
                 moveTo?.(0, 0);
                 zoomAbs?.(0, 0, 1);
-            }),
+                syncZoomScale();
+            },
             zoomWithWheel: instance.zoomWithWheel?.bind(instance) ?? ((event) => {
                 event.preventDefault();
                 zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
@@ -257,25 +285,41 @@ const initMap = async () => {
     const panzoom = createPanzoomController(panzoomInstance);
     mapViewport.addEventListener("wheel", panzoom.zoomWithWheel, { passive: false });
     const zoomToMarker = (point) => {
-        const mapRect = mapImage.getBoundingClientRect();
         const viewportRect = mapViewport.getBoundingClientRect();
-        // const stageRect = mapStage.getBoundingClientRect();
-        // Calculate marker position in pixels relative to the stage
-        const markerPixelX = (point.x / 100) * mapRect.width;
-        const markerPixelY = (point.y / 100) * mapRect.height;
-        // Zoom to 3x and center on marker
-        const targetZoom = 3;
+        // Viewport center
         const centerX = viewportRect.width / 2;
         const centerY = viewportRect.height / 2;
-        // Use panzoom's zoomAbs if available, otherwise use zoomIn buttons
-        if (panzoomInstance?.zoomAbs && panzoomInstance?.moveTo) {
-            // First, zoom to target level at marker position
-            panzoomInstance.zoomAbs(markerPixelX, markerPixelY, targetZoom);
-            // Then pan to center it
-            panzoomInstance.moveTo(centerX - markerPixelX * targetZoom, centerY - markerPixelY * targetZoom);
+        const targetZoom = 3.5;
+        const resetPanzoom = () => {
+            if (panzoomInstance?.reset) {
+                panzoomInstance.reset();
+                return;
+            }
+            panzoomInstance?.moveTo?.(0, 0);
+            panzoomInstance?.zoomAbs?.(0, 0, 1);
+        };
+        // Use panzoom if available, otherwise fallback
+        if (panzoomInstance?.moveTo && panzoomInstance?.zoomAbs) {
+            // Reset, then zoom to the viewport center, then pan to the marker at target scale
+            resetPanzoom();
+            requestAnimationFrame(() => {
+                const stageWidth = mapStage.clientWidth || mapImage.clientWidth;
+                const stageHeight = mapStage.clientHeight || mapImage.clientHeight;
+                const markerX = (point.x / 100) * stageWidth;
+                const markerY = (point.y / 100) * stageHeight;
+                panzoomInstance.zoomAbs?.(centerX, centerY, targetZoom);
+                requestAnimationFrame(() => {
+                    const panX = centerX - markerX * targetZoom;
+                    const panY = centerY - markerY * targetZoom;
+                    panzoomInstance.moveTo?.(panX, panY);
+                    mapViewport.style.setProperty("--map-zoom", targetZoom.toString());
+                    mapViewport.style.setProperty("--map-zoom-inv", (1 / targetZoom).toString());
+                });
+            });
         }
         else {
-            // Fallback: use zoom buttons a few times and let user scroll/drag
+            // Fallback: reset and use zoom buttons
+            panzoom.reset();
             panzoom.zoomIn();
             panzoom.zoomIn();
         }
@@ -314,6 +358,9 @@ const initMap = async () => {
                 setActiveMarker(marker, point);
                 zoomToMarker(point);
                 setSearchOpen(false);
+                if (searchInput) {
+                    searchInput.value = "";
+                }
                 searchResults.innerHTML = "";
             });
             searchResults.appendChild(button);
@@ -375,6 +422,11 @@ const initMap = async () => {
         if (event.key === "Escape") {
             setSearchOpen(false);
             openModalForPoint(null, null);
+        }
+        // Override Ctrl+F / Cmd+F to open map search
+        if ((event.ctrlKey || event.metaKey) && event.key === "f") {
+            event.preventDefault();
+            setSearchOpen(true);
         }
     });
     const enableCoordinatePicker = true;

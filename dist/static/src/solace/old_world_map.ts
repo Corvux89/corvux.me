@@ -28,6 +28,8 @@ type PanzoomOptions = {
     minScale?: number;
     contain?: "outside" | "inside";
     smoothScroll?: boolean;
+    bounds?: boolean;
+    boundsPadding?: number;
 };
 
 type PanzoomLegacyOptions = {
@@ -35,6 +37,8 @@ type PanzoomLegacyOptions = {
     minZoom?: number;
     zoomSpeed?: number;
     smoothScroll?: boolean;
+    bounds?: boolean;
+    boundsPadding?: number;
 };
 
 type PanzoomTransform = {
@@ -136,7 +140,30 @@ const createFallbackPanzoom = (stage: HTMLElement, viewport: HTMLElement) => {
     let lastX = 0;
     let lastY = 0;
 
+    const clampTranslate = () => {
+        const viewportRect = viewport.getBoundingClientRect();
+        const baseWidth = stage.clientWidth || viewportRect.width;
+        const baseHeight = stage.clientHeight || viewportRect.height;
+        const scaledWidth = baseWidth * scale;
+        const scaledHeight = baseHeight * scale;
+
+        if (scaledWidth <= viewportRect.width) {
+            translateX = (viewportRect.width - scaledWidth) / 2;
+        } else {
+            const minX = viewportRect.width - scaledWidth;
+            translateX = Math.min(0, Math.max(minX, translateX));
+        }
+
+        if (scaledHeight <= viewportRect.height) {
+            translateY = (viewportRect.height - scaledHeight) / 2;
+        } else {
+            const minY = viewportRect.height - scaledHeight;
+            translateY = Math.min(0, Math.max(minY, translateY));
+        }
+    };
+
     const applyTransform = () => {
+        clampTranslate();
         stage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         viewport.style.setProperty("--map-zoom", scale.toString());
         viewport.style.setProperty("--map-zoom-inv", (1 / scale).toString());
@@ -393,12 +420,16 @@ const initMap = async () => {
                                     minZoom: 1,
                                     zoomSpeed: 0.065,
                             smoothScroll: false,
+                            bounds: true,
+                            boundsPadding: 0,
                             })
                         : panzoomFactory(mapStage as HTMLElement, {
                                     maxScale: 16,
                                     minScale: 1,
-                                    contain: "outside",
+                                contain: "inside",
                             smoothScroll: false,
+                            bounds: true,
+                            boundsPadding: 0,
                             })
         : null;
 
@@ -410,6 +441,36 @@ const initMap = async () => {
         const getTransform = () => instance.getTransform?.() ?? { x: 0, y: 0, scale: 1 };
         const zoomAbs = instance.zoomAbs?.bind(instance);
         const moveTo = instance.moveTo?.bind(instance);
+
+        const clampPan = () => {
+            const transform = getTransform();
+            const viewportRect = mapViewport.getBoundingClientRect();
+            const baseWidth = mapStage.clientWidth || viewportRect.width;
+            const baseHeight = mapStage.clientHeight || viewportRect.height;
+            const scaledWidth = baseWidth * transform.scale;
+            const scaledHeight = baseHeight * transform.scale;
+
+            let nextX = transform.x;
+            let nextY = transform.y;
+
+            if (scaledWidth <= viewportRect.width) {
+                nextX = (viewportRect.width - scaledWidth) / 2;
+            } else {
+                const minX = viewportRect.width - scaledWidth;
+                nextX = Math.min(0, Math.max(minX, nextX));
+            }
+
+            if (scaledHeight <= viewportRect.height) {
+                nextY = (viewportRect.height - scaledHeight) / 2;
+            } else {
+                const minY = viewportRect.height - scaledHeight;
+                nextY = Math.min(0, Math.max(minY, nextY));
+            }
+
+            if (moveTo && (nextX !== transform.x || nextY !== transform.y)) {
+                moveTo(nextX, nextY);
+            }
+        };
 
         const syncZoomScale = () => {
             const transform = getTransform();
@@ -429,6 +490,11 @@ const initMap = async () => {
         };
 
         syncZoomScale();
+
+        mapStage.addEventListener("panzoomchange", clampPan as EventListener);
+        mapStage.addEventListener("panzoompan", clampPan as EventListener);
+        mapStage.addEventListener("panzoomzoom", clampPan as EventListener);
+        mapStage.addEventListener("panzoomend", clampPan as EventListener);
 
         return {
             zoomIn: () => {

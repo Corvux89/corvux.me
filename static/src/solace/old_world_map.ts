@@ -27,12 +27,14 @@ type PanzoomOptions = {
     maxScale?: number;
     minScale?: number;
     contain?: "outside" | "inside";
+    smoothScroll?: boolean;
 };
 
 type PanzoomLegacyOptions = {
     maxZoom?: number;
     minZoom?: number;
     zoomSpeed?: number;
+    smoothScroll?: boolean;
 };
 
 type PanzoomTransform = {
@@ -138,7 +140,7 @@ const createFallbackPanzoom = (stage: HTMLElement, viewport: HTMLElement) => {
         viewport.style.setProperty("--map-zoom-inv", (1 / scale).toString());
     };
 
-    const clampScale = (nextScale: number) => Math.min(12, Math.max(1, nextScale));
+    const clampScale = (nextScale: number) => Math.min(16, Math.max(1, nextScale));
 
     const zoomBy = (delta: number) => {
         scale = clampScale(scale + delta);
@@ -157,6 +159,8 @@ const createFallbackPanzoom = (stage: HTMLElement, viewport: HTMLElement) => {
             return;
         }
 
+        event.preventDefault();
+
         isDragging = true;
         lastX = event.clientX;
         lastY = event.clientY;
@@ -164,6 +168,7 @@ const createFallbackPanzoom = (stage: HTMLElement, viewport: HTMLElement) => {
     });
 
     viewport.addEventListener("pointermove", (event) => {
+        event.preventDefault();
         if (!isDragging) {
             return;
         }
@@ -231,6 +236,13 @@ const initMap = async () => {
         id: null,
     };
 
+    let recentTouch = false;
+    let touchTracking = false;
+    let touchMoved = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const touchMoveThreshold = 8;
+
     const setActiveMarker = (marker: HTMLButtonElement | null, point: MapPoint | null) => {
         const markers = markersContainer.querySelectorAll<HTMLButtonElement>(".solace-map-marker");
         markers.forEach((item) => item.classList.remove("is-active"));
@@ -277,27 +289,58 @@ const initMap = async () => {
         });
 
         marker.addEventListener("click", () => {
-            if (activeState.id === point.id) {
-                openModalForPoint(null, null);
-            } else {
-                openModalForPoint(point, marker);
-            }
-        });
-
-        marker.addEventListener("pointerup", (event) => {
-            if (event.pointerType === "mouse") {
+            if (recentTouch) {
                 return;
             }
 
-            event.preventDefault();
-            event.stopPropagation();
-
             if (activeState.id === point.id) {
                 openModalForPoint(null, null);
             } else {
                 openModalForPoint(point, marker);
             }
         });
+
+        marker.addEventListener("touchstart", (event) => {
+            touchTracking = true;
+            touchMoved = false;
+            touchStartX = event.touches[0]?.clientX ?? 0;
+            touchStartY = event.touches[0]?.clientY ?? 0;
+        }, { passive: true });
+
+        marker.addEventListener("touchmove", (event) => {
+            if (!touchTracking) {
+                return;
+            }
+
+            const currentX = event.touches[0]?.clientX ?? 0;
+            const currentY = event.touches[0]?.clientY ?? 0;
+            if (Math.abs(currentX - touchStartX) > touchMoveThreshold || Math.abs(currentY - touchStartY) > touchMoveThreshold) {
+                touchMoved = true;
+            }
+        }, { passive: true });
+
+        marker.addEventListener("touchend", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            touchTracking = false;
+            if (touchMoved) {
+                return;
+            }
+            recentTouch = true;
+            window.setTimeout(() => {
+                recentTouch = false;
+            }, 400);
+
+            if (activeState.id === point.id) {
+                openModalForPoint(null, null);
+            } else {
+                openModalForPoint(point, marker);
+            }
+        }, { passive: false });
+
+        marker.addEventListener("touchcancel", () => {
+            touchTracking = false;
+        }, { passive: true });
 
         markersContainer.appendChild(marker);
         markerById.set(point.id, marker);
@@ -316,6 +359,26 @@ const initMap = async () => {
         openModalForPoint(point, marker || null);
     });
 
+    markersContainer.addEventListener("touchend", (event) => {
+        const target = event.target as HTMLElement | null;
+        const marker = target?.closest<HTMLButtonElement>(".solace-map-marker");
+        const pointId = marker?.dataset.pointId;
+
+        if (!pointId) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (touchMoved) {
+            return;
+        }
+
+        const point = pointById.get(pointId) || null;
+        openModalForPoint(point, marker || null);
+    }, { passive: false });
+
     updatePanel(null);
     setModalOpen(false);
 
@@ -324,14 +387,16 @@ const initMap = async () => {
     const panzoomInstance = panzoomFactory
         ? window.panzoom
                         ? panzoomFactory(mapStage as HTMLElement, {
-                                    maxZoom: 12,
+                                    maxZoom: 16,
                                     minZoom: 1,
                                     zoomSpeed: 0.065,
+                            smoothScroll: false,
                             })
                         : panzoomFactory(mapStage as HTMLElement, {
-                                    maxScale: 12,
+                                    maxScale: 16,
                                     minScale: 1,
                                     contain: "outside",
+                            smoothScroll: false,
                             })
         : null;
 
@@ -353,7 +418,7 @@ const initMap = async () => {
         const zoomBy = (delta: number) => {
             const transform = getTransform();
             const rect = mapViewport.getBoundingClientRect();
-            const nextScale = Math.min(12, Math.max(1, transform.scale + delta));
+            const nextScale = Math.min(16, Math.max(1, transform.scale + delta));
 
             if (zoomAbs) {
                 zoomAbs(rect.width / 2, rect.height / 2, nextScale);
@@ -396,6 +461,24 @@ const initMap = async () => {
     const panzoom = createPanzoomController(panzoomInstance);
     mapViewport.addEventListener("wheel", panzoom.zoomWithWheel, { passive: false });
 
+    mapViewport.addEventListener("touchstart", (event) => {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest(".solace-map-marker")) {
+            return;
+        }
+
+        event.preventDefault();
+    }, { passive: false });
+
+    mapViewport.addEventListener("touchmove", (event) => {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest(".solace-map-marker")) {
+            return;
+        }
+
+        event.preventDefault();
+    }, { passive: false });
+
     const zoomToMarker = (point: MapPoint) => {
         const viewportRect = mapViewport.getBoundingClientRect();
 
@@ -403,7 +486,7 @@ const initMap = async () => {
         // Viewport center
         const centerX = viewportRect.width / 2;
         const centerY = viewportRect.height / 2;
-        const targetZoom = 3.5;
+        const targetZoom = 5;
 
         const resetPanzoom = () => {
             if (panzoomInstance?.reset) {

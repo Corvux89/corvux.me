@@ -1,0 +1,15 @@
+{
+    "mapSrc": "/static/images/Solace/Old_World.jpg",
+    "points": [
+        {
+            "id": "rooks-landing",
+            "name": "Rook's Landing",
+            "subtitle": "Capital of the Old World",
+            "description": "**Primary Species**: Minotaur\n\nNotable for its capacious city squares (on average, the largest in the continent), Rook’s Landing often sees the famous dances of the minotaurs, drawing gawkers and onlookers of every race. It can be certain that on any day performative debate takes place in these squares, ranging from solving small disputes to massive ensembles deciding the fate of the city itself. Vendors compete for placement serving foods local and exotic, and a thriving secondary market has sprung up around the edges of most of these squares. These proceedings are all visible from a ziggurat rising from the river’s edge - the largest temple to the Choral Host on Acanthera, itself square in the middle of the largest square.\n\nTrading with the arborkin to the west for lumber and the harengon to the east for minerals, a fleet of ships spreads daily across Whitelock Bay - fishing, merchantmen, even naval convoys. The area is also often home to a frequent, drizzling rain - most locals eschewing protective raingear. The parasols the city is known for are in fact meant as colorful props for the city and its performances - someone using one for the rain is a sure sign of a tourist.",
+            "region": "Whitelock River",
+            "subRegion": "Whitelock Bay",
+            "x": 27.02,
+            "y": 22.70
+        }
+    ]
+}

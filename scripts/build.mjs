@@ -66,12 +66,19 @@ async function buildSite() {
     { howto: howtoHtml }
   );
 
+  await renderToFile(
+    path.join(distDir, "Solace", "old-world-map", "index.html"),
+    "solace/old_world_map.html",
+    {}
+  );
+
   await renderToFile(path.join(distDir, "404.html"), "404.html", {});
   await renderToFile(path.join(distDir, "error.html"), "error.html", {});
 
   const staticUrls = [
     { loc: `${siteUrl}/` },
     { loc: `${siteUrl}/Avrae_Combat_Planner/` },
+    { loc: `${siteUrl}/Solace/old-world-map/` },
   ];
 
   await renderToFile(path.join(distDir, "sitemap.xml"), "sitemap.xml", {

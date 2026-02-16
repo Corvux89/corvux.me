@@ -169,3 +169,222 @@ body:not(.busy) .loading-overlay {
     }
 }
 
+.solace-map-page {
+    padding: 24px 16px 32px;
+}
+
+.solace-map-header {
+    max-width: 980px;
+    margin: 0 auto 20px;
+}
+
+.solace-map-subtitle {
+    color: #c8d0d7;
+    margin-left: 15px;
+}
+
+.solace-map-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.solace-map-card {
+    background: rgba(20, 22, 26, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+}
+
+.solace-map-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.solace-map-viewport {
+    background: #0b0c0f;
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 70vh;
+}
+
+.solace-map-stage {
+    position: relative;
+    display: inline-block;
+    transform-origin: 0 0;
+}
+
+.solace-map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.solace-map-markers {
+    position: absolute;
+    inset: 0;
+}
+
+.solace-map-marker {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.solace-map-marker-ring {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 0;
+}
+
+.solace-map-marker.is-active {
+    border-color: #fffae6;
+    box-shadow: 0 0 16px rgba(255, 250, 230, 0.8), inset 0 0 8px rgba(255, 250, 230, 0.4);
+}
+
+.solace-map-overlay {
+    position: absolute;
+    top: 72px;
+    left: 20px;
+    z-index: 5;
+    display: grid;
+    gap: 10px;
+}
+
+.solace-map-search-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(16, 18, 22, 0.9);
+    color: #f2f5f7;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.solace-map-search-panel {
+    width: min(280px, 80vw);
+    background: rgba(16, 18, 22, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 12px;
+    display: none;
+}
+
+.solace-map-search-panel.is-open {
+    display: grid;
+    gap: 8px;
+}
+
+.solace-map-search-label {
+    display: block;
+    font-size: 0.95rem;
+    color: #c8d0d7;
+    margin-bottom: 6px;
+}
+
+.solace-map-search-results {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.solace-map-search-result {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(16, 18, 22, 0.8);
+    color: #f2f5f7;
+    padding: 8px 10px;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.solace-map-search-result:hover,
+.solace-map-search-result:focus {
+    border-color: rgba(245, 210, 122, 0.8);
+    outline: none;
+}
+
+.solace-map-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 7, 9, 0.72);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 16px;
+}
+
+.solace-map-modal.is-open {
+    display: flex;
+}
+
+.solace-map-modal-content {
+    position: relative;
+    width: min(420px, 90vw);
+    background: rgba(16, 18, 22, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 22px 20px 20px;
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.45);
+}
+
+.solace-map-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: #c8d0d7;
+    font-size: 1.2rem;
+}
+
+.solace-map-modal-content h2,
+.solace-map-modal-content p {
+    margin-left: 0;
+}
+
+.solace-map-panel h2 {
+    margin-left: 0;
+}
+
+.solace-map-panel p {
+    margin-left: 0;
+}
+
+.solace-map-meta {
+    margin-top: 12px;
+    color: #f5d27a;
+    font-weight: 600;
+}
+
+@media (max-width: 992px) {
+    .solace-map-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .solace-map-overlay {
+        top: 96px;
+    }
+}
+

@@ -1,0 +1,63 @@
+{% extends "template.html" %}
+{% block body %}
+<div class="solace-map-page">
+    <header class="solace-map-header">
+        <h1>Solace: Old World Map</h1>
+        <p class="solace-map-subtitle">Hover or tap a marker to see locations and lore.</p>
+    </header>
+
+    <section class="solace-map-layout">
+        <div class="solace-map-card">
+            <div class="solace-map-toolbar" role="toolbar" aria-label="Map controls">
+                <button type="button" class="btn btn-sm btn-outline-light" data-map-action="zoom-in">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i> Zoom in
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-light" data-map-action="zoom-out">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i> Zoom out
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-light" data-map-action="reset">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div class="solace-map-overlay">
+                <button type="button" class="solace-map-search-toggle" id="solace-map-search-toggle"
+                        aria-expanded="false" aria-controls="solace-map-search-panel">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search</span>
+                </button>
+                <div class="solace-map-search-panel" id="solace-map-search-panel" aria-hidden="true">
+                    <label class="solace-map-search-label" for="solace-map-search">Find a location</label>
+                    <input id="solace-map-search" class="form-control" type="search" placeholder="Search locations"
+                           autocomplete="off">
+                    <div class="solace-map-search-results" id="solace-map-search-results" role="listbox"></div>
+                </div>
+            </div>
+
+            <div class="solace-map-viewport" id="solace-map-viewport">
+                <div class="solace-map-stage" id="solace-map-stage">
+                    <img id="solace-map-image" class="solace-map-image" src="/static/images/Solace/Old_World.jpg"
+                         alt="Solace old world map">
+                    <div class="solace-map-markers" id="solace-map-markers"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <div class="solace-map-modal" id="solace-map-modal" role="dialog" aria-modal="true"
+            aria-labelledby="solace-map-modal-title" aria-hidden="true" hidden>
+        <div class="solace-map-modal-content" role="document">
+            <button type="button" class="solace-map-modal-close" id="solace-map-modal-close"
+                    aria-label="Close location details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 id="solace-map-modal-title">Old World</h2>
+            <div class="solace-map-meta" id="solace-map-modal-meta"></div>
+            <p id="solace-map-modal-description">Select a location marker to learn more.</p>
+            
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js"></script>
+<script src="/static/src/solace/old_world_map.js" type="module"></script>
+{% endblock %}

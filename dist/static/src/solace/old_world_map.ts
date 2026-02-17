@@ -195,9 +195,13 @@ const initMap = async () => {
             marker.classList.add("is-active");
             activeState.id = point.id;
             updatePanel(point);
+            // Update URL hash for direct linking
+            history.replaceState(null, "", `#${point.id}`);
         } else {
             activeState.id = null;
             updatePanel(null);
+            // Clear hash when deselecting
+            history.replaceState(null, "", window.location.pathname);
         }
     };
 
@@ -740,6 +744,30 @@ const initMap = async () => {
             console.log(formatted);
             navigator.clipboard?.writeText(formatted);
         });
+    }
+
+    // Handle URL hash for direct links to POIs
+    const handleHash = () => {
+        const hash = window.location.hash.slice(1); // Remove '#'
+        if (!hash) return;
+
+        const point = pointById.get(hash);
+        if (point) {
+            const marker = markerById.get(point.id) || null;
+            setActiveMarker(marker, point);
+            zoomToMarker(point);
+        }
+    };
+
+    // Check hash on load
+    window.addEventListener("load", handleHash);
+    
+    // Handle hash changes (browser back/forward)
+    window.addEventListener("hashchange", handleHash);
+    
+    // Check immediately if already loaded
+    if (document.readyState === "complete") {
+        handleHash();
     }
 };
 

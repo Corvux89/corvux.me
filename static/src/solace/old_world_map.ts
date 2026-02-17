@@ -1,5 +1,12 @@
 import { marked } from "marked";
 
+// Map zoom and scale constants
+const MAP_SCALE_MIN = 1;
+const MAP_SCALE_MAX = 16;
+const MAP_ZOOM_TARGET = 13;
+const LABEL_SCALE_MIN = 0.3;
+const LABEL_SCALE_MAX = 1;
+
 type MapPoint = {
     id: string;
     name: string;
@@ -52,10 +59,15 @@ type PanzoomApi = {
     zoomOut?: () => void;
     reset?: () => void;
     zoomWithWheel?: (event: WheelEvent) => void;
-    zoomAbs?: (x: number, y: number, scale: number) => void;
+    smoothZoom?: (x: number, y: number, scale: number) => void;
+    pan?: (x: number, y: number) => void;
     moveTo?: (x: number, y: number) => void;
     getTransform?: () => PanzoomTransform;
+    getScale?: () => number;
+    getPan?: () => { x: number; y: number };
 };
+
+
 
 const mapImage = document.getElementById("solace-map-image") as HTMLImageElement | null;
 const markersContainer = document.getElementById("solace-map-markers");
@@ -130,114 +142,6 @@ const setSearchOpen = (open: boolean) => {
     if (open) {
         searchInput?.focus();
     }
-};
-
-const createFallbackPanzoom = (stage: HTMLElement, viewport: HTMLElement) => {
-    let scale = 1;
-    let translateX = 0;
-    let translateY = 0;
-    let isDragging = false;
-    let lastX = 0;
-    let lastY = 0;
-
-    const clampTranslate = () => {
-        const viewportRect = viewport.getBoundingClientRect();
-        const baseWidth = stage.clientWidth || viewportRect.width;
-        const baseHeight = stage.clientHeight || viewportRect.height;
-        const scaledWidth = baseWidth * scale;
-        const scaledHeight = baseHeight * scale;
-
-        if (scaledWidth <= viewportRect.width) {
-            translateX = (viewportRect.width - scaledWidth) / 2;
-        } else {
-            const minX = viewportRect.width - scaledWidth;
-            translateX = Math.min(0, Math.max(minX, translateX));
-        }
-
-        if (scaledHeight <= viewportRect.height) {
-            translateY = (viewportRect.height - scaledHeight) / 2;
-        } else {
-            const minY = viewportRect.height - scaledHeight;
-            translateY = Math.min(0, Math.max(minY, translateY));
-        }
-    };
-
-    const applyTransform = () => {
-        clampTranslate();
-        stage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        viewport.style.setProperty("--map-zoom", scale.toString());
-        viewport.style.setProperty("--map-zoom-inv", (1 / scale).toString());
-    };
-
-    const clampScale = (nextScale: number) => Math.min(16, Math.max(1, nextScale));
-
-    const zoomBy = (delta: number) => {
-        scale = clampScale(scale + delta);
-        applyTransform();
-    };
-
-    viewport.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const delta = event.deltaY < 0 ? 0.1 : -0.1;
-        zoomBy(delta);
-    }, { passive: false });
-
-    viewport.addEventListener("pointerdown", (event) => {
-        const target = event.target as HTMLElement | null;
-        if (target?.closest(".solace-map-marker")) {
-            return;
-        }
-
-        event.preventDefault();
-
-        isDragging = true;
-        lastX = event.clientX;
-        lastY = event.clientY;
-        viewport.setPointerCapture(event.pointerId);
-    });
-
-    viewport.addEventListener("pointermove", (event) => {
-        event.preventDefault();
-        if (!isDragging) {
-            return;
-        }
-
-        const deltaX = event.clientX - lastX;
-        const deltaY = event.clientY - lastY;
-        lastX = event.clientX;
-        lastY = event.clientY;
-        translateX += deltaX;
-        translateY += deltaY;
-        applyTransform();
-    });
-
-    viewport.addEventListener("pointerup", (event) => {
-        isDragging = false;
-        viewport.releasePointerCapture(event.pointerId);
-    });
-
-    viewport.addEventListener("pointercancel", (event) => {
-        isDragging = false;
-        viewport.releasePointerCapture(event.pointerId);
-    });
-
-    applyTransform();
-
-    return {
-        zoomIn: () => zoomBy(0.2),
-        zoomOut: () => zoomBy(-0.2),
-        reset: () => {
-            scale = 1;
-            translateX = 0;
-            translateY = 0;
-            applyTransform();
-        },
-        zoomWithWheel: (event: WheelEvent) => {
-            event.preventDefault();
-            const delta = event.deltaY < 0 ? 0.1 : -0.1;
-            zoomBy(delta);
-        },
-    };
 };
 
 const initMap = async () => {
@@ -412,122 +316,140 @@ const initMap = async () => {
     setModalOpen(false);
 
     const panzoomFactory = window.panzoom ?? window.Panzoom;
-
     const panzoomInstance = panzoomFactory
         ? window.panzoom
-                        ? panzoomFactory(mapStage as HTMLElement, {
-                                    maxZoom: 16,
-                                    minZoom: 1,
-                                    zoomSpeed: 0.065,
-                            smoothScroll: false,
-                            bounds: true,
-                            boundsPadding: 0,
-                            })
-                        : panzoomFactory(mapStage as HTMLElement, {
-                                    maxScale: 16,
-                                    minScale: 1,
-                                contain: "inside",
-                            smoothScroll: false,
-                            bounds: true,
-                            boundsPadding: 0,
-                            })
+            ? panzoomFactory(mapStage as HTMLElement, {
+                maxZoom: MAP_SCALE_MAX,
+                minZoom: MAP_SCALE_MIN,
+                zoomSpeed: 0.065,
+                smoothScroll: false,
+                bounds: true,
+                boundsPadding: 0,
+            })
+            : panzoomFactory(mapStage as HTMLElement, {
+                maxScale: MAP_SCALE_MAX,
+                minScale: MAP_SCALE_MIN,
+                contain: "inside",
+                smoothScroll: false,
+                bounds: true,
+                boundsPadding: 0,
+            })
         : null;
 
-    const createPanzoomController = (instance: PanzoomApi | null) => {
-        if (!instance) {
-            return createFallbackPanzoom(mapStage as HTMLElement, mapViewport);
+    if (!panzoomInstance) {
+        throw new Error("Panzoom is not available on this page.");
+    }
+
+    const getTransform = () => {
+        if (panzoomInstance.getTransform) {
+            return panzoomInstance.getTransform();
         }
 
-        const getTransform = () => instance.getTransform?.() ?? { x: 0, y: 0, scale: 1 };
-        const zoomAbs = instance.zoomAbs?.bind(instance);
-        const moveTo = instance.moveTo?.bind(instance);
-
-        const clampPan = () => {
-            const transform = getTransform();
-            const viewportRect = mapViewport.getBoundingClientRect();
-            const baseWidth = mapStage.clientWidth || viewportRect.width;
-            const baseHeight = mapStage.clientHeight || viewportRect.height;
-            const scaledWidth = baseWidth * transform.scale;
-            const scaledHeight = baseHeight * transform.scale;
-
-            let nextX = transform.x;
-            let nextY = transform.y;
-
-            if (scaledWidth <= viewportRect.width) {
-                nextX = (viewportRect.width - scaledWidth) / 2;
-            } else {
-                const minX = viewportRect.width - scaledWidth;
-                nextX = Math.min(0, Math.max(minX, nextX));
-            }
-
-            if (scaledHeight <= viewportRect.height) {
-                nextY = (viewportRect.height - scaledHeight) / 2;
-            } else {
-                const minY = viewportRect.height - scaledHeight;
-                nextY = Math.min(0, Math.max(minY, nextY));
-            }
-
-            if (moveTo && (nextX !== transform.x || nextY !== transform.y)) {
-                moveTo(nextX, nextY);
-            }
-        };
-
-        const syncZoomScale = () => {
-            const transform = getTransform();
-            mapViewport.style.setProperty("--map-zoom", transform.scale.toString());
-            mapViewport.style.setProperty("--map-zoom-inv", (1 / transform.scale).toString());
-        };
-
-        const zoomBy = (delta: number) => {
-            const transform = getTransform();
-            const rect = mapViewport.getBoundingClientRect();
-            const nextScale = Math.min(16, Math.max(1, transform.scale + delta));
-
-            if (zoomAbs) {
-                zoomAbs(rect.width / 2, rect.height / 2, nextScale);
-                syncZoomScale();
-            }
-        };
-
-        syncZoomScale();
-
-        mapStage.addEventListener("panzoomchange", clampPan as EventListener);
-        mapStage.addEventListener("panzoompan", clampPan as EventListener);
-        mapStage.addEventListener("panzoomzoom", clampPan as EventListener);
-        mapStage.addEventListener("panzoomend", clampPan as EventListener);
-
-        return {
-            zoomIn: () => {
-                if (instance.zoomIn) {
-                    instance.zoomIn();
-                } else {
-                    zoomBy(0.2);
-                }
-                syncZoomScale();
-            },
-            zoomOut: () => {
-                if (instance.zoomOut) {
-                    instance.zoomOut();
-                } else {
-                    zoomBy(-0.2);
-                }
-                syncZoomScale();
-            },
-            reset: () => {
-                instance.reset?.();
-                moveTo?.(0, 0);
-                zoomAbs?.(0, 0, 1);
-                syncZoomScale();
-            },
-            zoomWithWheel: instance.zoomWithWheel?.bind(instance) ?? ((event: WheelEvent) => {
-                event.preventDefault();
-                zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
-            }),
-        };
+        const scale = panzoomInstance.getScale?.() ?? 1;
+        const pan = panzoomInstance.getPan?.() ?? { x: 0, y: 0 };
+        return { x: pan.x ?? 0, y: pan.y ?? 0, scale };
     };
 
-    const panzoom = createPanzoomController(panzoomInstance);
-    mapViewport.addEventListener("wheel", panzoom.zoomWithWheel, { passive: false });
+    const clampPan = () => {
+        const transform = getTransform();
+        const viewportRect = mapViewport.getBoundingClientRect();
+        const baseWidth = mapStage.clientWidth || viewportRect.width;
+        const baseHeight = mapStage.clientHeight || viewportRect.height;
+        const scaledWidth = baseWidth * transform.scale;
+        const scaledHeight = baseHeight * transform.scale;
+
+        let nextX = transform.x;
+        let nextY = transform.y;
+
+        if (scaledWidth <= viewportRect.width) {
+            nextX = (viewportRect.width - scaledWidth) / 2;
+        } else {
+            const minX = viewportRect.width - scaledWidth;
+            nextX = Math.min(0, Math.max(minX, nextX));
+        }
+
+        if (scaledHeight <= viewportRect.height) {
+            nextY = (viewportRect.height - scaledHeight) / 2;
+        } else {
+            const minY = viewportRect.height - scaledHeight;
+            nextY = Math.min(0, Math.max(minY, nextY));
+        }
+
+        if (nextX !== transform.x || nextY !== transform.y) {
+            panzoomInstance.moveTo?.(nextX, nextY);
+        }
+    };
+
+    const centerMap = (scale: number) => {
+        const viewportRect = mapViewport.getBoundingClientRect();
+        const baseWidth = mapStage.clientWidth || mapImage.clientWidth || viewportRect.width;
+        const baseHeight = mapStage.clientHeight || mapImage.clientHeight || viewportRect.height;
+        const targetPanX = viewportRect.width / 2 - (baseWidth * scale) / 2;
+        const targetPanY = viewportRect.height / 2 - (baseHeight * scale) / 2;
+        panzoomInstance.moveTo?.(targetPanX, targetPanY);
+    };
+
+    const syncZoomScale = () => {
+        const transform = getTransform();
+        const labelScale = Math.min(LABEL_SCALE_MAX, Math.max(LABEL_SCALE_MIN, 1 / Math.pow(transform.scale, 1.5)));
+        mapViewport.style.setProperty("--map-zoom", transform.scale.toString());
+        mapViewport.style.setProperty("--map-zoom-inv", (1 / transform.scale).toString());
+        mapViewport.style.setProperty("--label-scale", labelScale.toString());
+    };
+
+    syncZoomScale();
+
+    const syncAndClamp = () => {
+        syncZoomScale();
+        clampPan();
+    };
+
+    mapStage.addEventListener("panzoomchange", syncAndClamp as EventListener);
+    mapStage.addEventListener("panzoompan", syncAndClamp as EventListener);
+    mapStage.addEventListener("panzoomzoom", syncAndClamp as EventListener);
+    mapStage.addEventListener("panzoomend", syncAndClamp as EventListener);
+
+    const clampScale = (scale: number) => Math.min(MAP_SCALE_MAX, Math.max(MAP_SCALE_MIN, scale));
+    const BUTTON_ZOOM_STEP = 0.5;
+
+    const zoomToScale = (targetScale: number) => {
+        const viewportRect = mapViewport.getBoundingClientRect();
+        const centerX = viewportRect.width / 2;
+        const centerY = viewportRect.height / 2;
+        const clamped = clampScale(targetScale);
+        const currentScale = getTransform().scale;
+
+        if (panzoomInstance.smoothZoom) {
+            const factor = clamped / currentScale;
+            if (Math.abs(factor - 1) < 0.001) {
+                return;
+            }
+            panzoomInstance.smoothZoom(centerX, centerY, factor);
+            syncZoomScale();
+            return;
+        }
+
+        if (clamped > currentScale) {
+            panzoomInstance.zoomIn?.();
+        } else if (clamped < currentScale) {
+            panzoomInstance.zoomOut?.();
+        }
+        syncZoomScale();
+    };
+
+    const zoomWithWheel = (event: WheelEvent) => {
+        event.preventDefault();
+        if (panzoomInstance.zoomWithWheel) {
+            panzoomInstance.zoomWithWheel(event);
+            return;
+        }
+
+        const delta = event.deltaY < 0 ? 0.1 : -0.1;
+        const currentScale = getTransform().scale;
+        zoomToScale(currentScale + delta);
+    };
+
+    mapViewport.addEventListener("wheel", zoomWithWheel, { passive: false });
 
     mapViewport.addEventListener("touchstart", (event) => {
         const target = event.target as HTMLElement | null;
@@ -548,51 +470,50 @@ const initMap = async () => {
     }, { passive: false });
 
     const zoomToMarker = (point: MapPoint) => {
-        const viewportRect = mapViewport.getBoundingClientRect();
-
-
-        // Viewport center
-        const centerX = viewportRect.width / 2;
-        const centerY = viewportRect.height / 2;
-        const targetZoom = 5;
-
-        const resetPanzoom = () => {
-            if (panzoomInstance?.reset) {
-                panzoomInstance.reset();
+        const applyZoomAndPan = () => {
+            const marker = markerById.get(point.id) || null;
+            if (!marker) {
                 return;
             }
 
-            panzoomInstance?.moveTo?.(0, 0);
-            panzoomInstance?.zoomAbs?.(0, 0, 1);
+            const viewportRect = mapViewport.getBoundingClientRect();
+            const currentTransform = getTransform();
+            const targetZoom = Math.max(currentTransform.scale, MAP_ZOOM_TARGET);
+
+            // Get the marker's current screen position (relative to viewport)
+            const markerRect = marker.getBoundingClientRect();
+            console.log(markerRect)
+            const markerCenterX = markerRect.left + markerRect.width / 2;
+            const markerCenterY = markerRect.top + markerRect.height / 2;
+
+            // Calculate viewport center
+            const viewportCenterX = viewportRect.left + viewportRect.width / 2;
+            const viewportCenterY = viewportRect.top + viewportRect.height / 2;
+
+            // Calculate how much to pan to center the marker
+            const panDeltaX = viewportCenterX - markerCenterX;
+            const panDeltaY = viewportCenterY - markerCenterY;
+
+            // Apply pan to center the marker
+            const newPanX = currentTransform.x + panDeltaX;
+            const newPanY = currentTransform.y + panDeltaY;
+            panzoomInstance.moveTo?.(newPanX, newPanY);
+
+            const factor = targetZoom / currentTransform.scale;
+            if (panzoomInstance.smoothZoom && Math.abs(factor - 1) >= 0.001) {
+                requestAnimationFrame(() => {
+                    const updatedRect = marker.getBoundingClientRect();
+                    const updatedCenterX = (updatedRect.left - viewportRect.left) + updatedRect.width / 2;
+                    const updatedCenterY = (updatedRect.top - viewportRect.top) + updatedRect.height / 2;
+                    if (panzoomInstance.smoothZoom){
+                        panzoomInstance.smoothZoom(updatedCenterX, updatedCenterY, factor);
+                    }
+                    syncZoomScale();
+                });
+            }
         };
 
-        // Use panzoom if available, otherwise fallback
-        if (panzoomInstance?.moveTo && panzoomInstance?.zoomAbs) {
-            // Reset, then zoom to the viewport center, then pan to the marker at target scale
-            resetPanzoom();
-
-            requestAnimationFrame(() => {
-                const stageWidth = mapStage.clientWidth || mapImage.clientWidth;
-                const stageHeight = mapStage.clientHeight || mapImage.clientHeight;
-                const markerX = (point.x / 100) * stageWidth;
-                const markerY = (point.y / 100) * stageHeight;
-
-                panzoomInstance.zoomAbs?.(centerX, centerY, targetZoom);
-
-                requestAnimationFrame(() => {
-                    const panX = centerX - markerX * targetZoom;
-                    const panY = centerY - markerY * targetZoom;
-                    panzoomInstance.moveTo?.(panX, panY);
-                    mapViewport.style.setProperty("--map-zoom", targetZoom.toString());
-                    mapViewport.style.setProperty("--map-zoom-inv", (1 / targetZoom).toString());
-                });
-            });
-        } else {
-            // Fallback: reset and use zoom buttons
-            panzoom.reset();
-            panzoom.zoomIn();
-            panzoom.zoomIn();
-        }
+        requestAnimationFrame(applyZoomAndPan);
     };
 
     const toolbarButtons = document.querySelectorAll<HTMLElement>("[data-map-action]");
@@ -601,20 +522,34 @@ const initMap = async () => {
         button.addEventListener("click", () => {
             const action = button.getAttribute("data-map-action");
 
-            if (!panzoom) {
-                return;
-            }
-
             if (action === "zoom-in") {
-                panzoom.zoomIn();
+                const currentScale = getTransform().scale;
+                zoomToScale(currentScale + BUTTON_ZOOM_STEP);
             }
 
             if (action === "zoom-out") {
-                panzoom.zoomOut();
+                const currentScale = getTransform().scale;
+                zoomToScale(currentScale - BUTTON_ZOOM_STEP);
             }
 
             if (action === "reset") {
-                panzoom.reset();
+                // Directly set pan and zoom to reset state
+                const viewportRect = mapViewport.getBoundingClientRect();
+                const baseWidth = mapStage.clientWidth || mapImage.clientWidth || viewportRect.width;
+                const baseHeight = mapStage.clientHeight || mapImage.clientHeight || viewportRect.height;
+                
+                const targetPanX = viewportRect.width / 2 - (baseWidth * MAP_SCALE_MIN) / 2;
+                const targetPanY = viewportRect.height / 2 - (baseHeight * MAP_SCALE_MIN) / 2;
+                
+                panzoomInstance.moveTo?.(targetPanX, targetPanY);
+                
+                const currentScale = getTransform().scale;
+                const factor = MAP_SCALE_MIN / currentScale;
+                if (panzoomInstance.smoothZoom && Math.abs(factor - 1) >= 0.001) {
+                    panzoomInstance.smoothZoom(viewportRect.width / 2, viewportRect.height / 2, factor);
+                }
+                
+                syncZoomScale();
             }
         });
     });

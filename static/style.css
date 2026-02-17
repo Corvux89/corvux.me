@@ -296,22 +296,24 @@ body:not(.busy) .loading-overlay {
 .solace-map-marker::after {
     content: attr(data-name);
     position: absolute;
-    bottom: 100%;
+    bottom: calc(100% - 4px);
     left: 50%;
-    transform: translateX(-50%) scale(var(--map-zoom-inv, 1));
+    transform: translateX(-50%) scale(var(--label-scale, 1));
     transform-origin: bottom center;
     white-space: nowrap;
     background: rgba(16, 18, 22, 0.95);
     color: #f2f5f7;
     padding: clamp(4px, 0.6vw, 8px) clamp(8px, 1vw, 14px);
     border-radius: 6px;
-    font-size: clamp(0.75rem, 1.1vw, 1rem);
+    font-size: clamp(12px, 1.1vw, 16px);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
     pointer-events: none;
     border: 1px solid rgba(255, 255, 255, 0.12);
     opacity: 0;
     transition: opacity 0.15s ease-in-out;
     z-index: 10;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     max-width: min(70vw, 360px);
     text-overflow: ellipsis;
     overflow: hidden;
@@ -319,6 +321,12 @@ body:not(.busy) .loading-overlay {
 
 .solace-map-marker:hover::after {
     opacity: 1;
+}
+
+.solace-map-viewport.is-showing-labels .solace-map-marker::after {
+    opacity: 1;
+    white-space: normal;
+    max-width: min(50vw, 200px);
 }
 
 .solace-map-marker.is-active {
@@ -479,4 +487,10 @@ body:not(.busy) .loading-overlay {
     background: rgba(255, 250, 230, 0.12);
     border-color: rgba(255, 250, 230, 0.35);
     color: #fffae6;
+}
+
+.solace-map-viewport.is-showing-labels .solace-map-marker::after {
+    opacity: 1;
+    white-space: normal;
+    max-width: min(60vw, 240px);
 }

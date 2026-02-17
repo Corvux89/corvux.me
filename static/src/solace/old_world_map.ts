@@ -759,16 +759,11 @@ const initMap = async () => {
         }
     };
 
-    // Check hash on load
-    window.addEventListener("load", handleHash);
-    
     // Handle hash changes (browser back/forward)
     window.addEventListener("hashchange", handleHash);
     
-    // Check immediately if already loaded
-    if (document.readyState === "complete") {
-        handleHash();
-    }
+    // Check hash immediately after data is loaded
+    handleHash();
 };
 
 void initMap();

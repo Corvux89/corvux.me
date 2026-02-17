@@ -422,8 +422,15 @@ body:not(.busy) .loading-overlay {
     padding: 22px 20px 20px;
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.45);
     max-height: min(80vh, calc(100vh - 120px));
+    display: flex;
+    flex-direction: column;
+}
+
+.solace-map-modal-description-scrollable {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
 }
 
 @media (max-width: 640px) {

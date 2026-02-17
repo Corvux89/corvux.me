@@ -5,6 +5,7 @@ const MAP_SCALE_MAX = 16;
 const MAP_ZOOM_TARGET = 13;
 const LABEL_SCALE_MIN = 0.3;
 const LABEL_SCALE_MAX = 1;
+const BUTTON_ZOOM_STEP = 1;
 const mapImage = document.getElementById("solace-map-image");
 const markersContainer = document.getElementById("solace-map-markers");
 const modal = document.getElementById("solace-map-modal");
@@ -37,6 +38,15 @@ const formatPercent = (value) => `${value}%`;
 const buildMetaLine = (point) => {
     const parts = [point.subtitle, point.region, point.subRegion].filter(Boolean);
     return parts.join(" · ");
+};
+const normalizeSearchText = (text) => {
+    const stopWords = new Set(["the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "is", "are"]);
+    return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, "") // Remove punctuation
+        .split(/\s+/) // Split into words
+        .filter((word) => word && !stopWords.has(word)) // Remove empty strings and stop words
+        .join(" ");
 };
 const updatePanel = (point) => {
     if (!point) {
@@ -273,14 +283,6 @@ const initMap = async () => {
             panzoomInstance.moveTo?.(nextX, nextY);
         }
     };
-    const centerMap = (scale) => {
-        const viewportRect = mapViewport.getBoundingClientRect();
-        const baseWidth = mapStage.clientWidth || mapImage.clientWidth || viewportRect.width;
-        const baseHeight = mapStage.clientHeight || mapImage.clientHeight || viewportRect.height;
-        const targetPanX = viewportRect.width / 2 - (baseWidth * scale) / 2;
-        const targetPanY = viewportRect.height / 2 - (baseHeight * scale) / 2;
-        panzoomInstance.moveTo?.(targetPanX, targetPanY);
-    };
     const syncZoomScale = () => {
         const transform = getTransform();
         const labelScale = Math.min(LABEL_SCALE_MAX, Math.max(LABEL_SCALE_MIN, 1 / Math.pow(transform.scale, 1.5)));
@@ -298,7 +300,6 @@ const initMap = async () => {
     mapStage.addEventListener("panzoomzoom", syncAndClamp);
     mapStage.addEventListener("panzoomend", syncAndClamp);
     const clampScale = (scale) => Math.min(MAP_SCALE_MAX, Math.max(MAP_SCALE_MIN, scale));
-    const BUTTON_ZOOM_STEP = 0.5;
     const zoomToScale = (targetScale) => {
         const viewportRect = mapViewport.getBoundingClientRect();
         const centerX = viewportRect.width / 2;
@@ -347,6 +348,9 @@ const initMap = async () => {
         }
         event.preventDefault();
     }, { passive: false });
+    mapViewport.addEventListener("touchend", () => {
+        syncZoomScale();
+    }, { passive: true });
     const zoomToMarker = (point) => {
         const applyZoomAndPan = () => {
             const marker = markerById.get(point.id) || null;
@@ -358,7 +362,6 @@ const initMap = async () => {
             const targetZoom = Math.max(currentTransform.scale, MAP_ZOOM_TARGET);
             // Get the marker's current screen position (relative to viewport)
             const markerRect = marker.getBoundingClientRect();
-            console.log(markerRect);
             const markerCenterX = markerRect.left + markerRect.width / 2;
             const markerCenterY = markerRect.top + markerRect.height / 2;
             // Calculate viewport center
@@ -371,6 +374,7 @@ const initMap = async () => {
             const newPanX = currentTransform.x + panDeltaX;
             const newPanY = currentTransform.y + panDeltaY;
             panzoomInstance.moveTo?.(newPanX, newPanY);
+            syncZoomScale(); // Update after pan
             const factor = targetZoom / currentTransform.scale;
             if (panzoomInstance.smoothZoom && Math.abs(factor - 1) >= 0.001) {
                 requestAnimationFrame(() => {
@@ -379,9 +383,22 @@ const initMap = async () => {
                     const updatedCenterY = (updatedRect.top - viewportRect.top) + updatedRect.height / 2;
                     if (panzoomInstance.smoothZoom) {
                         panzoomInstance.smoothZoom(updatedCenterX, updatedCenterY, factor);
+                        // Poll for zoom completion
+                        const checkZoomComplete = () => {
+                            const currentScale = getTransform().scale;
+                            if (Math.abs(currentScale - targetZoom) < 0.1) {
+                                syncZoomScale();
+                            }
+                            else {
+                                requestAnimationFrame(checkZoomComplete);
+                            }
+                        };
+                        requestAnimationFrame(checkZoomComplete);
                     }
-                    syncZoomScale();
                 });
+            }
+            else {
+                syncZoomScale();
             }
         };
         requestAnimationFrame(applyZoomAndPan);
@@ -445,24 +462,40 @@ const initMap = async () => {
         });
     };
     const filterPoints = (query) => {
-        const search = query.trim().toLowerCase();
+        const search = normalizeSearchText(query);
         if (!search) {
             renderSearchResults([]);
             return;
         }
-        const results = points.filter((point) => {
-            const haystack = [
+        const scored = points
+            .map((point) => {
+            const normalizedName = normalizeSearchText(point.name);
+            const haystack = normalizeSearchText([
                 point.name,
                 point.subtitle || "",
                 point.description || "",
                 point.region || "",
                 point.subRegion || "",
-            ]
-                .join(" ")
-                .toLowerCase();
-            return haystack.includes(search);
-        });
-        renderSearchResults(results.slice(0, 8));
+            ].join(" "));
+            if (!haystack.includes(search)) {
+                return { point, score: -1 };
+            }
+            // Score based on where the match occurs
+            let score = 0;
+            if (normalizedName === search)
+                score = 1000; // Exact name match
+            else if (normalizedName.startsWith(search))
+                score = 500; // Name starts with search
+            else if (normalizedName.includes(search))
+                score = 300; // Contains in name
+            else
+                score = 100; // Found in other fields
+            return { point, score };
+        })
+            .filter((item) => item.score !== -1)
+            .sort((a, b) => b.score - a.score)
+            .map((item) => item.point);
+        renderSearchResults(scored.slice(0, 8));
     };
     if (searchInput) {
         searchInput.addEventListener("input", () => filterPoints(searchInput.value));
@@ -471,12 +504,43 @@ const initMap = async () => {
                 return;
             }
             event.preventDefault();
-            const match = points.find((point) => point.name.toLowerCase() === searchInput.value.trim().toLowerCase());
-            if (match) {
-                const marker = markerById.get(match.id) || null;
-                openModalForPoint(match, marker);
+            const search = normalizeSearchText(searchInput.value);
+            if (!search) {
+                return;
+            }
+            const scored = points
+                .map((point) => {
+                const normalizedName = normalizeSearchText(point.name);
+                const haystack = normalizeSearchText([
+                    point.name,
+                    point.subtitle || "",
+                    point.description || "",
+                    point.region || "",
+                    point.subRegion || "",
+                ].join(" "));
+                if (!haystack.includes(search)) {
+                    return { point, score: -1 };
+                }
+                let score = 0;
+                if (normalizedName === search)
+                    score = 1000;
+                else if (normalizedName.startsWith(search))
+                    score = 500;
+                else if (normalizedName.includes(search))
+                    score = 300;
+                else
+                    score = 100;
+                return { point, score };
+            })
+                .filter((item) => item.score !== -1)
+                .sort((a, b) => b.score - a.score)
+                .map((item) => item.point);
+            if (scored.length > 0) {
+                const match = scored[0];
+                zoomToMarker(match);
                 renderSearchResults([]);
                 setSearchOpen(false);
+                searchInput.value = "";
             }
         });
     }

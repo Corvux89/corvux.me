@@ -762,8 +762,14 @@ const initMap = async () => {
     // Handle hash changes (browser back/forward)
     window.addEventListener("hashchange", handleHash);
     
-    // Check hash immediately after data is loaded
-    handleHash();
+    // Wait for map image to load before checking hash
+    if (mapImage.complete) {
+        // Image already loaded
+        handleHash();
+    } else {
+        // Wait for image to load
+        mapImage.addEventListener("load", handleHash, { once: true });
+    }
 };
 
 void initMap();

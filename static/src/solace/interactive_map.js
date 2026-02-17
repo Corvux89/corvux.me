@@ -81,8 +81,13 @@ const setSearchOpen = (open) => {
 };
 const initMap = async () => {
     let data = { points: [] };
+    // Get POI JSON URL from data attribute
+    const poisUrl = mapViewport.getAttribute("data-pois-url");
+    if (!poisUrl) {
+        throw new Error("No POI file specified");
+    }
     try {
-        const response = await fetch("/static/json/solace_old_world_pois.json", { cache: "no-store" });
+        const response = await fetch(poisUrl, { cache: "no-store" });
         if (!response.ok) {
             throw new Error(`Failed to load POIs (${response.status}).`);
         }
@@ -575,7 +580,7 @@ const initMap = async () => {
             setSearchOpen(true);
         }
     });
-    const enableCoordinatePicker = true;
+    const enableCoordinatePicker = mapViewport.getAttribute("data-coordinate-picker") === "true";
     if (enableCoordinatePicker) {
         mapViewport.addEventListener("click", (event) => {
             const target = event.target;

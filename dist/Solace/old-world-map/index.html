@@ -133,7 +133,9 @@
                 </div>
             </div>
 
-            <div class="solace-map-viewport" id="solace-map-viewport">
+            <div class="solace-map-viewport" id="solace-map-viewport" 
+                 data-pois-url="/static/json/solace_old_world_pois.json"
+                 data-coordinate-picker="false">
                 <div class="solace-map-stage" id="solace-map-stage">
                     <img id="solace-map-image" class="solace-map-image" src="#"
                          alt="Solace old world map">
@@ -159,7 +161,7 @@
     </div>
 </div>
 <script src="https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js"></script>
-<script src="/static/src/solace/old_world_map.js" type="module"></script>
+<script src="/static/src/solace/interactive_map.js" type="module"></script>
 
     </div>
 

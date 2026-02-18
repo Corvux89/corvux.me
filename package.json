@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "debug:serve": "npx serve dist",
     "heroku-postbuild": "npm run build",
+    "debug:local": "npx tsc && npm run build && npx serve dist",
+    "watch:site": "node scripts/build.mjs --watch",
+    "watch:ts": "npx tsc --watch --preserveWatchOutput",
     "start": "http-server dist -p $PORT"
   },
   "dependencies": {
@@ -23,6 +27,7 @@
     "@types/datatables.net": "^1.12.3",
     "@types/jquery": "^3.5.32",
     "@types/node": "^24.9.1",
+    "chokidar": "^3.6.0",
     "datatables.net-responsive": "^3.0.4",
     "mathjs": "^14.4.0",
     "ts-node": "^10.9.2",

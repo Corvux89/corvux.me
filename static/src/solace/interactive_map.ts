@@ -404,7 +404,7 @@ const initMap = async () => {
 
     const syncZoomScale = () => {
         const transform = getTransform();
-        const labelScale = Math.min(LABEL_SCALE_MAX, Math.max(LABEL_SCALE_MIN, 1 / Math.pow(transform.scale, 1.5)));
+        const labelScale = Math.min(LABEL_SCALE_MAX, Math.max(LABEL_SCALE_MIN, 1 / Math.pow(transform.scale, 1.1)));
         mapViewport.style.setProperty("--map-zoom", transform.scale.toString());
         mapViewport.style.setProperty("--map-zoom-inv", (1 / transform.scale).toString());
         mapViewport.style.setProperty("--label-scale", labelScale.toString());
@@ -423,6 +423,17 @@ const initMap = async () => {
     mapStage.addEventListener("panzoomend", syncAndClamp as EventListener);
 
     const clampScale = (scale: number) => Math.min(MAP_SCALE_MAX, Math.max(MAP_SCALE_MIN, scale));
+
+    const centerAtScale = (targetScale: number) => {
+        const viewportRect = mapViewport.getBoundingClientRect();
+        const baseWidth = mapImage.clientWidth || mapStage.clientWidth || viewportRect.width;
+        const baseHeight = mapImage.clientHeight || mapStage.clientHeight || viewportRect.height;
+        const targetPanX = viewportRect.width / 2 - (baseWidth * targetScale) / 2;
+        const targetPanY = viewportRect.height / 2 - (baseHeight * targetScale) / 2;
+
+        panzoomInstance.moveTo?.(targetPanX, targetPanY);
+        syncZoomScale();
+    };
 
     const zoomToScale = (targetScale: number) => {
         const viewportRect = mapViewport.getBoundingClientRect();
@@ -560,23 +571,24 @@ const initMap = async () => {
             }
 
             if (action === "reset") {
-                // Directly set pan and zoom to reset state
-                const viewportRect = mapViewport.getBoundingClientRect();
-                const baseWidth = mapStage.clientWidth || mapImage.clientWidth || viewportRect.width;
-                const baseHeight = mapStage.clientHeight || mapImage.clientHeight || viewportRect.height;
-                
-                const targetPanX = viewportRect.width / 2 - (baseWidth * MAP_SCALE_MIN) / 2;
-                const targetPanY = viewportRect.height / 2 - (baseHeight * MAP_SCALE_MIN) / 2;
-                
-                panzoomInstance.moveTo?.(targetPanX, targetPanY);
-                
+                // Reset zoom first, then center using the target scale
                 const currentScale = getTransform().scale;
                 const factor = MAP_SCALE_MIN / currentScale;
                 if (panzoomInstance.smoothZoom && Math.abs(factor - 1) >= 0.001) {
+                    const viewportRect = mapViewport.getBoundingClientRect();
                     panzoomInstance.smoothZoom(viewportRect.width / 2, viewportRect.height / 2, factor);
+                    const waitForReset = () => {
+                        const scale = getTransform().scale;
+                        if (Math.abs(scale - MAP_SCALE_MIN) < 0.01) {
+                            centerAtScale(MAP_SCALE_MIN);
+                            return;
+                        }
+                        requestAnimationFrame(waitForReset);
+                    };
+                    requestAnimationFrame(waitForReset);
+                } else {
+                    centerAtScale(MAP_SCALE_MIN);
                 }
-                
-                syncZoomScale();
             }
         });
     });
@@ -766,16 +778,24 @@ const initMap = async () => {
         }
     };
 
+    const applyInitialMapPosition = () => {
+        const hash = window.location.hash.slice(1);
+        if (!hash) {
+            centerAtScale(MAP_SCALE_MIN);
+            return;
+        }
+
+        handleHash();
+    };
+
     // Handle hash changes (browser back/forward)
     window.addEventListener("hashchange", handleHash);
-    
-    // Wait for map image to load before checking hash
+
+    // Wait for map image to load before applying initial position
     if (mapImage.complete) {
-        // Image already loaded
-        handleHash();
+        requestAnimationFrame(applyInitialMapPosition);
     } else {
-        // Wait for image to load
-        mapImage.addEventListener("load", handleHash, { once: true });
+        mapImage.addEventListener("load", applyInitialMapPosition, { once: true });
     }
 };
 

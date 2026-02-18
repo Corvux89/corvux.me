@@ -12,6 +12,16 @@ export default tseslint.config(
       "no-empty-pattern": "off"
     }
   },
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly'
+      }
+    }
+  },
   globalIgnores([
     '**/*.js', // Ignore JavaScript files
   ])

@@ -6,6 +6,7 @@
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "types": ["jquery"],
     "module": "NodeNext",
     "lib": ["DOM", "ESNext"]
   },

@@ -319,8 +319,8 @@
         {
             "id": "mosshollow",
             "name": "Mosshollow",
-            "description": "",
-            "region": "",
+            "description": "The hush of the woods deepens as Huatlaar, leader of Mosshollow, emerges from what at first seemed only a tangle of roots and moss at the base of a tree four men could not join hands around. Young but carrying the posture of someone forced too-early into responsibility, the Shifter woman brushes dirt from her hands and regards you with bright, inquisitive eyes. Around her, the village steadily reveals itself- rounded homes built into the roots of ancient trees, smoke drifting quietly through cleverly hidden vents, and narrow trails winding so naturally into the landscape they vanish when not focused on. The scent of fresh timber, worked leather, and damp earth lingers warmly beneath the canopy.\n\nNearby streams snake through clay-rich banks where villagers quietly shape vessels beneath shaded awnings, while copper and tin tools glint softly in filtered sunlight. The place feels less built than gently borrowed from the forest itself, every aspect of the land honored rather than conquered. Huatlaar offers a small nod, solemn despite her youth.\n\n<i>\"You found us, then, despite the pirates. Perhaps the land means to join our fates... be welcome in Mosshollow.\"</i>",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "40.57",
             "y": "35.86"
@@ -328,8 +328,8 @@
         {
             "id": "florston",
             "name": "Florston",
-            "description": "",
-            "region": "",
+            "description": "Florston, is little more than a ramshackle assortment of sheds and shacks, mostly constructed from the ruined carcasses of ships. It is slowly expanding, especially with the fresh set of hands from the most recent Expedition.",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "40.37",
             "y": "39.53"
@@ -337,8 +337,8 @@
         {
             "id": "mirador-cay",
             "name": "Mirador Cay",
-            "description": "",
-            "region": "",
+            "description": "Laughter and distant music spill through the hidden cove as one voice among the pirate council of Mirador Cay, approaches beneath lanternlight strung between ship masts and weathered balconies. He stands short, a dapper Dwarven pirate captain, immaculate despite the chaos flitting past- coat trimmed in salt-stained finery, beard clasped in polished silver rings, and hat angled with dramatic affect. The cove itself seems impossible, concealed behind towering rock walls where ships from every coast crowd together in uneasy harmony. Sailors, rogues, merchants, and mercenaries barter loudly in a sprawling bazaar of mismatched tents overflowing with crystal curiosities, parchment maps, exotic reagents, and contraband whose origins are politely left unquestioned.\n\nNo one here seems entirely trustworthy- and yet, drawing steel seems to be the thing everyone is least interested in. Pirates drink beside traders, masked smugglers haggle over rare inks, and stories pass as freely as coin. Somewhere overhead, lanterns sway against the sea breeze while music competes with drunken shouting from dockside taverns. Squint Sootsleeves spreads his arms wide with an unmistakable charisma.\n\n<i>\"Mirador Cay asks few questions and offers many opportunities, friend. Come, come. Spend your coin, spin me a tale. I'm sure you'll fit in fine.\"</i>",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "44.49",
             "y": "35.88"
@@ -346,8 +346,8 @@
         {
             "id": "pachasil",
             "name": "Pachasil",
-            "description": "",
-            "region": "",
+            "description": "Wind stirs softly through terraces of herbs and vegetables as Sarvilayanarrel, elder of Pachasil, waits already facing your direction despite clouded eyes that have long since surrendered his sight. The clearly-ancient Elf moseys among flowering rows with quiet certainty, a self-satisfied smile resting permanently atop his upper lip, one hand resting upon a carved staff polished smooth through decades of use. Around him, the settlement rises in gentle harmony with the hills- modest homes shaded beneath old trees, small limestone paths worn smooth by bare feet, and workshops where woodworkers shape rare timber into objects of patient craftsmanship. A bell chimes faintly in the distance, carried lazily upon mountain air.\n\nThe people here move with a strange stillness, neither hurried nor fearful, tending small farms and gathering herbs as though time's grip stretches thin here. Quiet shrines rest beside streams, tended by refugees who speak softly of peace and distances placed between themselves and dragons they no longer wish to know. Though blind, the elder seems to see you clearly enough, inclining his head with gentle grace.\n\n<i>\"The ocean is the longest road of all, and no traveler arrives unchanged. Rest awhile, if you wish. Pachasil shares little haste with the world beyond.\"</i>",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "44.60",
             "y": "41.93"
@@ -355,8 +355,8 @@
         {
             "id": "tepetl-kai",
             "name": "Tepetl Kai",
-            "description": "",
-            "region": "",
+            "description": "Salt spray rises in cool mist against the cliffside as Sahar, Moon's Fair Daughter, leader of Tepetl-Kai, descends from a narrow stone staircase carved into the rock face. Fine scales shimmer beneath woven shell ornaments, while broad, silken moth wings shift behind them in muted colors reminiscent of moonlit stone. Frilled antennae flick with patient attention, tasting the wind and the mood of your arrival alike. Beyond them, the village clings stubbornly to the cliff itself- homes carved into cavern walls, bridges suspended over perilous drops, and narrow platforms crowded with fisherfolk hauling strange mollusks from nets still dripping with seawater. Here and there, yellow reptilian eyes peer from shaded alcoves while squat Stonekin laborers vanish into smoke-veiled tunnels carrying iron and coal from the depths below.\n\nTowards the ocean far below, impossible figures leap from jagged heights into the surf with practiced confidence, vanishing into near-black water in pursuit of shellfish and seaweed from hidden reefs. Strange fungi dry in woven racks beneath cliff overhangs while tidal caves at the base of the cliff pulse faintly with lanternlight. Sahar inclines their head with deliberate warmth, antennae twitching once.\n\n<i>\"Tepetl-Kai welcomes you, travelers. Mind your footing- the cliffs are less forgiving than we are.\"</i>",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "37.87",
             "y": "39.26"
@@ -364,8 +364,8 @@
         {
             "id": "suyupacha",
             "name": "Suyupacha",
-            "description": "",
-            "region": "",
+            "description": "Golden light spills through impossibly vast branches overhead as Ba'chat, leader of Suyupacha, descends stepped terraces carved into the mountainside itself. The Tabaxi woman moves with feline confidence, adorned in woven silks, bright feathers, and charms that clatter softly against tawny fur. Far above and below stretch immense fields tiered into the cliffs like offerings to the heavens- sugarcane swaying beside medicinal gardens beneath the shelter of a colossal canopy older than memory. Drums echo somewhere unseen while incense mixes with the scent of growing things, curling towards your senses through warm tropical air.\nAnd among the fields, the dead labor. Silent figures carry harvest baskets and till night-black soil with impossible patience, their movements unnervingly precise beneath garlands of flowers carefully placed by living hands. No one seems alarmed. Farmers greet them kindly, children run laughing between rows, and shamans paint blessings onto weathered bone as casually as one might arrange a houseplant. The uncanny settles strangely against the beauty of the place. Ba'chat offers a easy purr of welcome, tail flicking once behind her.\n\n<i>\"Do not mind the workers, traveler. They earned their rest already. Until then, Suyupacha feeds many mouths. You may count yourselves among them.\"</i>",
+            "region": "Shellback Archipelago",
             "subRegion": "",
             "x": "38.67",
             "y": "44.76"

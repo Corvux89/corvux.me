@@ -27,7 +27,7 @@
     "@types/datatables.net": "^1.12.3",
     "@types/jquery": "^4.0.1",
     "@types/node": "^26.6.3",
-    "chokidar": "^3.6.0",
+    "chokidar": "^5.0.0",
     "datatables.net-responsive": "^4.1.1",
     "mathjs": "^15.2.0",
     "ts-node": "^10.9.2",

@@ -117,6 +117,12 @@ async function buildSite({ clean = true, copyStatic = true } = {}) {
     {}
   );
 
+  await renderToFile(
+    path.join(distDir, "Solace", "world-map", "index.html"),
+    "solace/za warudo.html",
+    {}
+  );
+
   await renderToFile(path.join(distDir, "404.html"), "404.html", {});
   await renderToFile(path.join(distDir, "error.html"), "error.html", {});
 
@@ -124,6 +130,7 @@ async function buildSite({ clean = true, copyStatic = true } = {}) {
     { loc: `${siteUrl}/` },
     { loc: `${siteUrl}/Avrae_Combat_Planner/` },
     { loc: `${siteUrl}/Solace/old-world-map/` },
+    { loc: `${siteUrl}/Solace/world-map/` },
   ];
 
   await renderToFile(path.join(distDir, "sitemap.xml"), "sitemap.xml", {

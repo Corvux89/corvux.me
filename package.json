@@ -15,7 +15,7 @@
   "dependencies": {
     "@eslint/js": "^10.0.1",
     "bootstrap": "^5.3.8",
-    "eslint": "^10.11.0",
+    "eslint": "^10.12.0",
     "http-server": "^14.1.1",
     "marked": "^18.0.14",
     "nunjucks": "^3.2.4",

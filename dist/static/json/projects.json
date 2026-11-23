@@ -6,13 +6,6 @@
     "github": "https://github.com/Corvux89/corvux.me",
     "tags": ["js", "html"]
   },
-   {
-    "name": "Steward",
-    "image": "images/Steward.png",
-    "desc": "Discord bot to help with play-by-post (pbp) game server moderation and automation. Uses rules and expressions to give more control to admins",
-    "github": "https://github.com/Corvux89/Steward",
-    "tags": ["py"]
-  },
   {
     "name": "Avrae Combat Planner",
     "image": "images/AvraeLogo.svg",

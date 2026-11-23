@@ -100,43 +100,36 @@ async function buildSite({ clean = true, copyStatic = true } = {}) {
     image: normalizeImagePath(project.image),
   }));
 
-  await renderToFile(path.join(distDir, "index.html"), "main.html", {
-    aboutme: aboutmeHtml,
-    projects,
-  });
+const pages = [
+  {
+    output: ["index.html"],
+    url: "/",
+    template: "main.html",
+    context: { aboutme: aboutmeHtml, projects },
+  },
+  {
+    output: ["Avrae_Combat_Planner", "index.html"],
+    url: "/Avrae_Combat_Planner/",
+    template: "combat_planner/combat_planner.html",
+    context: { howto: howtoHtml },
+  },
+];
 
+for (const page of pages) {
   await renderToFile(
-    path.join(distDir, "Avrae_Combat_Planner", "index.html"),
-    "combat_planner/combat_planner.html",
-    { howto: howtoHtml }
+    path.join(distDir, ...page.output),
+    page.template,
+    page.context
   );
-
-  await renderToFile(
-    path.join(distDir, "Solace", "old-world-map", "index.html"),
-    "solace/old_world_map.html",
-    {}
-  );
-
-  await renderToFile(
-    path.join(distDir, "Solace", "world-map", "index.html"),
-    "solace/za warudo.html",
-    {}
-  );
+}
 
   await renderToFile(path.join(distDir, "404.html"), "404.html", {});
   await renderToFile(path.join(distDir, "error.html"), "error.html", {});
 
-  const staticUrls = [
-    { loc: `${siteUrl}/` },
-    { loc: `${siteUrl}/Avrae_Combat_Planner/` },
-    { loc: `${siteUrl}/Solace/old-world-map/` },
-    { loc: `${siteUrl}/Solace/world-map/` },
-  ];
-
   await renderToFile(path.join(distDir, "sitemap.xml"), "sitemap.xml", {
-    static_urls: staticUrls,
-    dynamic_urls: [],
-  });
+  static_urls: pages.map((page) => ({ loc: `${siteUrl}${page.url}` })),
+  dynamic_urls: [],
+});
 
   if (copyStatic) {
     await fs.cp(staticDir, path.join(distDir, "static"), {

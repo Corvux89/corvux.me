@@ -277,7 +277,10 @@ export class Overlay {
         };
     }
     get validOverlay() {
-        return this.type ? this.requiredNodes[this.type].every(v => v !== "") : false;
+        if (!this.type) {
+            return false;
+        }
+        return this.requiredNodes[this.type].every(v => v !== "") ?? false;
     }
     static load(overlay) {
         return new Overlay(overlay.type, overlay.target, overlay.radius, overlay.center, overlay.size, overlay.start, overlay.end, overlay.length, overlay.width, overlay.topleft, overlay.color);
@@ -302,11 +305,10 @@ export class BattleMap {
         this.darkMode = darkMode;
     }
     save() {
-        console.log(this);
         localStorage.setItem(battlemapNode, JSON.stringify(this));
     }
     static load() {
-        const mapData = JSON.parse(localStorage.getItem(battlemapNode));
+        const mapData = JSON.parse(localStorage.getItem(battlemapNode) || "{}");
         const battlemap = new BattleMap();
         if (mapData) {
             battlemap.url = mapData.url !== undefined ? mapData.url : this.prototype.url;
@@ -334,10 +336,9 @@ export class BattleMap {
     }
     command(settings, mapOnly = false) {
         const commands = [];
-        let str = "";
         if (!this.url && !this.size)
             return commands;
-        str = `${settings.prefix}`;
+        let str = `${settings.prefix}`;
         if (settings.notes && !mapOnly) {
             str += `i effect ${settings.attach} map -attack "||Size: ${this.size || '10x10'}`;
             if (this.url)
@@ -403,5 +404,12 @@ export class SavedPlan {
             delete plans[name];
             localStorage.setItem(saveNode, JSON.stringify(plans));
         }
+    }
+}
+export class PackageData {
+    constructor(monsters, battlemap, name) {
+        this.monsters = monsters;
+        this.battlemap = battlemap;
+        this.name = name;
     }
 }

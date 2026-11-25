@@ -32,10 +32,6 @@ const Colors: {[key: string]: string} = {
 
 export const OverlayMap: {[key: string]: string} = {"Circle": "c", "Cone": "t", "Line": "l", "Square": "s"}
 
-export interface draggableElement extends JQuery {
-    draggable({})
-}
-
 export class Monster{
     constructor(
         public index: number = 0,
@@ -59,7 +55,7 @@ export class Monster{
         return split.length == 1 ? this.name.slice(0,2).toUpperCase() : split.filter(word => word).map(word => word[0]).join("").toUpperCase()
     }
 
-    combatID(number): string{
+    combatID(number: string|number): string{
         return this.prefix().includes("#") ? this.prefix().replace("#", `${number}`) : this.quantity > 1 ? `${this.prefix()}${number}` : this.prefix()
     }
 
@@ -120,7 +116,7 @@ export class Monster{
         return monsterRow
     }
 
-    maddRow(): JQuery<HTMLElement>{
+    maddRow(): JQuery<HTMLElement>|undefined{
         if (this.name == ""){
             return 
         }
@@ -187,7 +183,7 @@ export class Monster{
 
     static load(): Monster[] {
         const monsterData = JSON.parse(localStorage.getItem(monsterNode) || "[]")
-        const monsters = monsterData.map((data, index) => new Monster(
+        const monsters = monsterData.map((data: Monster, index: number) => new Monster(
             index,
             data.name,
             data.label,
@@ -223,7 +219,7 @@ export class Monster{
 
     static mapCommand(settings: Settings): string {
         const monsters = Monster.load()
-        const coords = []
+        const coords: string[] = []
 
         monsters.forEach(monster => {
             if (monster.name == "" || monster.quantity == 0){
@@ -342,7 +338,7 @@ export class Overlay {
         public color: string = ""
     ) { }
 
-    get requiredNodes(){
+    get requiredNodes(): Record<string, string[]>{
         return {
             "Circle": [this.radius, this.color, this.center],
             "Cone": [this.size, this.color, this.start, this.end],
@@ -352,10 +348,14 @@ export class Overlay {
     }
 
     get validOverlay(): boolean{
-       return this.type ? this.requiredNodes[this.type].every(v => v !== "") : false
+        if (!this.type) {
+            return false
+        }
+
+       return this.requiredNodes[this.type].every(v => v !== "") ?? false
     }
 
-    static load(overlay): Overlay {
+    static load(overlay: Overlay): Overlay {
         return new Overlay(
             overlay.type,
             overlay.target,
@@ -392,12 +392,11 @@ export class BattleMap {
     ) {}
 
     save(): void{
-        console.log(this)
         localStorage.setItem(battlemapNode, JSON.stringify(this))
     }
 
     static load(): BattleMap{
-        const mapData = JSON.parse(localStorage.getItem(battlemapNode))
+        const mapData = JSON.parse(localStorage.getItem(battlemapNode) || "{}")
         const battlemap = new BattleMap()
         if (mapData){
             battlemap.url = mapData.url !== undefined ? mapData.url : this.prototype.url
@@ -428,11 +427,10 @@ export class BattleMap {
 
     command(settings: Settings, mapOnly: boolean = false): string[]{
         const commands: string[] = []
-        let str = ""
 
         if (!this.url && !this.size) return commands
 
-        str = `${settings.prefix}`
+        let str = `${settings.prefix}`
 
         if (settings.notes && !mapOnly){
             str += `i effect ${settings.attach} map -attack "||Size: ${this.size || '10x10'}`
@@ -472,7 +470,7 @@ export class SavedPlan {
 
     static load(): {[key: string]: SavedPlan} {
         const data: { [name: string]: SavedPlan} = JSON.parse(localStorage.getItem(saveNode) || "{}")
-        const builds = {}
+        const builds: {[name: string]: SavedPlan} = {}
 
         for (const name in data){
             const build = data[name]
@@ -503,4 +501,12 @@ export class SavedPlan {
             localStorage.setItem(saveNode, JSON.stringify(plans))
         }
     }
+}
+
+export class PackageData{
+    constructor(
+        public monsters: Monster[],
+        public battlemap: BattleMap,
+        public name?: string
+    ) {}
 }

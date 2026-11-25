@@ -45,6 +45,23 @@ export function inputSelect(id, name, label, value, options) {
         .append(select, selectLabel);
     return div;
 }
+export function updateProperty(obj, key, value) {
+    obj[key] = value;
+    return obj;
+}
+export function getInputValue(E) {
+    if (E.is(":checkbox, :radio")) {
+        return E.is(":checked");
+    }
+    const value = E.is("input") ? E.val() : E.find(":selected").val();
+    if (value == undefined) {
+        return undefined;
+    }
+    if (E.attr("type") == "number") {
+        return Number(value);
+    }
+    return value.toString();
+}
 export function buildMonsterInventory() {
     const monsters = Monster.load();
     $("#monster-inventory").empty();
@@ -56,7 +73,10 @@ export function buildMaddTable() {
     const monsters = Monster.load();
     $("#madd-table").empty();
     monsters.forEach(monster => {
-        $("#madd-table").append(monster.maddRow());
+        const row = monster.maddRow();
+        if (row !== undefined) {
+            $("#madd-table").append(row);
+        }
     });
 }
 export function buildOverlayModal() {
@@ -242,7 +262,7 @@ function encodeBuild(name = "") {
         "battlemap": battlemap
     };
     if (name)
-        data["name"] = name;
+        data.name = name;
     return encodeURIComponent(JSON.stringify(data));
 }
 export function exportBuild() {
@@ -264,7 +284,9 @@ export function savePlan() {
         return;
     }
     if ($("#plan-name").val() != "") {
-        const plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()));
+        const name = $("#plan-name").val()?.toString();
+        const data = encodeBuild(name);
+        const plan = new SavedPlan(name, data);
         plan.save();
         buildSavedPlanList();
         $("#saveModal").modal("hide");

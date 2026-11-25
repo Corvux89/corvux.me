@@ -1,12 +1,18 @@
 import { BattleMap, Monster, Overlay, SavedPlan, Settings } from "./types.js";
-import { buildMaddTable, buildMapPreview, buildMonsterInventory, buildOverlayModal, buildMainCommandHeader, getTokenShortcode, isValidHttpURL, buildMaddHeader, buildMapHeader, buildOverlayHeader, copyString, exportBuild, savePlan, buildSavedPlanList } from "./utils.js";
+import { buildMaddTable, buildMapPreview, buildMonsterInventory, buildOverlayModal, buildMainCommandHeader, getTokenShortcode, isValidHttpURL, buildMaddHeader, buildMapHeader, buildOverlayHeader, copyString, exportBuild, savePlan, buildSavedPlanList, updateProperty, getInputValue } from "./utils.js";
 $("#monster-inventory").on("change", function (e) {
     const target = $(e.target);
+    const nameAttr = target.attr("name");
     const monsters = Monster.load();
     const index = target.parents(".monster").data("id");
-    const monster = monsters[index];
-    monster[target.attr("name")] = target.is("input") ? target.val() : target.find(":selected").val();
-    monster.save();
+    let monster = monsters[index];
+    if (nameAttr !== undefined) {
+        const value = getInputValue(target);
+        if (value !== undefined) {
+            monster = updateProperty(monster, nameAttr, value);
+            monster.save();
+        }
+    }
     buildMaddTable();
     buildMaddHeader();
     buildMapPreview();
@@ -97,8 +103,13 @@ $("#madd-table").on("change", function (e) {
     const index = target.parents(".monPos").data("id");
     const monster = monsters[index];
     const mon = target.parents(".monPos").data("mon");
-    monster.coords[mon] = target.val().toString();
-    monster.save();
+    if (target !== undefined && target.val() !== undefined) {
+        const value = target.val();
+        if (value !== undefined) {
+            monster.coords[mon] = value.toString();
+            monster.save();
+        }
+    }
     buildMaddHeader();
     buildMapPreview();
 });
@@ -117,10 +128,16 @@ $(document).on("click", ".madd-clear", function (e) {
 $("#overlay-setup").on("change", function (e) {
     const battlemap = BattleMap.load();
     const target = $(e.target);
-    battlemap.overlay[target.attr('name')] = target.is("input") ? target.val() : target.find(":selected").val();
-    battlemap.save();
-    if (target.attr("name") == "type")
-        buildOverlayModal();
+    const nameAttr = target.attr("name");
+    if (nameAttr !== undefined) {
+        const value = getInputValue(target);
+        if (value !== undefined) {
+            battlemap.overlay = updateProperty(battlemap.overlay, nameAttr, value);
+            battlemap.save();
+        }
+        if (nameAttr == "type")
+            buildOverlayModal();
+    }
     buildMapPreview();
     buildOverlayHeader();
 });
@@ -135,11 +152,15 @@ $("#reset-overlay").on("click", function () {
     buildMapPreview();
 });
 $(".settings").on("change", function (e) {
-    const settings = Settings.load();
+    let settings = Settings.load();
     const target = $(e.target);
+    const nameAttr = target.attr("name");
     let errorButton = $('.error-button');
-    settings[target.attr("name")] = target.prop('type') == 'text' ? target.val() : target.prop("checked");
-    settings.save();
+    if (nameAttr !== undefined) {
+        const value = getInputValue(target);
+        settings = updateProperty(settings, nameAttr, value);
+        settings.save();
+    }
     if (settings.conflict == true) {
         if (errorButton.length > 0) {
             return;
@@ -169,8 +190,12 @@ $(".settings").on("change", function (e) {
 });
 $("#map-setup").on("change", function (e) {
     const target = $(e.target);
-    battlemap[target.attr("name")] = target.prop('type') == 'text' || target.prop('type') == 'number' ? target.val() : target.prop("checked");
-    battlemap.save();
+    const nameAttr = target.attr("name");
+    const value = getInputValue(target);
+    if (nameAttr !== undefined) {
+        battlemap = updateProperty(battlemap, nameAttr, value);
+        battlemap.save();
+    }
     buildMapHeader();
     buildMapPreview();
 });
@@ -197,7 +222,13 @@ $("#reset-battlemap").on("click", function () {
     $("#map-overlay-type").find(":selected").prop("selected", false);
     $("#map-setup :input").map(function () {
         const target = $(this);
-        target.val(battlemap[target.attr("name")]);
+        const nameAttr = target.attr("name");
+        if (nameAttr !== undefined) {
+            const value = battlemap[nameAttr].toString();
+            if (value !== undefined) {
+                target.val(value);
+            }
+        }
     });
 });
 $("#reset-all").on("click", function () {
@@ -211,8 +242,8 @@ $("#save-plan").on("click", function () {
     savePlan();
 });
 $("#delete-plan").on("click", function () {
-    const planName = $("#plan-name").val().toString();
-    if (planName != "") {
+    const planName = $("#plan-name")?.val()?.toString();
+    if (planName != "" && planName !== undefined) {
         SavedPlan.dump(planName);
         $("#reset-monsters").trigger("click");
         $("#reset-battlemap").trigger("click");
@@ -228,7 +259,7 @@ BattleMap.import();
 SavedPlan.import();
 window.history.replaceState({}, document.title, window.location.pathname);
 const settings = Settings.load();
-const battlemap = BattleMap.load();
+let battlemap = BattleMap.load();
 buildMonsterInventory();
 buildMaddTable();
 buildMaddHeader();
@@ -240,23 +271,31 @@ buildMainCommandHeader();
 // Load Settings
 $(".settings :input").map(function () {
     const x = $(this);
+    const nameAttr = x.attr("name");
+    const value = settings[nameAttr];
     if (x.prop('type') == 'text')
-        x.val(settings[x.attr("name")]);
+        x.val(value.toString());
     else
-        x.prop("checked", settings[x.attr("name")]);
+        x.prop("checked", value == true);
 });
 // Load Overlay
 $("#overlay-setup [id^='map-overlay']").map(function () {
     const target = $(this);
-    target.val(battlemap.overlay[target.attr("name")]);
+    const nameAttr = target.attr("name");
+    if (nameAttr !== undefined) {
+        const value = battlemap.overlay[nameAttr];
+        target.val(value.toString());
+    }
 });
 // Load Map
 $("#map-setup :input").map(function () {
     const target = $(this);
+    const nameAttr = target.attr("name");
+    const value = battlemap[nameAttr];
     if (target.prop('type') == 'text' || target.prop('type') == 'number')
-        target.val(battlemap[target.attr("name")]);
+        target.val(value.toString());
     else
-        target.prop('checked', battlemap[target.attr("name")]);
+        target.prop('checked', value == true);
 });
 $(document).on("DOMContentLoaded", function () {
     buildMapPreview();

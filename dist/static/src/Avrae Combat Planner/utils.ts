@@ -1,6 +1,6 @@
-import { BattleMap, Monster, OverlayMap, planLimit, SavedPlan, Settings } from "./types.js"
+import { BattleMap, Monster, OverlayMap, PackageData, planLimit, SavedPlan, Settings } from "./types.js"
 
-export function inputText(id: string, name: string, label: string, value: string|number, type: string = "text", min: number = null, max: number = null): JQuery<HTMLElement>{
+export function inputText(id: string, name: string, label: string, value: string|number, type: string = "text", min: number|null = null, max: number|null = null): JQuery<HTMLElement>{
     const input = jQuery("<input>")
         .addClass("form-control")
         .attr({
@@ -58,6 +58,28 @@ export function inputSelect(id: string, name: string, label: string, value: stri
     return div
 }
 
+export function updateProperty<T, K extends keyof T>(obj: T, key: K, value: string|string[]|number|boolean|undefined): T {
+    (obj as Record<keyof T, unknown>)[key] = value
+    return obj
+}
+
+export function getInputValue(E: JQuery<HTMLElement>): string|boolean|number|undefined{
+    if (E.is(":checkbox, :radio")){
+        return E.is(":checked")
+    }
+
+    const value = E.is("input") ? E.val() : E.find(":selected").val()
+
+    if (value == undefined){
+        return undefined
+    }
+
+    if (E.attr("type") == "number"){
+        return Number(value)
+    }
+    return value.toString()
+}
+
 export function buildMonsterInventory(): void{
     const monsters = Monster.load()
     $("#monster-inventory").empty()
@@ -72,7 +94,10 @@ export function buildMaddTable(): void {
     $("#madd-table").empty()
 
     monsters.forEach(monster => {
-        $("#madd-table").append(monster.maddRow())
+        const row = monster.maddRow()
+        if (row !== undefined){
+            $("#madd-table").append(row)
+        }
     })
 }
 
@@ -204,7 +229,7 @@ export function isValidHttpURL(string: string): boolean {
     }
 }
 
-export function getTokenShortcode(url): Promise<string>{
+export function getTokenShortcode(url: string): Promise<string|null>{
     return new Promise((resolve, reject) => {
         const base64 = btoa(url)
         const queryURL = `https://token.otfbm.io/meta/${base64}`
@@ -287,12 +312,12 @@ export function copyString(content: string, tooltipString: string, buttonID: str
 function encodeBuild(name: string = ""): string{
     const monsters = Monster.load()
     const battlemap = BattleMap.load()
-    const data = {
+    const data: PackageData = {
         "monsters": monsters,
         "battlemap": battlemap
     }
 
-    if (name) data["name"] = name
+    if (name) data.name = name
 
     return encodeURIComponent(JSON.stringify(data))
 }
@@ -320,7 +345,9 @@ export function savePlan(): void {
     }
 
     if ($("#plan-name").val() != ""){
-        const plan = new SavedPlan($("#plan-name").val().toString(), encodeBuild($("#plan-name").val().toString()))
+        const name = $("#plan-name").val()?.toString()
+        const data = encodeBuild(name)
+        const plan = new SavedPlan(name, data)
         plan.save()
         buildSavedPlanList()
         $("#saveModal").modal("hide")
